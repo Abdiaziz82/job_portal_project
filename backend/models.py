@@ -16,6 +16,9 @@ class User(db.Model):
     def __repr__(self):
         return f'<User {self.first_name} {self.last_name}>'
 
+
+
+
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
@@ -39,5 +42,6 @@ class Job(db.Model):
     number_of_posts = db.Column(db.Integer, nullable=False)
     application_instructions = db.Column(db.Text, nullable=False)  # New field
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+
     def __repr__(self):
         return f'<Job {self.position}>'
