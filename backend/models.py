@@ -16,6 +16,16 @@ class User(db.Model):
     def __repr__(self):
         return f'<User {self.first_name} {self.last_name}>'
 
+class PersonalDetails(db.Model):
+    __tablename__ = 'personal_details'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Link to users table
+    date_of_birth = db.Column(db.Date, nullable=True)
+    gender = db.Column(db.String(10), nullable=True)
+    nationality = db.Column(db.String(50), nullable=True)
+    address = db.Column(db.String(200), nullable=True)
+
+    user = db.relationship('User', backref=db.backref('personal_details', lazy=True))
 
 
 
