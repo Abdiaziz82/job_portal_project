@@ -11,6 +11,7 @@ class Config:
         'SQLALCHEMY_DATABASE_URI', 
         'mysql+pymysql://flask_user:password@localhost/university_jobs'
     )
+    
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # JWT and Security

@@ -20,14 +20,23 @@ class PersonalDetails(db.Model):
     __tablename__ = 'personal_details'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Link to users table
+    full_names = db.Column(db.String(200), nullable=False)
+    title = db.Column(db.String(50), nullable=True)
     date_of_birth = db.Column(db.Date, nullable=True)
+    id_number = db.Column(db.String(20), nullable=True)
     gender = db.Column(db.String(10), nullable=True)
     nationality = db.Column(db.String(50), nullable=True)
-    address = db.Column(db.String(200), nullable=True)
+    home_county = db.Column(db.String(50), nullable=True)
+    constituency = db.Column(db.String(50), nullable=True)
+    postal_address = db.Column(db.String(100), nullable=True)
+    mobile_number = db.Column(db.String(20), nullable=True)
+    email_address = db.Column(db.String(100), nullable=False)
 
+    # Relationship to access user details
     user = db.relationship('User', backref=db.backref('personal_details', lazy=True))
 
-
+    def __repr__(self):
+        return f'<PersonalDetails for User {self.user_id}>'
 
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)

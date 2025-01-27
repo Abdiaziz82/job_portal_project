@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, make_response, current_app
-from models import db, User ,Job
+from models import db, User ,Job , PersonalDetails
 from flask_bcrypt import Bcrypt
 import jwt
 import datetime
@@ -479,3 +479,68 @@ def admin_logout():
     response = make_response(jsonify({"message": "Admin logged out successfully"}))
     response.set_cookie('admin_jwt', '', expires=0, path='/')  # Clear admin JWT cookie
     return response, 200
+
+
+@routes.route('/api/personal-details', methods=['POST'])
+@login_required
+def add_personal_details(current_user):
+    # Parse the JSON payload
+    data = request.get_json()
+    if not data:
+        return jsonify({'error': 'No input data provided'}), 400
+
+    try:
+        # Extract and validate fields from the JSON payload
+        full_names = data.get('full_names')
+        title = data.get('title')
+        date_of_birth = data.get('date_of_birth')
+        id_number = data.get('id_number')
+        gender = data.get('gender')
+        nationality = data.get('nationality')
+        home_county = data.get('home_county')
+        constituency = data.get('constituency')
+        postal_address = data.get('postal_address')
+        mobile_number = data.get('mobile_number')
+        email_address = data.get('email_address')
+
+        # Check required fields
+        if not full_names or not email_address:
+            return jsonify({'error': 'Full Names and Email Address are required'}), 400
+
+        # Convert date_of_birth to a Python date object if provided
+        if date_of_birth:
+            try:
+                date_of_birth = datetime.strptime(date_of_birth, '%Y-%m-%d').date()
+            except ValueError:
+                return jsonify({'error': 'Invalid date format. Use YYYY-MM-DD'}), 400
+
+        # Check if personal details for this user already exist
+        existing_details = PersonalDetails.query.filter_by(user_id=current_user.id).first()
+        if existing_details:
+            return jsonify({'error': 'Personal details for this user already exist'}), 400
+
+        # Create a new PersonalDetails object
+        personal_details = PersonalDetails(
+            user_id=current_user.id,
+            full_names=full_names,
+            title=title,
+            date_of_birth=date_of_birth,
+            id_number=id_number,
+            gender=gender,
+            nationality=nationality,
+            home_county=home_county,
+            constituency=constituency,
+            postal_address=postal_address,
+            mobile_number=mobile_number,
+            email_address=email_address
+        )
+
+        # Add and commit the new record to the database
+        db.session.add(personal_details)
+        db.session.commit()
+
+        return jsonify({'message': 'Personal details added successfully.'}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
