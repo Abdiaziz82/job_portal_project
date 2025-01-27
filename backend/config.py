@@ -14,10 +14,6 @@ class Config:
     
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-    # JWT and Security
-    SECRET_KEY = os.getenv('SECRET_KEY', 'supersecretkey')
-    JWT_EXPIRATION_DELTA = int(os.getenv('JWT_EXPIRATION_DELTA', 7200))  # 2 hours default
-
     # Flask-Mail configuration
     MAIL_SERVER = 'smtp.gmail.com'
     MAIL_PORT = 587
@@ -33,3 +29,7 @@ class Config:
     # Admin Credentials (Securely loaded from environment variables)
     ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'abdiazizhared64@gmail.com')
     ADMIN_PASSWORD = bcrypt.generate_password_hash(os.getenv('ADMIN_PASSWORD', 'admin123')).decode('utf-8')
+
+    # Manually Added JWT and Security Configuration
+    SECRET_KEY = 'supersecretkey'  # Replace with a strong secret key for production
+    JWT_EXPIRATION_DELTA = 7200  # 2 hours in seconds (adjust if needed)

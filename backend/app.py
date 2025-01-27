@@ -5,6 +5,7 @@ from models import db
 from routes import routes
 from flask_migrate import Migrate
 from flask_cors import CORS
+from flask_jwt_extended import JWTManager  # Import the JWTManager
 
 # Initialize Flask-Mail
 mail = Mail()
@@ -16,6 +17,7 @@ def create_app():
     # Initialize extensions
     db.init_app(app)
     mail.init_app(app)  # Initialize Flask-Mail with the app
+    JWTManager(app)  # Initialize JWTManager with the app
 
     # Enable CORS for all routes
     CORS(app, supports_credentials=True)
