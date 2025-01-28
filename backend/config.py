@@ -2,6 +2,7 @@ import os
 from dotenv import load_dotenv
 from flask_bcrypt import Bcrypt
 bcrypt = Bcrypt()
+
 # Load environment variables from the .env file
 load_dotenv()
 
@@ -33,3 +34,7 @@ class Config:
     # Manually Added JWT and Security Configuration
     SECRET_KEY = 'supersecretkey'  # Replace with a strong secret key for production
     JWT_EXPIRATION_DELTA = 7200  # 2 hours in seconds (adjust if needed)
+
+    # File Upload Configuration
+    UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')  # Setting up uploads folder in the current working directory
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # Maximum file size of 16 MB

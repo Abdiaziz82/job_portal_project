@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, make_response, current_app
-from models import db, User ,Job , PersonalDetails , WorkExperience
+from models import db, User ,Job , PersonalDetails , WorkExperience ,Certificate
 from flask_bcrypt import Bcrypt
 import jwt
 import datetime 
@@ -7,6 +7,11 @@ from datetime import datetime, timedelta
 from flask_mail import Message
 from itsdangerous import URLSafeTimedSerializer
 from functools import wraps
+from werkzeug.utils import secure_filename
+import os
+
+
+
 
 
 # Initialize bcrypt
@@ -14,7 +19,12 @@ bcrypt = Bcrypt()
 
 routes = Blueprint('routes', __name__)
 
+# Configuration for file uploads
+ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg'}
 
+def allowed_file(filename):
+    """Check if the uploaded file has an allowed extension."""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 def login_required(f):
@@ -571,3 +581,61 @@ def add_work_experience(current_user):
         # Handle errors
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+    
+@routes.route('/upload-certificate', methods=['POST'])
+@login_required  # Ensure the user is logged in
+def upload_certificate(current_user):
+    """Endpoint for users to upload certificates."""
+    # Extract form data
+    certificate_type = request.form.get('certificate_type')
+    specialization = request.form.get('specialization')
+    institution_name = request.form.get('institution_name')
+    year_of_completion = request.form.get('year_of_completion')
+    grade = request.form.get('grade')
+    additional_awards = request.form.get('additional_awards')
+
+    # Validate required fields
+    if not all([certificate_type, specialization, institution_name, year_of_completion]):
+        return jsonify({'error': 'Missing required fields'}), 400
+
+    # Validate file upload
+    if 'file' not in request.files:
+        return jsonify({'error': 'No file uploaded'}), 400
+
+    file = request.files['file']
+    if file.filename == '':
+        return jsonify({'error': 'No file selected'}), 400
+
+    if not allowed_file(file.filename):
+        return jsonify({'error': f'File type not allowed. Allowed types: {", ".join(ALLOWED_EXTENSIONS)}'}), 400
+
+    # Save the file to the configured upload folder
+    filename = secure_filename(file.filename)
+    upload_folder = current_app.config['UPLOAD_FOLDER']
+    file_path = os.path.join(upload_folder, filename)
+
+    try:
+        if not os.path.exists(upload_folder):
+            os.makedirs(upload_folder)  # Create the upload folder if it doesn't exist
+        file.save(file_path)  # Save the file
+    except Exception as e:
+        return jsonify({'error': 'File upload failed', 'details': str(e)}), 500
+
+    # Create and save the certificate record
+    try:
+        certificate = Certificate(
+            user_id=current_user.id,  # Automatically set user_id to the current user's ID
+            certificate_type=certificate_type,
+            specialization=specialization,
+            institution_name=institution_name,
+            year_of_completion=int(year_of_completion),
+            grade=grade,
+            additional_awards=additional_awards,
+            file_path=file_path
+        )
+        db.session.add(certificate)
+        db.session.commit()
+        return jsonify({'message': 'Certificate uploaded successfully', 'id': certificate.id}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to save certificate', 'details': str(e)}), 500

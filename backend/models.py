@@ -58,6 +58,26 @@ class WorkExperience(db.Model):
     def __repr__(self):
         return f'<WorkExperience {self.job_title} at {self.company_name} for User {self.user_id}>'
     
+class Certificate(db.Model):
+    __tablename__ = 'certificates'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign key linking to User
+    certificate_type = db.Column(db.String(50), nullable=False)  # KCSE, Diploma, Degree, etc.
+    specialization = db.Column(db.String(100), nullable=False)  # Program specialization (e.g., Computer Science)
+    institution_name = db.Column(db.String(200), nullable=False)  # Name of the institution
+    year_of_completion = db.Column(db.Integer, nullable=False)  # Year of completion
+    grade = db.Column(db.String(50), nullable=True)  # Grade/Score (e.g., A, First Class)
+    additional_awards = db.Column(db.String(255), nullable=True)  # Additional awards
+    file_path = db.Column(db.String(255), nullable=True)  # Path to the uploaded certificate file
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Timestamp for creation
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # Timestamp for updates
+
+    # Relationship to User (only defined in this model)
+    user = db.relationship('User', backref=db.backref('certificates', lazy=True))
+
+    def __repr__(self):
+        return f'<Certificate {self.certificate_type} from {self.institution_name} for User {self.user_id}>'
+    
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
