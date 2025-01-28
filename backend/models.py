@@ -37,7 +37,27 @@ class PersonalDetails(db.Model):
 
     def __repr__(self):
         return f'<PersonalDetails for User {self.user_id}>'
+        
+class WorkExperience(db.Model):
+    __tablename__ = 'work_experience'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign key linking to User
+    job_title = db.Column(db.String(255), nullable=False)
+    company_name = db.Column(db.String(255), nullable=False)
+    start_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date, nullable=True)  # Nullable for ongoing roles
+    responsibilities = db.Column(db.Text, nullable=True)
+    achievements = db.Column(db.Text, nullable=True)
+    skills_acquired = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
+    # Relationship to User (only defined in this model)
+    user = db.relationship('User', backref=db.backref('work_experience', lazy=True))
+
+    def __repr__(self):
+        return f'<WorkExperience {self.job_title} at {self.company_name} for User {self.user_id}>'
+    
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)

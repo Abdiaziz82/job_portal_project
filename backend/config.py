@@ -24,7 +24,7 @@ class Config:
     MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'abdiazizhared64@gmail.com')
 
     # Frontend URL
-    FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5176')
+    # FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5176')
 
     # Admin Credentials (Securely loaded from environment variables)
     ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'abdiazizhared64@gmail.com')
