@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, make_response, current_app
-from models import db, User ,Job , PersonalDetails
+from models import db, User ,Job , PersonalDetails , WorkExperience
 from flask_bcrypt import Bcrypt
 import jwt
 import datetime 
@@ -522,6 +522,50 @@ def add_personal_details(current_user):
 
         # Return success response
         return jsonify({'message': 'Personal details added successfully', 'id': new_details.id}), 201
+
+    except Exception as e:
+        # Handle errors
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@routes.route('/work-experience', methods=['POST'])
+@login_required  # Ensure the user is logged in
+def add_work_experience(current_user):
+    # Check if the user already has work experience (if needed, customize to allow multiple)
+    existing_experience = WorkExperience.query.filter_by(user_id=current_user.id).first()
+    if existing_experience:
+        return jsonify({'error': 'Work experience already exists for this user'}), 400
+
+    # Get JSON data from the request
+    data = request.get_json()
+
+    # Validate required fields (excluding user_id, as it's automatically set)
+    if not data or 'job_title' not in data or 'company_name' not in data:
+        return jsonify({'error': 'Missing required fields (job_title, company_name)'}), 400
+
+    try:
+        # Parse dates if provided
+        start_date = datetime.strptime(data['start_date'], '%Y-%m-%d').date() if 'start_date' in data else None
+        end_date = datetime.strptime(data['end_date'], '%Y-%m-%d').date() if 'end_date' in data else None
+
+        # Create a new WorkExperience object
+        new_experience = WorkExperience(
+            user_id=current_user.id,  # Automatically set user_id to the current user's ID
+            job_title=data['job_title'],
+            company_name=data['company_name'],
+            start_date=start_date,
+            end_date=end_date,
+            responsibilities=data.get('responsibilities'),
+            achievements=data.get('achievements'),
+            skills_acquired=data.get('skills_acquired')
+        )
+
+        # Add to the database session and commit
+        db.session.add(new_experience)
+        db.session.commit()
+
+        # Return success response
+        return jsonify({'message': 'Work experience added successfully', 'id': new_experience.id}), 201
 
     except Exception as e:
         # Handle errors

@@ -19,7 +19,8 @@ def create_app():
     mail.init_app(app)  # Initialize Flask-Mail with the app
     JWTManager(app)  # Initialize JWTManager with the app
 
-   
+    # Enable CORS for all routes
+    CORS(app, supports_credentials=True , origins=["http://localhost:5173"])
 
     # Initialize Flask-Migrate
     migrate = Migrate(app, db)
