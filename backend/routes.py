@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, make_response, current_app
-from models import db, User ,Job , PersonalDetails , WorkExperience ,Certificate ,EducationalBackground
+from models import db, User ,Job , PersonalDetails , WorkExperience ,Certificate ,EducationalBackground ,Referee
 from flask_bcrypt import Bcrypt
 import jwt
 import datetime 
@@ -641,68 +641,129 @@ def upload_certificate(current_user):
         return jsonify({'error': 'Failed to save certificate', 'details': str(e)}), 500
     
 
-# @routes.route('/educational-background', methods=['POST'])
-# @login_required  # Ensure the user is logged in
-# def educational_background(current_user):
-#     """Endpoint for users to upload their educational background."""
-#     # Extract form data
-#     high_school_name = request.form.get('high_school_name')
-#     high_school_year_completed = request.form.get('high_school_year_completed')
-#     high_school_grade = request.form.get('high_school_grade')
-#     high_school_extracurricular = request.form.get('high_school_extracurricular')
-#     university_name = request.form.get('university_name')
-#     degree_program = request.form.get('degree_program')
-#     field_of_study = request.form.get('field_of_study')
-#     university_grade = request.form.get('university_grade')
-#     start_date = request.form.get('start_date')
-#     end_date = request.form.get('end_date')
+@routes.route('/upload-educational-background', methods=['POST'])
+@login_required  # Ensure the user is logged in
+def upload_educational_background(current_user):
+    """Endpoint for users to upload their educational background."""
+    # Extract form data
+    school_name = request.form.get('school_name')
+    year_completed = request.form.get('year_completed')
+    high_school_grade = request.form.get('high_school_grade')
+    high_school_activities = request.form.get('high_school_activities')
+    university_name = request.form.get('university_name')
+    degree_program = request.form.get('degree_program')
+    field_of_study = request.form.get('field_of_study')
+    university_grade = request.form.get('university_grade')
+    start_date = request.form.get('start_date')
+    end_date = request.form.get('end_date')
 
-#     # Validate required fields
-#     if not all([high_school_name, high_school_year_completed, university_name, degree_program, field_of_study, start_date, end_date]):
-#         return jsonify({'error': 'Missing required fields'}), 400
+    # Validate required fields
+    if not all([school_name, year_completed]):
+        return jsonify({'error': 'Missing required fields (school_name, year_completed)'}), 400
 
-#     # Validate file upload
-#     if 'file' not in request.files:
-#         return jsonify({'error': 'No file uploaded'}), 400
+    # Validate file upload (if applicable)
+    file_path = None
+    if 'file' in request.files:
+        file = request.files['file']
+        if file.filename != '':
+            if not allowed_file(file.filename):
+                return jsonify({'error': f'File type not allowed. Allowed types: {", ".join(ALLOWED_EXTENSIONS)}'}), 400
 
-#     file = request.files['file']
-#     if file.filename == '':
-#         return jsonify({'error': 'No file selected'}), 400
+            # Save the file
+            filename = secure_filename(file.filename)
+            upload_folder = current_app.config['UPLOAD_FOLDER']
+            file_path = os.path.join(upload_folder, filename)
 
-#     if not allowed_file(file.filename):
-#         return jsonify({'error': f'File type not allowed. Allowed types: {", ".join(ALLOWED_EXTENSIONS)}'}), 400
+            try:
+                if not os.path.exists(upload_folder):
+                    os.makedirs(upload_folder)
+                file.save(file_path)
+            except Exception as e:
+                return jsonify({'error': 'File upload failed', 'details': str(e)}), 500
 
-#     # Save the file to the configured upload folder
-#     filename = secure_filename(file.filename)
-#     upload_folder = current_app.config['UPLOAD_FOLDER']
-#     file_path = os.path.join(upload_folder, filename)
+    # Parse date fields (if provided)
+    try:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d').date() if start_date else None
+        end_date = datetime.strptime(end_date, '%Y-%m-%d').date() if end_date else None
+    except ValueError as e:
+        return jsonify({'error': 'Invalid date format. Use YYYY-MM-DD', 'details': str(e)}), 400
 
-#     try:
-#         if not os.path.exists(upload_folder):
-#             os.makedirs(upload_folder)  # Create the upload folder if it doesn't exist
-#         file.save(file_path)  # Save the file
-#     except Exception as e:
-#         return jsonify({'error': 'File upload failed', 'details': str(e)}), 500
+    # Create and save the educational background record
+    try:
+        educational_background = EducationalBackground(
+            user_id=current_user.id,  # Automatically set user_id to the current user's ID
+            school_name=school_name,
+            year_completed=int(year_completed),
+            high_school_grade=high_school_grade,
+            high_school_activities=high_school_activities,
+            university_name=university_name,
+            degree_program=degree_program,
+            field_of_study=field_of_study,
+            university_grade=university_grade,
+            start_date=start_date,
+            end_date=end_date,
+            file_path=file_path
+        )
+        db.session.add(educational_background)
+        db.session.commit()
+        return jsonify({'message': 'Educational background uploaded successfully', 'id': educational_background.id}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to save educational background', 'details': str(e)}), 500
 
-#     # Create and save the educational background record
-#     try:
-#         education = EducationalBackground(
-#             user_id=current_user.id,  # Automatically set user_id to the current user's ID
-#             high_school_name=high_school_name,
-#             high_school_year_completed=int(high_school_year_completed),
-#             high_school_grade=high_school_grade,
-#             high_school_extracurricular=high_school_extracurricular,
-#             university_name=university_name,
-#             degree_program=degree_program,
-#             field_of_study=field_of_study,
-#             university_grade=university_grade,
-#             start_date=start_date,
-#             end_date=end_date,
-#             file_path=file_path
-#         )
-#         db.session.add(education)
-#         db.session.commit()
-#         return jsonify({'message': 'Educational background uploaded successfully', 'id': education.id}), 201
-#     except Exception as e:
-#         db.session.rollback()
-#         return jsonify({'error': 'Failed to save educational background', 'details': str(e)}), 500
+@routes.route('/add-referees', methods=['POST'])
+@login_required
+def add_referees(current_user):
+    """Saves both referees linked to a user"""
+
+    try:
+        data = request.json  # Expecting JSON data
+
+        referee1 = data.get('referee1')
+        referee2 = data.get('referee2')
+
+        # Ensure both referees are provided
+        if not referee1 or not referee2:
+            return jsonify({'error': 'Both referees are required'}), 400
+
+        # Check if referees already exist for the user
+        existing_referees = Referee.query.filter_by(user_id=current_user.id).first()
+        if existing_referees:
+            return jsonify({'error': 'Referees already exist for this user'}), 409
+
+        # Save Referee 1
+        ref1 = Referee(
+            user_id=current_user.id,
+            full_name=referee1.get('full_name'),
+            occupation=referee1.get('occupation'),
+            address=referee1.get('address'),
+            post_code=referee1.get('post_code'),
+            city_town=referee1.get('city_town'),
+            mobile_no=referee1.get('mobile_no'),
+            email=referee1.get('email'),
+            known_period=referee1.get('known_period')
+        )
+        db.session.add(ref1)
+
+        # Save Referee 2
+        ref2 = Referee(
+            user_id=current_user.id,
+            full_name=referee2.get('full_name'),
+            occupation=referee2.get('occupation'),
+            address=referee2.get('address'),
+            post_code=referee2.get('post_code'),
+            city_town=referee2.get('city_town'),
+            mobile_no=referee2.get('mobile_no'),
+            email=referee2.get('email'),
+            known_period=referee2.get('known_period')
+        )
+        db.session.add(ref2)
+
+        # Commit both referees to the database
+        db.session.commit()
+
+        return jsonify({'message': 'Referees saved successfully'}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to save referees', 'details': str(e)}), 500

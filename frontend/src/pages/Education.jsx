@@ -1,8 +1,81 @@
+import React, { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import axios from "axios"; // For making HTTP requests
 
 export default function Education() {
   const navigate = useNavigate();
+
+  // State for form fields
+  const [formData, setFormData] = useState({
+    school_name: "",
+    year_completed: "",
+    high_school_grade: "",
+    high_school_activities: "",
+    university_name: "",
+    degree_program: "",
+    field_of_study: "",
+    university_grade: "",
+    start_date: "",
+    end_date: "",
+    file: null, // For file upload
+  });
+
+  // Handle input changes
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  // Handle file input changes
+  const handleFileChange = (e) => {
+    setFormData({ ...formData, file: e.target.files[0] });
+  };
+
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    // Create a FormData object to send files and form data
+    const data = new FormData();
+    data.append("school_name", formData.school_name);
+    data.append("year_completed", formData.year_completed);
+    data.append("high_school_grade", formData.high_school_grade);
+    data.append("high_school_activities", formData.high_school_activities);
+    data.append("university_name", formData.university_name);
+    data.append("degree_program", formData.degree_program);
+    data.append("field_of_study", formData.field_of_study);
+    data.append("university_grade", formData.university_grade);
+    data.append("start_date", formData.start_date);
+    data.append("end_date", formData.end_date);
+    if (formData.file) {
+      data.append("file", formData.file);
+    }
+
+    try {
+      // Send POST request to the backend
+      const response = await axios.post(
+        "http://localhost:5000/upload-educational-background",
+        data,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data", // Required for file uploads
+          },
+          withCredentials: true, // Include cookies for authentication
+        }
+      );
+
+      // Handle success
+      if (response.status === 201) {
+        alert("Educational background saved successfully!");
+        navigate(-1); // Navigate back after successful submission
+      }
+    } catch (error) {
+      // Handle errors
+      console.error("Error saving educational background:", error);
+      alert("Failed to save educational background. Please try again.");
+    }
+  };
 
   return (
     <div className="flex flex-col min-h-screen p-6 bg-gray-50">
@@ -19,7 +92,7 @@ export default function Education() {
       <h1 className="text-3xl font-bold text-gray-800 mb-8">Educational Background</h1>
 
       {/* Form */}
-      <form className="bg-white p-8 rounded-lg shadow-md space-y-10">
+      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md space-y-10">
         {/* High School Section */}
         <div>
           <h2 className="text-2xl font-semibold text-green-700 mb-4">High School Education</h2>
@@ -30,8 +103,12 @@ export default function Education() {
               </label>
               <input
                 type="text"
+                name="school_name"
                 placeholder="Enter high school name"
+                value={formData.school_name}
+                onChange={handleInputChange}
                 className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                required
               />
             </div>
             <div>
@@ -40,8 +117,12 @@ export default function Education() {
               </label>
               <input
                 type="number"
+                name="year_completed"
                 placeholder="Enter year of graduation"
+                value={formData.year_completed}
+                onChange={handleInputChange}
                 className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                required
               />
             </div>
           </div>
@@ -53,7 +134,10 @@ export default function Education() {
               </label>
               <input
                 type="text"
+                name="high_school_grade"
                 placeholder="Enter grade or classification (e.g., A, B)"
+                value={formData.high_school_grade}
+                onChange={handleInputChange}
                 className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
               />
             </div>
@@ -62,7 +146,10 @@ export default function Education() {
                 Extracurricular Activities
               </label>
               <textarea
+                name="high_school_activities"
                 placeholder="Enter activities or clubs participated in"
+                value={formData.high_school_activities}
+                onChange={handleInputChange}
                 className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
                 rows="3"
               ></textarea>
@@ -80,7 +167,10 @@ export default function Education() {
               </label>
               <input
                 type="text"
+                name="university_name"
                 placeholder="Enter university name"
+                value={formData.university_name}
+                onChange={handleInputChange}
                 className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
               />
             </div>
@@ -90,7 +180,10 @@ export default function Education() {
               </label>
               <input
                 type="text"
+                name="degree_program"
                 placeholder="Enter degree or program (e.g., BSc, MSc, PhD)"
+                value={formData.degree_program}
+                onChange={handleInputChange}
                 className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
               />
             </div>
@@ -103,7 +196,10 @@ export default function Education() {
               </label>
               <input
                 type="text"
+                name="field_of_study"
                 placeholder="Enter field of study (e.g., Computer Science)"
+                value={formData.field_of_study}
+                onChange={handleInputChange}
                 className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
               />
             </div>
@@ -113,7 +209,10 @@ export default function Education() {
               </label>
               <input
                 type="text"
+                name="university_grade"
                 placeholder="Enter grade or classification (e.g., First Class)"
+                value={formData.university_grade}
+                onChange={handleInputChange}
                 className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
               />
             </div>
@@ -126,6 +225,9 @@ export default function Education() {
               </label>
               <input
                 type="date"
+                name="start_date"
+                value={formData.start_date}
+                onChange={handleInputChange}
                 className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
               />
             </div>
@@ -135,6 +237,9 @@ export default function Education() {
               </label>
               <input
                 type="date"
+                name="end_date"
+                value={formData.end_date}
+                onChange={handleInputChange}
                 className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
               />
             </div>
@@ -148,7 +253,8 @@ export default function Education() {
           </label>
           <input
             type="file"
-            multiple
+            name="file"
+            onChange={handleFileChange}
             className="block w-full text-gray-700 border p-2 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
           />
           <small className="text-gray-500">

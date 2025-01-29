@@ -96,6 +96,25 @@ class EducationalBackground(db.Model):
 
     # Relationship to the User model
     user = db.relationship('User', backref=db.backref('educational_backgrounds', lazy=True))
+
+class Referee(db.Model):
+    __tablename__ = 'referees'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Link referees to a user
+    full_name = db.Column(db.String(255), nullable=False)
+    occupation = db.Column(db.String(255), nullable=False)
+    address = db.Column(db.String(255), nullable=False)
+    post_code = db.Column(db.String(20), nullable=True)
+    city_town = db.Column(db.String(100), nullable=False)
+    mobile_no = db.Column(db.String(20), nullable=False)
+    email = db.Column(db.String(255), nullable=False)
+    known_period = db.Column(db.String(100), nullable=False)
+
+    user = db.relationship('User', backref=db.backref('referees', lazy=True))
+
+    def __repr__(self):
+        return f"<Referee {self.full_name} - {self.occupation}>"
     
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
