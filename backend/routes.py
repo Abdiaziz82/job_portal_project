@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, make_response, current_app
-from models import db, User ,Job , PersonalDetails , WorkExperience ,Certificate
+from models import db, User ,Job , PersonalDetails , WorkExperience ,Certificate ,EducationalBackground
 from flask_bcrypt import Bcrypt
 import jwt
 import datetime 
@@ -639,3 +639,70 @@ def upload_certificate(current_user):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Failed to save certificate', 'details': str(e)}), 500
+    
+
+# @routes.route('/educational-background', methods=['POST'])
+# @login_required  # Ensure the user is logged in
+# def educational_background(current_user):
+#     """Endpoint for users to upload their educational background."""
+#     # Extract form data
+#     high_school_name = request.form.get('high_school_name')
+#     high_school_year_completed = request.form.get('high_school_year_completed')
+#     high_school_grade = request.form.get('high_school_grade')
+#     high_school_extracurricular = request.form.get('high_school_extracurricular')
+#     university_name = request.form.get('university_name')
+#     degree_program = request.form.get('degree_program')
+#     field_of_study = request.form.get('field_of_study')
+#     university_grade = request.form.get('university_grade')
+#     start_date = request.form.get('start_date')
+#     end_date = request.form.get('end_date')
+
+#     # Validate required fields
+#     if not all([high_school_name, high_school_year_completed, university_name, degree_program, field_of_study, start_date, end_date]):
+#         return jsonify({'error': 'Missing required fields'}), 400
+
+#     # Validate file upload
+#     if 'file' not in request.files:
+#         return jsonify({'error': 'No file uploaded'}), 400
+
+#     file = request.files['file']
+#     if file.filename == '':
+#         return jsonify({'error': 'No file selected'}), 400
+
+#     if not allowed_file(file.filename):
+#         return jsonify({'error': f'File type not allowed. Allowed types: {", ".join(ALLOWED_EXTENSIONS)}'}), 400
+
+#     # Save the file to the configured upload folder
+#     filename = secure_filename(file.filename)
+#     upload_folder = current_app.config['UPLOAD_FOLDER']
+#     file_path = os.path.join(upload_folder, filename)
+
+#     try:
+#         if not os.path.exists(upload_folder):
+#             os.makedirs(upload_folder)  # Create the upload folder if it doesn't exist
+#         file.save(file_path)  # Save the file
+#     except Exception as e:
+#         return jsonify({'error': 'File upload failed', 'details': str(e)}), 500
+
+#     # Create and save the educational background record
+#     try:
+#         education = EducationalBackground(
+#             user_id=current_user.id,  # Automatically set user_id to the current user's ID
+#             high_school_name=high_school_name,
+#             high_school_year_completed=int(high_school_year_completed),
+#             high_school_grade=high_school_grade,
+#             high_school_extracurricular=high_school_extracurricular,
+#             university_name=university_name,
+#             degree_program=degree_program,
+#             field_of_study=field_of_study,
+#             university_grade=university_grade,
+#             start_date=start_date,
+#             end_date=end_date,
+#             file_path=file_path
+#         )
+#         db.session.add(education)
+#         db.session.commit()
+#         return jsonify({'message': 'Educational background uploaded successfully', 'id': education.id}), 201
+#     except Exception as e:
+#         db.session.rollback()
+#         return jsonify({'error': 'Failed to save educational background', 'details': str(e)}), 500

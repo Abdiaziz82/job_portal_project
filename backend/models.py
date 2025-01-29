@@ -78,6 +78,25 @@ class Certificate(db.Model):
     def __repr__(self):
         return f'<Certificate {self.certificate_type} from {self.institution_name} for User {self.user_id}>'
     
+class EducationalBackground(db.Model):
+    __tablename__ = 'educational_backgrounds'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign key to the User table
+    school_name = db.Column(db.String(200), nullable=False)  # High school name
+    year_completed = db.Column(db.Integer, nullable=False)  # Year graduated
+    high_school_grade = db.Column(db.String(50))  # High school grade/class
+    high_school_activities = db.Column(db.Text)  # Extracurricular activities
+    university_name = db.Column(db.String(200))  # University name
+    degree_program = db.Column(db.String(100))  # Degree/Program
+    field_of_study = db.Column(db.String(100))  # Field of study
+    university_grade = db.Column(db.String(50))  # University grade/class
+    start_date = db.Column(db.Date)  # University start date
+    end_date = db.Column(db.Date)  # University end date
+    file_path = db.Column(db.String(500))  # Path to uploaded certificates or transcripts
+
+    # Relationship to the User model
+    user = db.relationship('User', backref=db.backref('educational_backgrounds', lazy=True))
+    
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)
