@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, make_response, current_app
-from models import db, User ,Job , PersonalDetails , WorkExperience ,Certificate ,EducationalBackground ,Referee
+from models import db, User ,Job , PersonalDetails , WorkExperience ,Certificate ,EducationalBackground ,Referee ,NextOfKin , ProfessionalQualifications ,RelevantCoursesAndProfessionalBody
 from flask_bcrypt import Bcrypt
 import jwt
 import datetime 
@@ -779,3 +779,108 @@ def add_referees(current_user):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Failed to save referees', 'details': str(e)}), 500
+    
+@routes.route('/next-of-kin', methods=['POST'])
+@login_required  # Ensure the user is logged in
+def add_next_of_kin(current_user):
+    # Get JSON data from the request
+    data = request.get_json()
+
+    # Validate required fields
+    if not data or 'kin_name' not in data or 'kin_address' not in data or 'kin_tel' not in data or 'kin_relationship' not in data:
+        return jsonify({'error': 'Missing required fields (kin_name, kin_address, kin_tel, kin_relationship)'}), 400
+
+    try:
+        # Create a new NextOfKin object
+        new_kin = NextOfKin(
+            user_id=current_user.id,  # Automatically set user_id to the current user's ID
+            kin_name=data['kin_name'],
+            kin_address=data['kin_address'],
+            kin_tel=data['kin_tel'],
+            kin_relationship=data['kin_relationship']
+        )
+
+        # Add to the database session and commit
+        db.session.add(new_kin)
+        db.session.commit()
+
+        # Return success response
+        return jsonify({
+            'message': 'Next of Kin details added successfully',
+            'id': new_kin.id
+        }), 201
+
+    except Exception as e:
+        # Handle errors
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
+@routes.route('/professional-qualifications', methods=['POST'])
+@login_required
+def add_professional_qualifications(current_user):
+    data = request.get_json()
+
+    if not data or 'qualifications' not in data:
+        return jsonify({'error': 'Missing required fields'}), 400
+
+    try:
+        # Check if the user already has professional qualifications
+        existing_qualifications = ProfessionalQualifications.query.filter_by(user_id=current_user.id).first()
+        if existing_qualifications:
+            return jsonify({'error': 'Professional qualifications already exist for this user'}), 400
+
+        # Loop through the qualifications and save each one
+        for qualification in data['qualifications']:
+            new_qualification = ProfessionalQualifications(
+                user_id=current_user.id,
+                year_from=qualification['yearFrom'],
+                year_to=qualification['yearTo'],
+                institution=qualification['institution'],
+                award=qualification['award'],
+                specialization=qualification['specialization'],
+                grade=qualification['grade'],
+                created_at=datetime.utcnow()
+            )
+            db.session.add(new_qualification)
+
+        db.session.commit()
+        return jsonify({'message': 'Professional qualifications saved successfully'}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
+@routes.route('/relevant-courses-professional-body', methods=['POST'])
+@login_required
+def add_relevant_courses_and_professional_body(current_user):
+    data = request.get_json()
+
+    if not data:
+        return jsonify({'error': 'Missing required fields'}), 400
+
+    try:
+        # Loop through each record (course + professional body)
+        for record in data:
+            new_record = RelevantCoursesAndProfessionalBody(
+                user_id=current_user.id,
+                year=record['year'],
+                institution=record['institution'],
+                course_name=record['course_name'],
+                details=record['details'],
+                duration=record['duration'],
+                body_name=record['body_name'],
+                membership_no=record['membership_no'],
+                membership_type=record['membership_type'],
+                renewal_date=datetime.strptime(record['renewal_date'], '%Y-%m-%d'),  # Convert the date
+                created_at=datetime.utcnow()
+            )
+
+            db.session.add(new_record)
+        
+        db.session.commit()
+
+        return jsonify({'message': 'Relevant courses and professional body records saved successfully'}), 201
+
+    except Exception as e:
+        db.session.rollback()  # Rollback any changes if an error occurs
+        return jsonify({'error': str(e)}), 500

@@ -127,6 +127,47 @@ class EducationalBackground(db.Model):
     # Relationship to the User model
     user = db.relationship('User', backref=db.backref('educational_backgrounds', lazy=True))
 
+class ProfessionalQualifications(db.Model):
+    __tablename__ = 'professional_qualifications'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign key to User
+    year_from = db.Column(db.Integer, nullable=False)
+    year_to = db.Column(db.Integer, nullable=False)
+    institution = db.Column(db.String(255), nullable=False)
+    award = db.Column(db.String(255), nullable=False)
+    specialization = db.Column(db.String(255), nullable=False)
+    grade = db.Column(db.String(50), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Timestamp for record creation
+
+    # Relationship to User
+    user = db.relationship('User', backref=db.backref('professional_qualifications', lazy=True))
+
+    def __repr__(self):
+        return f"<ProfessionalQualifications {self.id}>"
+    
+class RelevantCoursesAndProfessionalBody(db.Model):
+    __tablename__ = 'relevant_courses_and_professional_bodies'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign key to User
+    year = db.Column(db.Integer)  # Year of the course
+    institution = db.Column(db.String(255))  # Institution offering the course
+    course_name = db.Column(db.String(255))  # Name of the course
+    details = db.Column(db.Text)  # Course details
+    duration = db.Column(db.String(255))  # Duration of the course
+    body_name = db.Column(db.String(255))  # Name of the professional body
+    membership_no = db.Column(db.String(255))  # Membership number for the professional body
+    membership_type = db.Column(db.String(255))  # Type of membership (e.g., Full, Associate)
+    renewal_date = db.Column(db.Date)  # Date when membership needs to be renewed
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Timestamp for record creation
+
+    # Relationship to User
+    user = db.relationship('User', backref=db.backref('relevant_courses_and_professional_bodies', lazy=True))
+
+    def __repr__(self):
+        return f"<RelevantCoursesAndProfessionalBody {self.id} - {self.course_name} / {self.body_name}>"
+
 class Referee(db.Model):
     __tablename__ = 'referees'
 

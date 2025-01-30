@@ -1,6 +1,9 @@
+import { FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
-const ProfessionalQualificationsForm = ({ onSubmit }) => {
+const ProfessionalQualificationsForm = () => {
+  const navigate = useNavigate();
   const [qualifications, setQualifications] = useState([
     { yearFrom: "", yearTo: "", institution: "", award: "", specialization: "", grade: "" }
   ]);
@@ -27,31 +30,71 @@ const ProfessionalQualificationsForm = ({ onSubmit }) => {
   };
 
   // Handle form submission
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    console.log("Submitted Data:", qualifications);
-    setSuccessMessage("Qualifications saved successfully!");
-    onSubmit && onSubmit(qualifications);
+
+    try {
+      // Send the qualifications data to the backend
+      const response = await fetch("http://localhost:5000/professional-qualifications", {
+        method: "POST",
+        credentials: "include", // Include cookies for authentication
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ qualifications }), // Send the qualifications array
+      });
+
+      // Check if the response is successful
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to save qualifications");
+      }
+
+      // Handle successful response
+      const result = await response.json();
+      setSuccessMessage(result.message); // Show success message
+      alert(result.message); // Alert the user
+
+      // Clear the form after successful submission
+      setQualifications([{ yearFrom: "", yearTo: "", institution: "", award: "", specialization: "", grade: "" }]);
+
+      // Navigate to another page (e.g., home page)
+      navigate("/"); // Replace "/" with the desired route
+    } catch (error) {
+      console.error("Error:", error);
+      alert(error.message || "An error occurred while saving qualifications.");
+    }
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-lg p-6 mt-10">
-      <h2 className="text-2xl font-semibold text-gray-800 text-center mb-4">Professional/Technical Qualifications</h2>
+    <div className="flex flex-col min-h-screen p-6 bg-gray-50">
+      {/* Back Button */}
+      <button
+        onClick={() => navigate(-1)}
+        className="flex items-center text-green-700 hover:text-green-800 transition mb-6"
+      >
+        <FaArrowLeft className="mr-2" />
+        Back
+      </button>
+
+      {/* Form Title */}
+      <h1 className="text-3xl font-bold text-gray-800 mb-8">Professional/Technical Qualifications</h1>
       {successMessage && <p className="text-green-600 text-center mb-4">{successMessage}</p>}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md space-y-6">
         {qualifications.map((qualification, index) => (
-          <div key={index} className="border p-4 rounded-md shadow-sm bg-gray-50">
-            <div className="grid grid-cols-2 gap-4">
+          <div key={index} className="border p-6 rounded-md shadow-sm bg-gray-50 space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Year From */}
               <div>
-                <label className="block text-gray-700 font-medium">From</label>
+                <label className="block text-gray-700 font-medium mb-2">From</label>
                 <input
                   type="number"
                   name="yearFrom"
                   value={qualification.yearFrom}
                   onChange={(event) => handleInputChange(index, event)}
-                  className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Year"
                   required
                 />
@@ -59,13 +102,13 @@ const ProfessionalQualificationsForm = ({ onSubmit }) => {
 
               {/* Year To */}
               <div>
-                <label className="block text-gray-700 font-medium">To</label>
+                <label className="block text-gray-700 font-medium mb-2">To</label>
                 <input
                   type="number"
                   name="yearTo"
                   value={qualification.yearTo}
                   onChange={(event) => handleInputChange(index, event)}
-                  className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                  className="w-full p-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                   placeholder="Year"
                   required
                 />
@@ -73,56 +116,56 @@ const ProfessionalQualificationsForm = ({ onSubmit }) => {
             </div>
 
             {/* Institution */}
-            <div className="mt-3">
-              <label className="block text-gray-700 font-medium">Institution</label>
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">Institution</label>
               <input
                 type="text"
                 name="institution"
                 value={qualification.institution}
                 onChange={(event) => handleInputChange(index, event)}
-                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Enter Institution Name"
                 required
               />
             </div>
 
             {/* Award */}
-            <div className="mt-3">
-              <label className="block text-gray-700 font-medium">Award/Attainment</label>
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">Award/Attainment</label>
               <input
                 type="text"
                 name="award"
                 value={qualification.award}
                 onChange={(event) => handleInputChange(index, event)}
-                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 placeholder="e.g. Diploma, Certificate"
                 required
               />
             </div>
 
             {/* Specialization */}
-            <div className="mt-3">
-              <label className="block text-gray-700 font-medium">Specialization/Subject</label>
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">Specialization/Subject</label>
               <input
                 type="text"
                 name="specialization"
                 value={qualification.specialization}
                 onChange={(event) => handleInputChange(index, event)}
-                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 placeholder="e.g. Human Resource, Engineering"
                 required
               />
             </div>
 
             {/* Class/Grade */}
-            <div className="mt-3">
-              <label className="block text-gray-700 font-medium">Class/Grade</label>
+            <div>
+              <label className="block text-gray-700 font-medium mb-2">Class/Grade</label>
               <input
                 type="text"
                 name="grade"
                 value={qualification.grade}
                 onChange={(event) => handleInputChange(index, event)}
-                className="w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500"
+                className="w-full p-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
                 placeholder="e.g. Distinction, Credit"
                 required
               />
@@ -151,12 +194,14 @@ const ProfessionalQualificationsForm = ({ onSubmit }) => {
         </button>
 
         {/* Submit Button */}
-        <button
-          type="submit"
-          className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 mt-4 transition duration-200"
-        >
-          Submit
-        </button>
+        <div className="flex justify-end">
+          <button
+            type="submit"
+            className="px-6 py-3 bg-green-700 text-white font-medium rounded-md hover:bg-green-800 transition"
+          >
+            Save Changes
+          </button>
+        </div>
       </form>
     </div>
   );

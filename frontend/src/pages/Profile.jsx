@@ -18,6 +18,7 @@ export default function Profile() {
             { label: "Certificates", path: "certificates" },
             { label: "Educational Background", path: "education" },
             { label: "ProfessionalQualifications", path: "ProfessionalQualifications" },
+            { label: "RelevantCourses", path: "RelevantCoursesForm" },
             { label: "Referees", path: "referees" },
           ].map((section) => (
             <div

@@ -27,10 +27,52 @@ export default function NextOfKinForm() {
   };
 
   // Handle form submission
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Form Data Submitted:", formData);
-    alert("Next of Kin details saved successfully!");
+
+    // API URL
+    const API_URL = "http://localhost:5000/next-of-kin"; // Adjust as needed
+
+    // Prepare the data for submission (only send non-empty kin)
+    const kinData = [
+      {
+        kin_name: formData.kin1_name,
+        kin_address: formData.kin1_address,
+        kin_tel: formData.kin1_tel,
+        kin_relationship: formData.kin1_relationship,
+      },
+      {
+        kin_name: formData.kin2_name,
+        kin_address: formData.kin2_address,
+        kin_tel: formData.kin2_tel,
+        kin_relationship: formData.kin2_relationship,
+      },
+    ].filter((kin) => kin.kin_name && kin.kin_address && kin.kin_tel && kin.kin_relationship);
+
+    try {
+      for (const kin of kinData) {
+        const response = await fetch(API_URL, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include", // Ensures cookies are sent
+          body: JSON.stringify(kin),
+        });
+
+        const result = await response.json();
+
+        if (!response.ok) {
+          throw new Error(result.error || "Failed to add Next of Kin");
+        }
+      }
+
+      alert("Next of Kin details saved successfully!");
+      navigate("/success-page"); // Redirect if needed
+    } catch (error) {
+      console.error("Error:", error.message);
+      alert("Failed to save Next of Kin details.");
+    }
   };
 
   return (
@@ -106,9 +148,9 @@ export default function NextOfKinForm() {
           </div>
         </div>
 
-        {/* Next of Kin 2 */}
+        {/* Next of Kin 2 (Optional) */}
         <div className="space-y-4">
-          <h2 className="text-lg font-semibold text-gray-700">Next of Kin 2</h2>
+          <h2 className="text-lg font-semibold text-gray-700">Next of Kin 2 (Optional)</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
               <label className="block text-gray-700 font-medium mb-2">Name</label>
