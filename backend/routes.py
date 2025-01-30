@@ -492,52 +492,64 @@ def admin_logout():
 @routes.route('/personal-details', methods=['POST'])
 @login_required  # Ensure the user is logged in
 def add_personal_details(current_user):
-    # Check if the user already has personal details
-    existing_details = PersonalDetails.query.filter_by(user_id=current_user.id).first()
-    if existing_details:
-        return jsonify({'error': 'Personal details already exist for this user'}), 400
-
-    # Get JSON data from the request
-    data = request.get_json()
-
-    # Validate required fields (excluding user_id, as it's automatically set)
-    if not data or 'full_names' not in data or 'email_address' not in data:
-        return jsonify({'error': 'Missing required fields (full_names, email_address)'}), 400
+    """Saves personal details linked to a user"""
 
     try:
-        # Parse date_of_birth if provided
-        date_of_birth = None
-        if 'date_of_birth' in data:
-            date_of_birth = datetime.strptime(data['date_of_birth'], '%Y-%m-%d').date()
+        data = request.get_json()
 
-        # Create a new PersonalDetails object
+        # Check if personal details already exist
+        existing_details = PersonalDetails.query.filter_by(user_id=current_user.id).first()
+        if existing_details:
+            return jsonify({'error': 'Personal details already exist for this user'}), 400
+
+        # Validate required fields
+        required_fields = ['full_names', 'email_address']
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            return jsonify({'error': f"Missing required fields: {', '.join(missing_fields)}"}), 400
+
+        # Convert date fields safely
+        def parse_date(date_str):
+            try:
+                return datetime.strptime(date_str, '%Y-%m-%d').date() if date_str else None
+            except ValueError:
+                return None
+
         new_details = PersonalDetails(
-            user_id=current_user.id,  # Automatically set user_id to the current user's ID
+            user_id=current_user.id,
             full_names=data['full_names'],
-            title=data.get('title'),
-            date_of_birth=date_of_birth,
-            id_number=data.get('id_number'),
-            gender=data.get('gender'),
-            nationality=data.get('nationality'),
-            home_county=data.get('home_county'),
-            constituency=data.get('constituency'),
-            postal_address=data.get('postal_address'),
-            mobile_number=data.get('mobile_number'),
-            email_address=data['email_address']
+            title=data.get('title', ''),  # Default to empty string if not provided
+            date_of_birth=parse_date(data.get('date_of_birth')),
+            id_number=data.get('id_number', ''),
+            gender=data.get('gender', ''),
+            nationality=data.get('nationality', ''),
+            home_county=data.get('home_county', ''),
+            constituency=data.get('constituency', ''),
+            postal_address=data.get('postal_address', ''),
+            mobile_number=data.get('mobile_number', ''),
+            email_address=data['email_address'],
+            alternative_contact_name=data.get('alternative_contact_name', ''),
+            alternative_contact_phone=data.get('alternative_contact_phone', ''),
+            disability=data.get('disability', 'no'),
+            disability_details=data.get('disability_details', ''),
+            disability_registration=data.get('disability_registration', ''),
+            criminal_conviction=data.get('criminal_conviction', 'no'),
+            criminal_offence_details=data.get('criminal_offence_details', ''),
+            dismissal_from_employment=data.get('dismissal_from_employment', 'no'),
+            dismissal_reason=data.get('dismissal_reason', ''),
+            dismissal_date=parse_date(data.get('dismissal_date'))
         )
 
-        # Add to the database session and commit
+        # Save to the database
         db.session.add(new_details)
         db.session.commit()
 
-        # Return success response
         return jsonify({'message': 'Personal details added successfully', 'id': new_details.id}), 201
 
     except Exception as e:
-        # Handle errors
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
-
+    
 @routes.route('/work-experience', methods=['POST'])
 @login_required  # Ensure the user is logged in
 def add_work_experience(current_user):

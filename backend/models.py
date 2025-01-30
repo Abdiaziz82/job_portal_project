@@ -32,11 +32,41 @@ class PersonalDetails(db.Model):
     mobile_number = db.Column(db.String(20), nullable=True)
     email_address = db.Column(db.String(100), nullable=False)
 
+    # New Fields
+    alternative_contact_name = db.Column(db.String(200), nullable=True)
+    alternative_contact_phone = db.Column(db.String(20), nullable=True)
+    disability = db.Column(db.String(3), nullable=False, default="no")  # "yes" or "no"
+    disability_details = db.Column(db.Text, nullable=True)
+    disability_registration = db.Column(db.String(100), nullable=True)
+    criminal_conviction = db.Column(db.String(3), nullable=False, default="no")  # "yes" or "no"
+    criminal_offence_details = db.Column(db.Text, nullable=True)
+    dismissal_from_employment = db.Column(db.String(3), nullable=False, default="no")  # "yes" or "no"
+    dismissal_reason = db.Column(db.Text, nullable=True)
+    dismissal_date = db.Column(db.Date, nullable=True)
+
     # Relationship to access user details
     user = db.relationship('User', backref=db.backref('personal_details', lazy=True))
 
     def __repr__(self):
         return f'<PersonalDetails for User {self.user_id}>'
+    
+class NextOfKin(db.Model):
+    __tablename__ = 'next_of_kin'
+    
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign key linking to User
+    kin_name = db.Column(db.String(255), nullable=False)
+    kin_address = db.Column(db.Text, nullable=False)
+    kin_tel = db.Column(db.String(20), nullable=False)
+    kin_relationship = db.Column(db.String(100), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationship to User (only defined in this model)
+    user = db.relationship('User', backref=db.backref('next_of_kin', lazy=True))
+
+    def __repr__(self):
+        return f'<NextOfKin {self.kin_name} ({self.kin_relationship}) for User {self.user_id}>'
         
 class WorkExperience(db.Model):
     __tablename__ = 'work_experience'
