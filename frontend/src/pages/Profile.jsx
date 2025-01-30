@@ -13,9 +13,11 @@ export default function Profile() {
         <>
           {[
             { label: "Personal Details", path: "personal-details" },
+            { label: "Next of Kin", path: "Next of Kin" },
             { label: "Work Experience", path: "work-experience" },
             { label: "Certificates", path: "certificates" },
             { label: "Educational Background", path: "education" },
+            { label: "ProfessionalQualifications", path: "ProfessionalQualifications" },
             { label: "Referees", path: "referees" },
           ].map((section) => (
             <div

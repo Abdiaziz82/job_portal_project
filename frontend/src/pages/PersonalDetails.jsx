@@ -29,7 +29,17 @@ export default function PersonalDetails() {
     constituency: "",
     postal_address: "",
     mobile_number: "",
-    email_address: ""
+    email_address: "",
+    alternative_contact_name: "",
+    alternative_contact_phone: "",
+    disability: "no", // Default to "No"
+    disability_details: "",
+    disability_registration: "",
+    criminal_conviction: "no", // Default to "No"
+    criminal_offence_details: "",
+    dismissal_from_employment: "no", // Default to "No"
+    dismissal_reason: "",
+    dismissal_date: ""
   });
 
   // Handle form input changes
@@ -44,7 +54,7 @@ export default function PersonalDetails() {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       // Send POST request to the backend
       const response = await fetch("http://localhost:5000/personal-details", {
@@ -55,12 +65,12 @@ export default function PersonalDetails() {
         },
         body: JSON.stringify(formData),
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json(); // Parse error response
         throw new Error(errorData.error || "Failed to save personal details");
       }
-  
+
       const result = await response.json();
       alert(result.message); // Show success message
       navigate("/"); // Redirect to home or another page
@@ -249,6 +259,190 @@ export default function PersonalDetails() {
               required
             />
           </div>
+        </div>
+
+        {/* New Fields */}
+        {/* Alternative Contact Person */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-gray-700 font-medium mb-2">Name of Alternative Contact Person</label>
+            <input
+              type="text"
+              name="alternative_contact_name"
+              placeholder="Enter alternative contact person's name"
+              value={formData.alternative_contact_name}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 font-medium mb-2">Telephone No</label>
+            <input
+              type="text"
+              name="alternative_contact_phone"
+              placeholder="Enter alternative contact's phone number"
+              value={formData.alternative_contact_phone}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+            />
+          </div>
+        </div>
+
+        {/* Disability Section */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-2">Are you living with a disability?</label>
+          <div className="flex gap-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="disability"
+                value="yes"
+                checked={formData.disability === "yes"}
+                onChange={handleChange}
+                className="mr-2"
+              />
+              Yes
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="disability"
+                value="no"
+                checked={formData.disability === "no"}
+                onChange={handleChange}
+                className="mr-2"
+              />
+              No
+            </label>
+          </div>
+
+          {formData.disability === "yes" && (
+            <div className="mt-4 space-y-4">
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Details/Nature of Disability</label>
+                <textarea
+                  name="disability_details"
+                  placeholder="Enter details of disability"
+                  value={formData.disability_details}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                  rows="3"
+                ></textarea>
+              </div>
+
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Details of Registration with the National Council for People with Disabilities</label>
+                <input
+                  type="text"
+                  name="disability_registration"
+                  placeholder="Enter registration details"
+                  value={formData.disability_registration}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                />
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Criminal Conviction Section */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-2">Have you ever been convicted of any criminal offence or a subject of probation order?</label>
+          <div className="flex gap-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="criminal_conviction"
+                value="yes"
+                checked={formData.criminal_conviction === "yes"}
+                onChange={handleChange}
+                className="mr-2"
+              />
+              Yes
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="criminal_conviction"
+                value="no"
+                checked={formData.criminal_conviction === "no"}
+                onChange={handleChange}
+                className="mr-2"
+              />
+              No
+            </label>
+          </div>
+
+          {formData.criminal_conviction === "yes" && (
+            <div className="mt-4">
+              <label className="block text-gray-700 font-medium mb-2">Nature of Offence, Year, and Duration of Conviction</label>
+              <textarea
+                name="criminal_offence_details"
+                placeholder="Enter details of the offence"
+                value={formData.criminal_offence_details}
+                onChange={handleChange}
+                className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                rows="3"
+              ></textarea>
+            </div>
+          )}
+        </div>
+
+        {/* Dismissal from Employment Section */}
+        <div>
+          <label className="block text-gray-700 font-medium mb-2">Have you ever been dismissed or otherwise removed from employment?</label>
+          <div className="flex gap-4">
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="dismissal_from_employment"
+                value="yes"
+                checked={formData.dismissal_from_employment === "yes"}
+                onChange={handleChange}
+                className="mr-2"
+              />
+              Yes
+            </label>
+            <label className="flex items-center">
+              <input
+                type="radio"
+                name="dismissal_from_employment"
+                value="no"
+                checked={formData.dismissal_from_employment === "no"}
+                onChange={handleChange}
+                className="mr-2"
+              />
+              No
+            </label>
+          </div>
+
+          {formData.dismissal_from_employment === "yes" && (
+            <div className="mt-4 space-y-4">
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Reason(s) for Dismissal/Removal</label>
+                <textarea
+                  name="dismissal_reason"
+                  placeholder="Enter reason(s) for dismissal/removal"
+                  value={formData.dismissal_reason}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                  rows="3"
+                ></textarea>
+              </div>
+
+              <div>
+                <label className="block text-gray-700 font-medium mb-2">Effective Date (dd-mm-yyyy)</label>
+                <input
+                  type="date"
+                  name="dismissal_date"
+                  value={formData.dismissal_date}
+                  onChange={handleChange}
+                  className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Submit Button */}
