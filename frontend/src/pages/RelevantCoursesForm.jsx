@@ -72,7 +72,7 @@ const RelevantCoursesForm = () => {
   
       const response = await fetch("http://localhost:5000/relevant-courses-professional-body", {
         method: "POST",
-        credentials: "include", // Include cookies for authentication
+        credentials: "include", 
         headers: {
           "Content-Type": "application/json",
         },
@@ -104,7 +104,7 @@ const RelevantCoursesForm = () => {
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)} // Navigate back
-        className="flex items-center text-blue-600 hover:text-blue-800 mb-4"
+        className="flex items-center text-green-600 hover:text-blue-800 mb-4"
       >
         <span className="text-xl">←</span> {/* Left arrow icon */}
         <span className="ml-2 font-medium">Back</span>
@@ -301,7 +301,7 @@ const RelevantCoursesForm = () => {
             type="submit"
             className="px-6 py-3 bg-green-700 text-white font-medium rounded-md hover:bg-green-800 transition"
           >
-            Save Information
+            Save details
           </button>
         </div>
       </form>

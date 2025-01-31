@@ -31,9 +31,9 @@ class Config:
     ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'abdiazizhared64@gmail.com')
     ADMIN_PASSWORD = bcrypt.generate_password_hash(os.getenv('ADMIN_PASSWORD', 'admin123')).decode('utf-8')
 
-    # Manually Added JWT and Security Configuration
-    SECRET_KEY = 'supersecretkey'  # Replace with a strong secret key for production
-    JWT_EXPIRATION_DELTA = 7200  # 2 hours in seconds (adjust if needed)
+    
+    SECRET_KEY = 'supersecretkey'  
+    JWT_EXPIRATION_DELTA = 7200  
 
     # File Upload Configuration
     UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')  # Setting up uploads folder in the current working directory

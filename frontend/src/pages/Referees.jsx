@@ -198,7 +198,7 @@ export default function Referees() {
             type="submit"
             className="px-6 py-3 bg-green-700 text-white font-medium rounded-md hover:bg-green-800 transition"
           >
-            Save Changes
+            Save details
           </button>
         </div>
       </form>

@@ -33,6 +33,7 @@ import CreatedJobs from "./pages/AdminDashboard/CreatedJobs";
 import NextOfKinForm from "./pages/NextOfKinForm";
 import ProfessionalQualificationsForm from "./pages/ProfessionalQualifications";
 import RelevantCoursesForm from "./pages/RelevantCoursesForm";
+import EmploymentDetailsForm from "./pages/EmploymentDetailsForm";
 
 function App() {
   return (
@@ -69,6 +70,7 @@ function App() {
                     <Route path="certificates" element={<Certificates />} />
                     <Route path="education" element={<Education />} />
                     <Route path="RelevantCoursesForm" element={<RelevantCoursesForm />} />
+                    <Route path="EmploymentDetailsForm" element={<EmploymentDetailsForm />} />
                     <Route path="referees" element={<Referees />} />
                     <Route path="ProfessionalQualifications" element={<ProfessionalQualificationsForm />} />
                     

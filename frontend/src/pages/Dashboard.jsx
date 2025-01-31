@@ -4,7 +4,7 @@ const Dashboard = () => {
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
       {/* Dashboard Title */}
-      <h1 className="text-4xl font-extrabold text-gray-800 mb-10 text-center">University Job Portal Dashboard</h1>
+      <h1 className="text-4xl font-extrabold text-gray-800 mb-10 text-center">Your Job Portal Dashboard</h1>
 
       {/* Stats Cards Section */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">

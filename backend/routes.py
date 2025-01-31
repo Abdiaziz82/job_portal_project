@@ -1,17 +1,13 @@
 from flask import Blueprint, jsonify, request, make_response, current_app
-from models import db, User ,Job , PersonalDetails , WorkExperience ,Certificate ,EducationalBackground ,Referee ,NextOfKin , ProfessionalQualifications ,RelevantCoursesAndProfessionalBody
+from models import db, User ,Job , PersonalDetails , WorkExperience ,Certificate ,EducationalBackground ,Referee ,NextOfKin , ProfessionalQualifications ,RelevantCoursesAndProfessionalBody, EmploymentDetails
 from flask_bcrypt import Bcrypt
 import jwt
-import datetime 
 from datetime import datetime, timedelta
 from flask_mail import Message
 from itsdangerous import URLSafeTimedSerializer
 from functools import wraps
 from werkzeug.utils import secure_filename
 import os
-
-
-
 
 
 # Initialize bcrypt
@@ -74,7 +70,7 @@ def signup():
         first_name=data['first_name'],
         last_name=data['last_name'],
         email_address=data['email_address'],
-        mobile_number=data.get('mobile_number'),  # This is optional
+        mobile_number=data.get('mobile_number'), 
         password=hashed_password
     )
 
@@ -347,7 +343,7 @@ def admin_login():
         # Generate Admin JWT Token
         admin_token = jwt.encode({
             'admin': True,
-            'exp': datetime.datetime.utcnow() + datetime.timedelta(seconds=current_app.config['JWT_EXPIRATION_DELTA'])
+            'exp': datetime.utcnow() + timedelta(seconds=current_app.config['JWT_EXPIRATION_DELTA'])
         }, current_app.config['SECRET_KEY'], algorithm='HS256')
 
         response = make_response(jsonify({'message': 'Admin Login successful'}))
@@ -883,4 +879,55 @@ def add_relevant_courses_and_professional_body(current_user):
 
     except Exception as e:
         db.session.rollback()  # Rollback any changes if an error occurs
+        return jsonify({'error': str(e)}), 500
+
+@routes.route('/employment-details', methods=['POST'])
+@login_required  # Ensure the user is logged in
+def add_employment_details(current_user):
+    """Saves employment details linked to a user"""
+
+    try:
+        data = request.get_json()
+
+        # Check if employment details already exist for the user (optional, if you want to restrict to one record per user)
+        existing_details = EmploymentDetails.query.filter_by(user_id=current_user.id).first()
+        if existing_details:
+            return jsonify({'error': 'Employment details already exist for this user'}), 400
+
+        # Validate required fields
+        required_fields = ['year', 'designation', 'job_group', 'gross_salary', 'ministry']
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            return jsonify({'error': f"Missing required fields: {', '.join(missing_fields)}"}), 400
+
+        # Convert date fields safely
+        def parse_date(date_str):
+            try:
+                return datetime.strptime(date_str, '%Y-%m-%d').date() if date_str else None
+            except ValueError:
+                return None
+
+        # Create a new EmploymentDetails record
+        new_details = EmploymentDetails(
+            user_id=current_user.id,  # Link to the current logged-in user
+            year=data['year'],
+            designation=data['designation'],
+            job_group=data['job_group'],
+            gross_salary=data['gross_salary'],
+            ministry=data['ministry'],
+            from_date=parse_date(data.get('from_date')),
+            to_date=parse_date(data.get('to_date')),
+            duties=data.get('duties', ''),
+            publications=data.get('publications', ''),
+            skills_experience=data.get('skills_experience', '')
+        )
+
+        # Save to the database
+        db.session.add(new_details)
+        db.session.commit()
+
+        return jsonify({'message': 'Employment details added successfully', 'id': new_details.id}), 201
+
+    except Exception as e:
+        db.session.rollback()
         return jsonify({'error': str(e)}), 500

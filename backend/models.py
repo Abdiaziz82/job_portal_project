@@ -10,7 +10,7 @@ class User(db.Model):
     first_name = db.Column(db.String(100), nullable=False)
     last_name = db.Column(db.String(100), nullable=False)
     email_address = db.Column(db.String(120), unique=True, nullable=False)
-    mobile_number = db.Column(db.String(15), nullable=True)  # assuming mobile number can be nullable
+    mobile_number = db.Column(db.String(15), nullable=True)  
     password = db.Column(db.String(200), nullable=False)
 
     def __repr__(self):
@@ -168,6 +168,30 @@ class RelevantCoursesAndProfessionalBody(db.Model):
     def __repr__(self):
         return f"<RelevantCoursesAndProfessionalBody {self.id} - {self.course_name} / {self.body_name}>"
 
+class EmploymentDetails(db.Model):
+    __tablename__ = 'employment_details'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign key linking to User
+    year = db.Column(db.String(10), nullable=True)
+    designation = db.Column(db.String(255), nullable=True)
+    job_group = db.Column(db.String(100), nullable=True)
+    gross_salary = db.Column(db.Numeric(10, 2), nullable=True)
+    ministry = db.Column(db.String(255), nullable=True)
+    from_date = db.Column(db.Date, nullable=True)
+    to_date = db.Column(db.Date, nullable=True)
+    duties = db.Column(db.Text, nullable=True)
+    publications = db.Column(db.Text, nullable=True)
+    skills_experience = db.Column(db.Text, nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationship to User (only defined in this model)
+    user = db.relationship('User', backref=db.backref('employment_details', lazy=True))
+
+    def __repr__(self):
+        return f'<EmploymentDetails {self.designation} for User {self.user_id}>'
+    
 class Referee(db.Model):
     __tablename__ = 'referees'
 
