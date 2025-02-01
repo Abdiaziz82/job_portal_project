@@ -68,7 +68,7 @@ export default function NextOfKinForm() {
       }
 
       alert("Next of Kin details saved successfully!");
-      navigate("/success-page"); // Redirect if needed
+      navigate("/dashboard/profile"); // Redirect to profile page
     } catch (error) {
       console.error("Error:", error.message);
       alert("Failed to save Next of Kin details.");

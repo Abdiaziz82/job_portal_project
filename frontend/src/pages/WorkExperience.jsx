@@ -22,28 +22,21 @@ export default function WorkExperience() {
       // Send POST request to the backend to save work experience
       const response = await fetch("http://localhost:5000/work-experience", {
         method: "POST",
-        credentials: "include", // Include cookies for JWT authentication
+        credentials: "include", // Include cookies for authentication
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData), // Send the form data as JSON
+        body: JSON.stringify(formData),
       });
 
       if (!response.ok) {
-        const errorData = await response.json(); // Parse error response
-
-        // If there are multiple errors, show each one in a readable way
-        if (errorData.errors && errorData.errors.length > 0) {
-          const errorMessages = errorData.errors.join(", ");
-          throw new Error(errorMessages); // Combine errors into one message
-        } else {
-          throw new Error(errorData.error || "Failed to save work experience");
-        }
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Failed to save work experience");
       }
 
       const result = await response.json();
       alert(result.message); // Show success message
-      navigate("/dashboard/profile"); // Redirect to home or another page
+      navigate("/dashboard/profile"); // Redirect to profile page
     } catch (error) {
       console.error("Error:", error);
       alert(error.message || "An error occurred while saving work experience.");

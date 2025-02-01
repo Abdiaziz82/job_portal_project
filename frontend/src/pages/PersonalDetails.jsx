@@ -59,7 +59,7 @@ export default function PersonalDetails() {
       // Send POST request to the backend
       const response = await fetch("http://localhost:5000/personal-details", {
         method: "POST",
-        credentials: "include", // Include cookies for JWT authentication
+        credentials: "include", // Include cookies for authentication
         headers: {
           "Content-Type": "application/json",
         },
@@ -67,13 +67,13 @@ export default function PersonalDetails() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json(); // Parse error response
+        const errorData = await response.json();
         throw new Error(errorData.error || "Failed to save personal details");
       }
 
       const result = await response.json();
       alert(result.message); // Show success message
-      navigate("/"); // Redirect to home or another page
+      navigate("/dashboard/profile"); // Redirect to profile page
     } catch (error) {
       console.error("Error:", error);
       alert(error.message || "An error occurred while saving personal details.");
