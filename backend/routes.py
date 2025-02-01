@@ -545,6 +545,25 @@ def add_personal_details(current_user):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+@routes.route('/personal-details', methods=['GET'])
+@login_required
+def get_personal_details(current_user):
+    """Fetches personal details for the logged-in user"""
+    try:
+        details = PersonalDetails.query.filter_by(user_id=current_user.id).first()
+        if not details:
+            return jsonify({'error': 'No personal details found'}), 404
+
+        return jsonify({
+            'title' : details.title,
+            'full_names': details.full_names,
+            'email_address': details.email_address,
+            'mobile_number': details.mobile_number,
+            # Add more fields as needed
+        }), 200
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
     
 @routes.route('/work-experience', methods=['POST'])
 @login_required  # Ensure the user is logged in
@@ -588,6 +607,25 @@ def add_work_experience(current_user):
     except Exception as e:
         # Handle errors
         db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
+@routes.route('/work-experience', methods=['GET'])
+@login_required
+def get_work_experience(current_user):
+    try:
+        # Fetch work experiences for the logged-in user
+        experiences = WorkExperience.query.filter_by(user_id=current_user.id).all()
+        return jsonify([{
+            'id': exp.id,
+            'job_title': exp.job_title,
+            'company_name': exp.company_name,
+            'start_date': exp.start_date.isoformat() if exp.start_date else None,
+            'end_date': exp.end_date.isoformat() if exp.end_date else None,
+            'responsibilities': exp.responsibilities,
+            'achievements': exp.achievements,
+            'skills_acquired': exp.skills_acquired
+        } for exp in experiences]), 200
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
     
 @routes.route('/upload-certificate', methods=['POST'])
@@ -809,6 +847,25 @@ def add_next_of_kin(current_user):
     except Exception as e:
         # Handle errors
         db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@routes.route('/next-of-kin', methods=['GET'])
+@login_required
+def get_next_of_kin(current_user):
+    """Fetches next of kin details for the logged-in user"""
+    try:
+        kin_details = NextOfKin.query.filter_by(user_id=current_user.id).all()
+        if not kin_details:
+            return jsonify({'error': 'No next of kin details found'}), 404
+
+        return jsonify([{
+            'id': kin.id,
+            'kin_name': kin.kin_name,
+            'kin_address': kin.kin_address,
+            'kin_tel': kin.kin_tel,
+            'kin_relationship': kin.kin_relationship
+        } for kin in kin_details]), 200
+    except Exception as e:
         return jsonify({'error': str(e)}), 500
     
 @routes.route('/professional-qualifications', methods=['POST'])

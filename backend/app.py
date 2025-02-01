@@ -20,7 +20,7 @@ def create_app():
     JWTManager(app)  # Initialize JWTManager with the app
 
     # Enable CORS for all routes
-    CORS(app, supports_credentials=True , origins=["http://localhost:5173"])
+    CORS(app, supports_credentials=True)
 
     # Initialize Flask-Migrate
     migrate = Migrate(app, db)
