@@ -22,7 +22,7 @@ export default function Profile() {
 
   const fetchWorkExperiences = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/work-experience", {
+      const response = await fetch("http://localhost:5000/work-experience", {
         credentials: "include",
       });
       if (response.ok) {
@@ -36,7 +36,7 @@ export default function Profile() {
 
   const fetchPersonalDetails = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/personal-details", {
+      const response = await fetch("http://localhost:5000/personal-details", {
         credentials: "include",
       });
       if (response.ok) {
@@ -50,7 +50,7 @@ export default function Profile() {
 
   const fetchNextOfKin = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/next-of-kin", {
+      const response = await fetch("http://localhost:5000/next-of-kin", {
         credentials: "include",
       });
       if (response.ok) {
@@ -94,7 +94,8 @@ export default function Profile() {
                     ? `Update ${section.label}`
                     : section.label === "Next of Kin" && nextOfKin.length > 0
                     ? `Update ${section.label}`
-                    : `Add ${section.label}`}
+                    : `Add ${section.label}`
+                    }
                 </Link>
               </div>
               {section.label === "Personal Details" ? (
