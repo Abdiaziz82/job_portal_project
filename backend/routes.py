@@ -685,7 +685,34 @@ def upload_certificate(current_user):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Failed to save certificate', 'details': str(e)}), 500
-    
+
+@routes.route('/certificates', methods=['GET'])
+@login_required  # Ensure the user is logged in
+def get_certificates(current_user):
+    """Endpoint to fetch certificates for the logged-in user."""
+    try:
+        # Query certificates for the current user
+        certificates = Certificate.query.filter_by(user_id=current_user.id).all()
+
+        # Convert certificates to a list of dictionaries
+        certificates_data = [
+            {
+                "id": cert.id,
+                "certificate_type": cert.certificate_type,
+                "specialization": cert.specialization,
+                "institution_name": cert.institution_name,
+                "year_of_completion": cert.year_of_completion,
+                "grade": cert.grade,
+                "additional_awards": cert.additional_awards,
+                "file_path": cert.file_path,
+            }
+            for cert in certificates
+        ]
+
+        return jsonify(certificates_data), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch certificates", "details": str(e)}), 500
+
 
 @routes.route('/upload-educational-background', methods=['POST'])
 @login_required  # Ensure the user is logged in
@@ -757,6 +784,37 @@ def upload_educational_background(current_user):
         db.session.rollback()
         return jsonify({'error': 'Failed to save educational background', 'details': str(e)}), 500
 
+@routes.route('/education', methods=['GET'])
+@login_required  # Ensure the user is logged in
+def get_education(current_user):
+    """Endpoint to fetch educational background for the logged-in user."""
+    try:
+        # Query educational background for the current user
+        education = EducationalBackground.query.filter_by(user_id=current_user.id).all()
+
+        # Convert education records to a list of dictionaries
+        education_data = [
+            {
+                "id": edu.id,
+                "school_name": edu.school_name,
+                "year_completed": edu.year_completed,
+                "high_school_grade": edu.high_school_grade,
+                "high_school_activities": edu.high_school_activities,
+                "university_name": edu.university_name,
+                "degree_program": edu.degree_program,
+                "field_of_study": edu.field_of_study,
+                "university_grade": edu.university_grade,
+                "start_date": edu.start_date.isoformat() if edu.start_date else None,
+                "end_date": edu.end_date.isoformat() if edu.end_date else None,
+                "file_path": edu.file_path,
+            }
+            for edu in education
+        ]
+
+        return jsonify(education_data), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch educational background", "details": str(e)}), 500
+
 @routes.route('/add-referees', methods=['POST'])
 @login_required
 def add_referees(current_user):
@@ -813,6 +871,35 @@ def add_referees(current_user):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Failed to save referees', 'details': str(e)}), 500
+    
+@routes.route('/referees', methods=['GET'])
+@login_required  # Ensure the user is logged in
+def get_referees(current_user):
+    """Endpoint to fetch referees for the logged-in user."""
+    try:
+        # Query referees for the current user
+        referees = Referee.query.filter_by(user_id=current_user.id).all()
+
+        # Convert referees to a list of dictionaries
+        referees_data = [
+            {
+                "id": ref.id,
+                "full_name": ref.full_name,
+                "occupation": ref.occupation,
+                "address": ref.address,
+                "post_code": ref.post_code,
+                "city_town": ref.city_town,
+                "mobile_no": ref.mobile_no,
+                "email": ref.email,
+                "known_period": ref.known_period,
+               
+            }
+            for ref in referees
+        ]
+
+        return jsonify(referees_data), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch referees", "details": str(e)}), 500
     
 @routes.route('/next-of-kin', methods=['POST'])
 @login_required  # Ensure the user is logged in
@@ -902,6 +989,33 @@ def add_professional_qualifications(current_user):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+@routes.route('/professional-qualifications', methods=['GET'])
+@login_required  # Ensure the user is logged in
+def get_professional_qualifications(current_user):
+    """Endpoint to fetch professional qualifications for the logged-in user."""
+    try:
+        # Query professional qualifications for the current user
+        qualifications = ProfessionalQualifications.query.filter_by(user_id=current_user.id).all()
+
+        # Convert qualifications to a list of dictionaries
+        qualifications_data = [
+            {
+                "id": qual.id,
+                "year_from": qual.year_from,
+                "year_to": qual.year_to,
+                "institution": qual.institution,
+                "award": qual.award,
+                "specialization": qual.specialization,
+                "grade": qual.grade,
+                "created_at": qual.created_at.isoformat() if qual.created_at else None,
+            }
+            for qual in qualifications
+        ]
+
+        return jsonify(qualifications_data), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch professional qualifications", "details": str(e)}), 500
     
 @routes.route('/relevant-courses-professional-body', methods=['POST'])
 @login_required
@@ -938,6 +1052,36 @@ def add_relevant_courses_and_professional_body(current_user):
         db.session.rollback()  # Rollback any changes if an error occurs
         return jsonify({'error': str(e)}), 500
 
+@routes.route('/relevant-courses', methods=['GET'])
+@login_required  # Ensure the user is logged in
+def get_relevant_courses(current_user):
+    """Endpoint to fetch relevant courses and professional body data for the logged-in user."""
+    try:
+        # Query relevant courses and professional body data for the current user
+        courses = RelevantCoursesAndProfessionalBody.query.filter_by(user_id=current_user.id).all()
+
+        # Convert records to a list of dictionaries
+        courses_data = [
+            {
+                "id": course.id,
+                "year": course.year,
+                "institution": course.institution,
+                "course_name": course.course_name,
+                "details": course.details,
+                "duration": course.duration,
+                "body_name": course.body_name,
+                "membership_no": course.membership_no,
+                "membership_type": course.membership_type,
+                "renewal_date": course.renewal_date.isoformat() if course.renewal_date else None,
+                "created_at": course.created_at.isoformat() if course.created_at else None,
+            }
+            for course in courses
+        ]
+
+        return jsonify(courses_data), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch relevant courses and professional body data", "details": str(e)}), 500
+    
 @routes.route('/employment-details', methods=['POST'])
 @login_required  # Ensure the user is logged in
 def add_employment_details(current_user):
@@ -988,3 +1132,34 @@ def add_employment_details(current_user):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+    
+@routes.route('/employment-details', methods=['GET'])
+@login_required  # Ensure the user is logged in
+def get_employment_details(current_user):
+    """Endpoint to fetch employment details for the logged-in user."""
+    try:
+        # Query employment details for the current user
+        employment_details = EmploymentDetails.query.filter_by(user_id=current_user.id).all()
+
+        # Convert employment details to a list of dictionaries
+        employment_data = [
+            {
+                "id": emp.id,
+                "year": emp.year,
+                "designation": emp.designation,
+                "job_group": emp.job_group,
+                "gross_salary": emp.gross_salary,
+                "ministry": emp.ministry,
+                "from_date": emp.from_date.isoformat() if emp.from_date else None,
+                "to_date": emp.to_date.isoformat() if emp.to_date else None,
+                "duties": emp.duties,
+                "publications": emp.publications,
+                "skills_experience": emp.skills_experience,
+                "created_at": emp.created_at.isoformat() if emp.created_at else None,
+            }
+            for emp in employment_details
+        ]
+
+        return jsonify(employment_data), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch employment details", "details": str(e)}), 500
