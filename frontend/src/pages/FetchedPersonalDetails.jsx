@@ -11,12 +11,15 @@ export default function FetchedPersonalDetails() {
 
   const fetchPersonalDetails = async () => {
     try {
-      const response = await fetch("http://localhost:5000/personal-details", {
-        credentials: "include",
+      const response = await fetch("http://127.0.0.1:5000/personal-details", {
+        credentials: "include", // Include cookies for authentication
       });
       if (response.ok) {
         const data = await response.json();
         setPersonalDetails(data);
+      } else {
+        const error = await response.json();
+        console.error("Failed to fetch personal details:", error.error);
       }
     } catch (error) {
       console.error("Error fetching personal details:", error);
@@ -40,8 +43,66 @@ export default function FetchedPersonalDetails() {
       {personalDetails ? (
         <div className="mt-4 space-y-2">
           <h3 className="text-md font-semibold">{personalDetails.full_names}</h3>
-          <p className="text-sm text-gray-600">{personalDetails.email_address}</p>
-          <p className="text-sm text-gray-600">{personalDetails.mobile_number}</p>
+          <p className="text-sm text-gray-600">
+            <strong>Title:</strong> {personalDetails.title}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Date of Birth:</strong> {personalDetails.date_of_birth}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>ID Number:</strong> {personalDetails.id_number}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Gender:</strong> {personalDetails.gender}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Nationality:</strong> {personalDetails.nationality}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Home County:</strong> {personalDetails.home_county}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Constituency:</strong> {personalDetails.constituency}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Postal Address:</strong> {personalDetails.postal_address}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Mobile Number:</strong> {personalDetails.mobile_number}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Email Address:</strong> {personalDetails.email_address}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Alternative Contact Name:</strong> {personalDetails.alternative_contact_name}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Alternative Contact Phone:</strong> {personalDetails.alternative_contact_phone}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Disability:</strong> {personalDetails.disability}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Disability Details:</strong> {personalDetails.disability_details}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Disability Registration:</strong> {personalDetails.disability_registration}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Criminal Conviction:</strong> {personalDetails.criminal_conviction}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Criminal Offence Details:</strong> {personalDetails.criminal_offence_details}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Dismissal from Employment:</strong> {personalDetails.dismissal_from_employment}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Dismissal Reason:</strong> {personalDetails.dismissal_reason}
+          </p>
+          <p className="text-sm text-gray-600">
+            <strong>Dismissal Date:</strong> {personalDetails.dismissal_date}
+          </p>
         </div>
       ) : (
         <p className="text-sm text-gray-600">No personal details added yet.</p>

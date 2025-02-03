@@ -16,7 +16,7 @@ export default function Login() {
     setLoading(true);
   
     try {
-      const response = await fetch('http://localhost:5000/login', {
+      const response = await fetch('http://127.0.0.1:5000/login', {
         method: 'POST',
         credentials: 'include',  // Send cookies with request
         headers: {

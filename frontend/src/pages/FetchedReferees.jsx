@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { FaPlus } from "react-icons/fa";
 
-export default function FetchedReferees() {
+export default function FetchedReferees() { 
   const [referees, setReferees] = useState([]);
 
   useEffect(() => {
@@ -11,7 +11,7 @@ export default function FetchedReferees() {
 
   const fetchReferees = async () => {
     try {
-      const response = await fetch("http://localhost:5000/referees", {
+      const response = await fetch("http://127.0.0.1:5000/referees", {
         credentials: "include", // Include cookies for authentication
       });
       if (response.ok) {

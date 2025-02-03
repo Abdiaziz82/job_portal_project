@@ -11,7 +11,7 @@ export default function FetchedProfessionalQualifications() {
 
   const fetchQualifications = async () => {
     try {
-      const response = await fetch("http://localhost:5000/professional-qualifications", {
+      const response = await fetch("http://127.0.0.1:5000/professional-qualifications", {
         credentials: "include", // Include cookies for authentication
       });
       if (response.ok) {

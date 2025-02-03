@@ -11,7 +11,7 @@ export default function FetchedWorkExperience() {
 
   const fetchWorkExperiences = async () => {
     try {
-      const response = await fetch("http://localhost:5000/work-experience", {
+      const response = await fetch("http://127.0.0.1:5000/work-experience", {
         credentials: "include",
       });
       if (response.ok) {
@@ -42,7 +42,11 @@ export default function FetchedWorkExperience() {
           <div key={experience.id} className="mt-4 space-y-2">
             <h3 className="text-md font-semibold">{experience.job_title}</h3>
             <p className="text-sm text-gray-600">{experience.company_name}</p>
+            <p className="text-sm text-gray-600">{experience.start_date}</p>
+            <p className="text-sm text-gray-600">{experience.end_date}</p>
             <p className="text-sm text-gray-600">{experience.responsibilities}</p>
+            <p className="text-sm text-gray-600">{experience.achievements}</p>
+            <p className="text-sm text-gray-600">{experience.skills_acquired}</p>
           </div>
         ))
       ) : (
