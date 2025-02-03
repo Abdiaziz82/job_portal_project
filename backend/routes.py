@@ -551,16 +551,37 @@ def add_personal_details(current_user):
 def get_personal_details(current_user):
     """Fetches personal details for the logged-in user"""
     try:
+        # Fetch personal details for the current user
         details = PersonalDetails.query.filter_by(user_id=current_user.id).first()
         if not details:
             return jsonify({'error': 'No personal details found'}), 404
 
+        # Return all fields from the PersonalDetails model
         return jsonify({
-            'title' : details.title,
+            'id': details.id,
+            'user_id': details.user_id,
+            'title': details.title,
             'full_names': details.full_names,
-            'email_address': details.email_address,
+            'date_of_birth': details.date_of_birth.isoformat() if details.date_of_birth else None,
+            'id_number': details.id_number,
+            'gender': details.gender,
+            'nationality': details.nationality,
+            'home_county': details.home_county,
+            'constituency': details.constituency,
+            'postal_address': details.postal_address,
             'mobile_number': details.mobile_number,
-            # Add more fields as needed
+            'email_address': details.email_address,
+            'alternative_contact_name': details.alternative_contact_name,
+            'alternative_contact_phone': details.alternative_contact_phone,
+            'disability': details.disability,
+            'disability_details': details.disability_details,
+            'disability_registration': details.disability_registration,
+            'criminal_conviction': details.criminal_conviction,
+            'criminal_offence_details': details.criminal_offence_details,
+            'dismissal_from_employment': details.dismissal_from_employment,
+            'dismissal_reason': details.dismissal_reason,
+            'dismissal_date': details.dismissal_date.isoformat() if details.dismissal_date else None,
+            
         }), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
