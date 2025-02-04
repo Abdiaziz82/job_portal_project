@@ -8,6 +8,7 @@ from itsdangerous import URLSafeTimedSerializer
 from functools import wraps
 from werkzeug.utils import secure_filename
 import os
+from flask import send_from_directory ,url_for
 
 
 # Initialize bcrypt
@@ -22,6 +23,10 @@ def allowed_file(filename):
     """Check if the uploaded file has an allowed extension."""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+@routes.route('/uploads/<filename>')
+def uploaded_file(filename):
+    """Serve uploaded files from the uploads folder."""
+    return send_from_directory(current_app.config['UPLOAD_FOLDER'], filename)
 
 def login_required(f):
     @wraps(f)
@@ -586,6 +591,64 @@ def get_personal_details(current_user):
     except Exception as e:
         return jsonify({'error': str(e)}), 500
     
+@routes.route('/personal-details', methods=['PUT'])
+@login_required  # Ensure the user is logged in
+def update_personal_details(current_user):
+    """Updates personal details linked to a user"""
+
+    try:
+        data = request.get_json()
+
+        # Fetch the existing personal details for the current user
+        existing_details = PersonalDetails.query.filter_by(user_id=current_user.id).first()
+        if not existing_details:
+            return jsonify({'error': 'Personal details not found for this user'}), 404
+
+        # Validate required fields
+        required_fields = ['full_names', 'email_address']
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            return jsonify({'error': f"Missing required fields: {', '.join(missing_fields)}"}), 400
+
+        # Convert date fields safely
+        def parse_date(date_str):
+            try:
+                return datetime.strptime(date_str, '%Y-%m-%d').date() if date_str else None
+            except ValueError:
+                return None
+
+        # Update the fields with new data
+        existing_details.full_names = data['full_names']
+        existing_details.title = data.get('title', existing_details.title)
+        existing_details.date_of_birth = parse_date(data.get('date_of_birth')) or existing_details.date_of_birth
+        existing_details.id_number = data.get('id_number', existing_details.id_number)
+        existing_details.gender = data.get('gender', existing_details.gender)
+        existing_details.nationality = data.get('nationality', existing_details.nationality)
+        existing_details.home_county = data.get('home_county', existing_details.home_county)
+        existing_details.constituency = data.get('constituency', existing_details.constituency)
+        existing_details.postal_address = data.get('postal_address', existing_details.postal_address)
+        existing_details.mobile_number = data.get('mobile_number', existing_details.mobile_number)
+        existing_details.email_address = data['email_address']
+        existing_details.alternative_contact_name = data.get('alternative_contact_name', existing_details.alternative_contact_name)
+        existing_details.alternative_contact_phone = data.get('alternative_contact_phone', existing_details.alternative_contact_phone)
+        existing_details.disability = data.get('disability', existing_details.disability)
+        existing_details.disability_details = data.get('disability_details', existing_details.disability_details)
+        existing_details.disability_registration = data.get('disability_registration', existing_details.disability_registration)
+        existing_details.criminal_conviction = data.get('criminal_conviction', existing_details.criminal_conviction)
+        existing_details.criminal_offence_details = data.get('criminal_offence_details', existing_details.criminal_offence_details)
+        existing_details.dismissal_from_employment = data.get('dismissal_from_employment', existing_details.dismissal_from_employment)
+        existing_details.dismissal_reason = data.get('dismissal_reason', existing_details.dismissal_reason)
+        existing_details.dismissal_date = parse_date(data.get('dismissal_date')) or existing_details.dismissal_date
+
+        # Save the updated details to the database
+        db.session.commit()
+
+        return jsonify({'message': 'Personal details updated successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
 @routes.route('/work-experience', methods=['POST'])
 @login_required  # Ensure the user is logged in
 def add_work_experience(current_user):
@@ -650,7 +713,7 @@ def get_work_experience(current_user):
         return jsonify({'error': str(e)}), 500
     
 @routes.route('/upload-certificate', methods=['POST'])
-@login_required  # Ensure the user is logged in
+@login_required
 def upload_certificate(current_user):
     """Endpoint for users to upload certificates."""
     # Extract form data
@@ -665,40 +728,37 @@ def upload_certificate(current_user):
     if not all([certificate_type, specialization, institution_name, year_of_completion]):
         return jsonify({'error': 'Missing required fields'}), 400
 
-    # Validate file upload
-    if 'file' not in request.files:
-        return jsonify({'error': 'No file uploaded'}), 400
+    # Handle file upload (if applicable)
+    file_path = None
+    if 'file' in request.files:
+        file = request.files['file']
+        if file.filename != '':
+            if not allowed_file(file.filename):
+                return jsonify({'error': f'File type not allowed. Allowed types: {", ".join(ALLOWED_EXTENSIONS)}'}), 400
 
-    file = request.files['file']
-    if file.filename == '':
-        return jsonify({'error': 'No file selected'}), 400
+            # Save the file
+            filename = secure_filename(file.filename)
+            upload_folder = current_app.config['UPLOAD_FOLDER']
+            file_path = os.path.join(upload_folder, filename)
 
-    if not allowed_file(file.filename):
-        return jsonify({'error': f'File type not allowed. Allowed types: {", ".join(ALLOWED_EXTENSIONS)}'}), 400
+            try:
+                if not os.path.exists(upload_folder):
+                    os.makedirs(upload_folder)
+                file.save(file_path)
+            except Exception as e:
+                return jsonify({'error': 'File upload failed', 'details': str(e)}), 500
 
-    # Save the file to the configured upload folder
-    filename = secure_filename(file.filename)
-    upload_folder = current_app.config['UPLOAD_FOLDER']
-    file_path = os.path.join(upload_folder, filename)
-
-    try:
-        if not os.path.exists(upload_folder):
-            os.makedirs(upload_folder)  # Create the upload folder if it doesn't exist
-        file.save(file_path)  # Save the file
-    except Exception as e:
-        return jsonify({'error': 'File upload failed', 'details': str(e)}), 500
-
-    # Create and save the certificate record
+    # Save the certificate in the database
     try:
         certificate = Certificate(
-            user_id=current_user.id,  # Automatically set user_id to the current user's ID
+            user_id=current_user.id,
             certificate_type=certificate_type,
             specialization=specialization,
             institution_name=institution_name,
             year_of_completion=int(year_of_completion),
             grade=grade,
             additional_awards=additional_awards,
-            file_path=file_path
+            file_path=file_path  # Store full path
         )
         db.session.add(certificate)
         db.session.commit()
@@ -708,33 +768,61 @@ def upload_certificate(current_user):
         return jsonify({'error': 'Failed to save certificate', 'details': str(e)}), 500
 
 @routes.route('/certificates', methods=['GET'])
-@login_required  # Ensure the user is logged in
+@login_required
 def get_certificates(current_user):
-    """Endpoint to fetch certificates for the logged-in user."""
+    """Fetch certificates for the logged-in user."""
     try:
-        # Query certificates for the current user
         certificates = Certificate.query.filter_by(user_id=current_user.id).all()
 
-        # Convert certificates to a list of dictionaries
-        certificates_data = [
+        certificate_data = [
             {
-                "id": cert.id,
-                "certificate_type": cert.certificate_type,
-                "specialization": cert.specialization,
-                "institution_name": cert.institution_name,
-                "year_of_completion": cert.year_of_completion,
-                "grade": cert.grade,
-                "additional_awards": cert.additional_awards,
-                "file_path": cert.file_path,
+                "id": certificate.id,
+                "certificate_type": certificate.certificate_type,
+                "specialization": certificate.specialization,
+                "institution_name": certificate.institution_name,
+                "year_of_completion": certificate.year_of_completion,
+                "grade": certificate.grade,
+                "additional_awards": certificate.additional_awards,
+                "file_path": url_for('routes.uploaded_file', filename=os.path.basename(certificate.file_path), _external=True) if certificate.file_path else None
             }
-            for cert in certificates
+            for certificate in certificates
         ]
 
-        return jsonify(certificates_data), 200
+        return jsonify(certificate_data), 200
     except Exception as e:
         return jsonify({"error": "Failed to fetch certificates", "details": str(e)}), 500
 
+@routes.route('/certificates/<int:id>', methods=['PUT'])
+@login_required
+def update_certificate(current_user, id):
+    """Updates certificate details for a user"""
+    try:
+        data = request.get_json()
 
+        # Fetch the existing certificate details
+        certificate = Certificate.query.filter_by(id=id, user_id=current_user.id).first()
+        if not certificate:
+            return jsonify({'error': 'Certificate not found'}), 404
+
+        # Update the fields
+        certificate.certificate_type = data.get('certificate_type', certificate.certificate_type)
+        certificate.specialization = data.get('specialization', certificate.specialization)
+        certificate.institution_name = data.get('institution_name', certificate.institution_name)
+        certificate.year_of_completion = data.get('year_of_completion', certificate.year_of_completion)
+        certificate.grade = data.get('grade', certificate.grade)
+        certificate.additional_awards = data.get('additional_awards', certificate.additional_awards)
+
+        # Save to the database
+        db.session.commit()
+
+        return jsonify({'message': 'Certificate updated successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+    
 @routes.route('/upload-educational-background', methods=['POST'])
 @login_required  # Ensure the user is logged in
 def upload_educational_background(current_user):
@@ -806,14 +894,12 @@ def upload_educational_background(current_user):
         return jsonify({'error': 'Failed to save educational background', 'details': str(e)}), 500
 
 @routes.route('/education', methods=['GET'])
-@login_required  # Ensure the user is logged in
+@login_required
 def get_education(current_user):
     """Endpoint to fetch educational background for the logged-in user."""
     try:
-        # Query educational background for the current user
         education = EducationalBackground.query.filter_by(user_id=current_user.id).all()
 
-        # Convert education records to a list of dictionaries
         education_data = [
             {
                 "id": edu.id,
@@ -827,7 +913,7 @@ def get_education(current_user):
                 "university_grade": edu.university_grade,
                 "start_date": edu.start_date.isoformat() if edu.start_date else None,
                 "end_date": edu.end_date.isoformat() if edu.end_date else None,
-                "file_path": edu.file_path,
+                "file_path": url_for('routes.uploaded_file', filename=os.path.basename(edu.file_path), _external=True) if edu.file_path else None
             }
             for edu in education
         ]
@@ -836,6 +922,82 @@ def get_education(current_user):
     except Exception as e:
         return jsonify({"error": "Failed to fetch educational background", "details": str(e)}), 500
 
+@routes.route('/education/<int:id>', methods=['PUT'])
+@login_required
+def update_educational_background(current_user, id):
+    """Updates educational background details for a user"""
+    try:
+        data = request.get_json()
+
+        # Fetch the existing educational background details
+        education = EducationalBackground.query.filter_by(id=id, user_id=current_user.id).first()
+        if not education:
+            return jsonify({'error': 'Educational background not found'}), 404
+
+        # Update the fields
+        education.school_name = data.get('school_name', education.school_name)
+        education.year_completed = data.get('year_completed', education.year_completed)
+        education.high_school_grade = data.get('high_school_grade', education.high_school_grade)
+        education.high_school_activities = data.get('high_school_activities', education.high_school_activities)
+        education.university_name = data.get('university_name', education.university_name)
+        education.degree_program = data.get('degree_program', education.degree_program)
+        education.field_of_study = data.get('field_of_study', education.field_of_study)
+        education.university_grade = data.get('university_grade', education.university_grade)
+        education.start_date = data.get('start_date', education.start_date)
+        education.end_date = data.get('end_date', education.end_date)
+
+        # Save to the database
+        db.session.commit()
+
+        return jsonify({'message': 'Educational background updated successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@routes.route('/education/<int:id>/upload-file', methods=['POST'])
+@login_required
+def upload_educational_background_file(current_user, id):
+    """Endpoint for users to upload a new file for their educational background."""
+    try:
+        # Fetch the existing educational background details
+        education = EducationalBackground.query.filter_by(id=id, user_id=current_user.id).first()
+        if not education:
+            return jsonify({'error': 'Educational background not found'}), 404
+
+        # Validate file upload
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file uploaded'}), 400
+
+        file = request.files['file']
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+
+        if not allowed_file(file.filename):
+            return jsonify({'error': f'File type not allowed. Allowed types: {", ".join(ALLOWED_EXTENSIONS)}'}), 400
+
+        # Save the file
+        filename = secure_filename(file.filename)
+        upload_folder = current_app.config['UPLOAD_FOLDER']
+        file_path = os.path.join(upload_folder, filename)
+
+        try:
+            if not os.path.exists(upload_folder):
+                os.makedirs(upload_folder)
+            file.save(file_path)
+        except Exception as e:
+            return jsonify({'error': 'File upload failed', 'details': str(e)}), 500
+
+        # Update the file path in the database
+        education.file_path = file_path
+        db.session.commit()
+
+        return jsonify({'message': 'File uploaded successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
 @routes.route('/add-referees', methods=['POST'])
 @login_required
 def add_referees(current_user):
@@ -975,6 +1137,33 @@ def get_next_of_kin(current_user):
         } for kin in kin_details]), 200
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+@routes.route('/next-of-kin/<int:id>', methods=['PUT'])
+@login_required
+def update_next_of_kin(current_user, id):
+    """Updates next of kin details for a user"""
+    try:
+        data = request.get_json()
+
+        # Fetch the existing next of kin details
+        next_of_kin = NextOfKin.query.filter_by(id=id, user_id=current_user.id).first()
+        if not next_of_kin:
+            return jsonify({'error': 'Next of kin not found'}), 404
+
+        # Update the fields
+        next_of_kin.kin_name = data.get('kin_name', next_of_kin.kin_name)
+        next_of_kin.kin_address = data.get('kin_address', next_of_kin.kin_address)
+        next_of_kin.kin_tel = data.get('kin_tel', next_of_kin.kin_tel)
+        next_of_kin.kin_relationship = data.get('kin_relationship', next_of_kin.kin_relationship)
+
+        # Save to the database
+        db.session.commit()
+
+        return jsonify({'message': 'Next of kin updated successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
     
 @routes.route('/professional-qualifications', methods=['POST'])
 @login_required
@@ -1037,6 +1226,35 @@ def get_professional_qualifications(current_user):
         return jsonify(qualifications_data), 200
     except Exception as e:
         return jsonify({"error": "Failed to fetch professional qualifications", "details": str(e)}), 500
+
+@routes.route('/professional-qualifications/<int:id>', methods=['PUT'])
+@login_required
+def update_professional_qualification(current_user, id):
+    """Updates professional qualification details for a user"""
+    try:
+        data = request.get_json()
+
+        # Fetch the existing professional qualification details
+        qualification = ProfessionalQualifications.query.filter_by(id=id, user_id=current_user.id).first()
+        if not qualification:
+            return jsonify({'error': 'Professional qualification not found'}), 404
+
+        # Update the fields
+        qualification.award = data.get('award', qualification.award)
+        qualification.institution = data.get('institution', qualification.institution)
+        qualification.specialization = data.get('specialization', qualification.specialization)
+        qualification.grade = data.get('grade', qualification.grade)
+        qualification.year_from = data.get('year_from', qualification.year_from)
+        qualification.year_to = data.get('year_to', qualification.year_to)
+
+        # Save to the database
+        db.session.commit()
+
+        return jsonify({'message': 'Professional qualification updated successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
     
 @routes.route('/relevant-courses-professional-body', methods=['POST'])
 @login_required
@@ -1102,6 +1320,38 @@ def get_relevant_courses(current_user):
         return jsonify(courses_data), 200
     except Exception as e:
         return jsonify({"error": "Failed to fetch relevant courses and professional body data", "details": str(e)}), 500
+
+@routes.route('/relevant-courses/<int:id>', methods=['PUT'])
+@login_required
+def update_relevant_course(current_user, id):
+    """Updates relevant course details for a user"""
+    try:
+        data = request.get_json()
+
+        # Fetch the existing relevant course details
+        course = RelevantCoursesAndProfessionalBody.query.filter_by(id=id, user_id=current_user.id).first()
+        if not course:
+            return jsonify({'error': 'Relevant course not found'}), 404
+
+        # Update the fields
+        course.course_name = data.get('course_name', course.course_name)
+        course.institution = data.get('institution', course.institution)
+        course.year = data.get('year', course.year)
+        course.details = data.get('details', course.details)
+        course.duration = data.get('duration', course.duration)
+        course.body_name = data.get('body_name', course.body_name)
+        course.membership_no = data.get('membership_no', course.membership_no)
+        course.membership_type = data.get('membership_type', course.membership_type)
+        course.renewal_date = data.get('renewal_date', course.renewal_date)
+
+        # Save to the database
+        db.session.commit()
+
+        return jsonify({'message': 'Relevant course updated successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
     
 @routes.route('/employment-details', methods=['POST'])
 @login_required  # Ensure the user is logged in
@@ -1184,3 +1434,36 @@ def get_employment_details(current_user):
         return jsonify(employment_data), 200
     except Exception as e:
         return jsonify({"error": "Failed to fetch employment details", "details": str(e)}), 500
+
+@routes.route('/employment-details/<int:id>', methods=['PUT'])
+@login_required
+def update_employment_details(current_user, id):
+    """Updates employment details for a user"""
+    try:
+        data = request.get_json()
+
+        # Fetch the existing employment details
+        employment = EmploymentDetails.query.filter_by(id=id, user_id=current_user.id).first()
+        if not employment:
+            return jsonify({'error': 'Employment details not found'}), 404
+
+        # Update the fields
+        employment.year = data.get('year', employment.year)
+        employment.designation = data.get('designation', employment.designation)
+        employment.job_group = data.get('job_group', employment.job_group)
+        employment.gross_salary = data.get('gross_salary', employment.gross_salary)
+        employment.ministry = data.get('ministry', employment.ministry)
+        employment.from_date = data.get('from_date', employment.from_date)
+        employment.to_date = data.get('to_date', employment.to_date)
+        employment.duties = data.get('duties', employment.duties)
+        employment.publications = data.get('publications', employment.publications)
+        employment.skills_experience = data.get('skills_experience', employment.skills_experience)
+
+        # Save to the database
+        db.session.commit()
+
+        return jsonify({'message': 'Employment details updated successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
