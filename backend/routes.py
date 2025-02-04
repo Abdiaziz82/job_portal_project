@@ -1083,6 +1083,37 @@ def get_referees(current_user):
         return jsonify(referees_data), 200
     except Exception as e:
         return jsonify({"error": "Failed to fetch referees", "details": str(e)}), 500
+
+@routes.route('/referees/<int:id>', methods=['PUT'])
+@login_required
+def update_referee(current_user, id):
+    """Updates referee details for a user"""
+    try:
+        data = request.get_json()
+
+        # Fetch the existing referee details
+        referee = Referee.query.filter_by(id=id, user_id=current_user.id).first()
+        if not referee:
+            return jsonify({'error': 'Referee not found'}), 404
+
+        # Update the fields
+        referee.full_name = data.get('full_name', referee.full_name)
+        referee.occupation = data.get('occupation', referee.occupation)
+        referee.address = data.get('address', referee.address)
+        referee.post_code = data.get('post_code', referee.post_code)
+        referee.city_town = data.get('city_town', referee.city_town)
+        referee.mobile_no = data.get('mobile_no', referee.mobile_no)
+        referee.email = data.get('email', referee.email)
+        referee.known_period = data.get('known_period', referee.known_period)
+
+        # Save to the database
+        db.session.commit()
+
+        return jsonify({'message': 'Referee updated successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
     
 @routes.route('/next-of-kin', methods=['POST'])
 @login_required  # Ensure the user is logged in
