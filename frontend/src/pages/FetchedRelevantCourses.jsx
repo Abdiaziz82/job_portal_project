@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { FaPlus } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import { FaPlus, FaEdit, FaTrash } from "react-icons/fa"; // Importing the required icons
 
 export default function FetchedRelevantCourses() {
   const [courses, setCourses] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchCourses();
@@ -25,6 +26,10 @@ export default function FetchedRelevantCourses() {
     }
   };
 
+  const handleEditClick = (course) => {
+    navigate("edit-relevant-course", { state: { course } });
+  };
+
   return (
     <div className="p-6 bg-white rounded-lg shadow-md w-full">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
@@ -41,7 +46,7 @@ export default function FetchedRelevantCourses() {
       </div>
       {courses.length > 0 ? (
         courses.map((course) => (
-          <div key={course.id} className="mt-4 space-y-2">
+          <div key={course.id} className="mt-4 space-y-2 border-b pb-4">
             <h3 className="text-md font-semibold">{course.course_name}</h3>
             <p className="text-sm text-gray-600">
               <strong>Institution:</strong> {course.institution}
@@ -70,6 +75,17 @@ export default function FetchedRelevantCourses() {
             <p className="text-sm text-gray-600">
               <strong>Created At:</strong> {course.created_at}
             </p>
+            <div className="flex space-x-4 mt-2">
+              <button
+                className="flex items-center text-blue-600 hover:underline"
+                onClick={() => handleEditClick(course)}
+              >
+                <FaEdit className="mr-1" /> Edit
+              </button>
+              <button className="flex items-center text-red-600 hover:underline">
+                <FaTrash className="mr-1" /> Remove
+              </button>
+            </div>
           </div>
         ))
       ) : (

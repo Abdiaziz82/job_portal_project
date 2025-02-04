@@ -40,7 +40,7 @@ export default function Certificate() {
       }
 
       // Send request to the backend
-      const response = await fetch("http://localhost:5000/upload-certificate", {
+      const response = await fetch("http://127.0.0.1:5000/upload-certificate", {
         method: "POST",
         credentials: "include", // Include cookies in the request
         body: formData,

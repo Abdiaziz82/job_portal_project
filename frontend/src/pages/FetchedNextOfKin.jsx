@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { FaPlus } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import { FaPlus, FaEdit, FaTrash } from "react-icons/fa"; // Importing the required icons
 
 export default function FetchedNextOfKin() {
   const [nextOfKin, setNextOfKin] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchNextOfKin();
@@ -23,6 +24,10 @@ export default function FetchedNextOfKin() {
     }
   };
 
+  const handleEditClick = (kin) => {
+    navigate("edit-next-of-kin", { state: { nextOfKin: kin } });
+  };
+
   return (
     <div className="p-6 bg-white rounded-lg shadow-md w-full">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
@@ -34,7 +39,7 @@ export default function FetchedNextOfKin() {
           className="flex items-center bg-green-700 text-white px-3 py-1 rounded-md hover:bg-green-800 transition text-sm sm:text-base whitespace-nowrap"
         >
           <FaPlus className="mr-2" />
-          {nextOfKin.length > 0 ? `Update Next of Kin` : `Add Next of Kin`}
+          Add Next of Kin
         </Link>
       </div>
       {nextOfKin.length > 0 ? (
@@ -44,6 +49,20 @@ export default function FetchedNextOfKin() {
             <p className="text-sm text-gray-600">{kin.kin_address}</p>
             <p className="text-sm text-gray-600">{kin.kin_tel}</p>
             <p className="text-sm text-gray-600">{kin.kin_relationship}</p>
+            {/* Adding Edit and Remove icons with text */}
+            <div className="flex space-x-4 mt-4">
+              <div
+                className="flex items-center text-blue-600 cursor-pointer"
+                onClick={() => handleEditClick(kin)}
+              >
+                <FaEdit className="mr-2" />
+                <span>Edit</span>
+              </div>
+              <div className="flex items-center text-red-600 cursor-pointer">
+                <FaTrash className="mr-2" />
+                <span>Remove</span>
+              </div>
+            </div>
           </div>
         ))
       ) : (

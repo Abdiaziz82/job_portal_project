@@ -34,6 +34,14 @@ import NextOfKinForm from "./pages/NextOfKinForm";
 import ProfessionalQualificationsForm from "./pages/ProfessionalQualifications";
 import RelevantCoursesForm from "./pages/RelevantCoursesForm";
 import EmploymentDetailsForm from "./pages/EmploymentDetailsForm";
+import EditPersonalDetails from "./pages/EditPersonalDetails";
+import EditNextOfKin from "./pages/EditNextOfKin";
+import EditCertificate from "./pages/EditCertificate";
+import EditProfessionalQualification from "./pages/EditProfessionalQualification";
+import EditEducationalBackground from "./pages/EditEducationalBackground";
+import EditEmploymentDetails from "./pages/EditEmploymentDetails";
+import EditRelevantCourse from "./pages/EditRelevantCourse";
+import EditReferee from "./pages/EditReferee";
 
 function App() {
   return (
@@ -73,7 +81,14 @@ function App() {
                     <Route path="EmploymentDetailsForm" element={<EmploymentDetailsForm />} />
                     <Route path="referees" element={<Referees />} />
                     <Route path="ProfessionalQualifications" element={<ProfessionalQualificationsForm />} />
-                    
+                    <Route path="edit-personal-details" element={<EditPersonalDetails />} />
+                    <Route path="edit-next-of-kin" element={<EditNextOfKin />} />
+                    <Route path="edit-certificate" element={<EditCertificate />} />
+                    <Route path="edit-professional-qualification" element={<EditProfessionalQualification />} />
+                    <Route path="edit-educational-background" element={<EditEducationalBackground />} />
+                    <Route path="edit-employment-details" element={<EditEmploymentDetails />} />
+                    <Route path="edit-relevant-course" element={<EditRelevantCourse />} />
+                    <Route path="edit-referee" element={<EditReferee />} />
                   </Route>
                   <Route path="notifications" element={<Notifications />} />
                   <Route path="logout" element={<Logout />} />

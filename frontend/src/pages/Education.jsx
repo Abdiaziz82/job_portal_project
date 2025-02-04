@@ -55,7 +55,7 @@ export default function Education() {
     try {
       // Send POST request to the backend
       const response = await axios.post(
-        "http://localhost:5000/upload-educational-background",
+        "http://127.0.0.1:5000/upload-educational-background",
         data,
         {
           headers: {

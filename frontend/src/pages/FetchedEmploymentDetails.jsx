@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { FaPlus } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import { FaPlus, FaEdit, FaTrash } from "react-icons/fa"; // Importing the required icons
 
 export default function FetchedEmploymentDetails() {
   const [employmentDetails, setEmploymentDetails] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchEmploymentDetails();
@@ -25,6 +26,26 @@ export default function FetchedEmploymentDetails() {
     }
   };
 
+  const handleEditClick = (employment) => {
+    navigate("edit-employment-details", { state: { employment } });
+  };
+
+  const handleDelete = async (id) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/employment-details/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+      if (response.ok) {
+        setEmploymentDetails(employmentDetails.filter((item) => item.id !== id));
+      } else {
+        console.error("Failed to delete employment detail:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error deleting employment detail:", error);
+    }
+  };
+
   return (
     <div className="p-6 bg-white rounded-lg shadow-md w-full">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
@@ -41,35 +62,32 @@ export default function FetchedEmploymentDetails() {
       </div>
       {employmentDetails.length > 0 ? (
         employmentDetails.map((employment) => (
-          <div key={employment.id} className="mt-4 space-y-2">
+          <div key={employment.id} className="mt-4 space-y-2 border-b pb-4">
             <h3 className="text-md font-semibold">{employment.designation}</h3>
-            <p className="text-sm text-gray-600">
-              <strong>Year:</strong> {employment.year}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Job Group:</strong> {employment.job_group}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Gross Salary:</strong> {employment.gross_salary}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Ministry:</strong> {employment.ministry}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>From Date:</strong> {employment.from_date}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>To Date:</strong> {employment.to_date}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Duties:</strong> {employment.duties}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Publications:</strong> {employment.publications}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Skills & Experience:</strong> {employment.skills_experience}
-            </p>
+            <p className="text-sm text-gray-600"><strong>Year:</strong> {employment.year}</p>
+            <p className="text-sm text-gray-600"><strong>Job Group:</strong> {employment.job_group}</p>
+            <p className="text-sm text-gray-600"><strong>Gross Salary:</strong> {employment.gross_salary}</p>
+            <p className="text-sm text-gray-600"><strong>Ministry:</strong> {employment.ministry}</p>
+            <p className="text-sm text-gray-600"><strong>From Date:</strong> {employment.from_date}</p>
+            <p className="text-sm text-gray-600"><strong>To Date:</strong> {employment.to_date}</p>
+            <p className="text-sm text-gray-600"><strong>Duties:</strong> {employment.duties}</p>
+            <p className="text-sm text-gray-600"><strong>Publications:</strong> {employment.publications}</p>
+            <p className="text-sm text-gray-600"><strong>Skills & Experience:</strong> {employment.skills_experience}</p>
+            
+            <div className="flex space-x-4 mt-2">
+              <button
+                className="flex items-center text-blue-600 hover:text-blue-800 text-sm"
+                onClick={() => handleEditClick(employment)}
+              >
+                <FaEdit className="mr-1" /> Edit
+              </button>
+              <button
+                className="flex items-center text-red-600 hover:text-red-800 text-sm"
+                onClick={() => handleDelete(employment.id)}
+              >
+                <FaTrash className="mr-1" /> Remove
+              </button>
+            </div>
           </div>
         ))
       ) : (

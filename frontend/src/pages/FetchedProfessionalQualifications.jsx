@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
-import { FaPlus } from "react-icons/fa";
+import { Link, useNavigate } from "react-router-dom";
+import { FaPlus, FaEdit, FaTrash } from "react-icons/fa"; // Importing the required icons
 
 export default function FetchedProfessionalQualifications() {
   const [qualifications, setQualifications] = useState([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchQualifications();
@@ -25,6 +26,10 @@ export default function FetchedProfessionalQualifications() {
     }
   };
 
+  const handleEditClick = (qualification) => {
+    navigate("edit-professional-qualification", { state: { qualification } });
+  };
+
   return (
     <div className="p-6 bg-white rounded-lg shadow-md w-full">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
@@ -36,7 +41,7 @@ export default function FetchedProfessionalQualifications() {
           className="flex items-center bg-green-700 text-white px-3 py-1 rounded-md hover:bg-green-800 transition text-sm sm:text-base whitespace-nowrap"
         >
           <FaPlus className="mr-2" />
-          {qualifications.length > 0 ? `Update Qualifications` : `Add Qualifications`}
+          Add Qualifications
         </Link>
       </div>
       {qualifications.length > 0 ? (
@@ -61,6 +66,17 @@ export default function FetchedProfessionalQualifications() {
             <p className="text-sm text-gray-600">
               <strong>Created At:</strong> {qualification.created_at}
             </p>
+            <div className="flex space-x-4 mt-2">
+              <button
+                className="flex items-center text-blue-600 hover:underline"
+                onClick={() => handleEditClick(qualification)}
+              >
+                <FaEdit className="mr-1" /> Edit
+              </button>
+              <button className="flex items-center text-red-600 hover:underline">
+                <FaTrash className="mr-1" /> Remove
+              </button>
+            </div>
           </div>
         ))
       ) : (
