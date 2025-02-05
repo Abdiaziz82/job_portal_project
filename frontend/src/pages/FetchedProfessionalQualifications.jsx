@@ -30,6 +30,26 @@ export default function FetchedProfessionalQualifications() {
     navigate("edit-professional-qualification", { state: { qualification } });
   };
 
+  const handleDeleteClick = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this qualification?")) return;
+  
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/professional-qualifications/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+  
+      if (response.ok) {
+        setQualifications(qualifications.filter((qual) => qual.id !== id));
+      } else {
+        console.error("Failed to delete qualification:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error deleting qualification:", error);
+    }
+  };
+  
+
   return (
     <div className="p-6 bg-white rounded-lg shadow-md w-full">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
@@ -73,9 +93,13 @@ export default function FetchedProfessionalQualifications() {
               >
                 <FaEdit className="mr-1" /> Edit
               </button>
-              <button className="flex items-center text-red-600 hover:underline">
-                <FaTrash className="mr-1" /> Remove
-              </button>
+              <button
+               className="flex items-center text-red-600 hover:text-red-800 text-sm"
+               onClick={() => handleDeleteClick(qualification.id)}
+              >
+  <FaTrash className="mr-1" /> Remove
+</button>
+
             </div>
           </div>
         ))

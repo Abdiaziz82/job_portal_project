@@ -30,6 +30,26 @@ export default function FetchedEducationalBackground() {
     navigate("edit-educational-background", { state: { education: edu } });
   };
 
+  const handleDeleteClick = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this educational background?")) return;
+  
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/education/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+  
+      if (response.ok) {
+        setEducation(education.filter((edu) => edu.id !== id));
+      } else {
+        console.error("Failed to delete education:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error deleting education:", error);
+    }
+  };
+  
+
   return (
     <div className="p-6 bg-white rounded-lg shadow-md w-full">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
@@ -93,7 +113,8 @@ export default function FetchedEducationalBackground() {
               >
                 <FaEdit className="mr-1" /> Edit
               </button>
-              <button className="flex items-center text-red-600 hover:text-red-800 text-sm">
+              <button onClick={() => handleDeleteClick(edu.id)}
+               className="flex items-center text-red-600 hover:text-red-800 text-sm">
                 <FaTrash className="mr-1" /> Remove
               </button>
             </div>

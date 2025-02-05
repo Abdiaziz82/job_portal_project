@@ -30,14 +30,17 @@ export default function FetchedEmploymentDetails() {
     navigate("edit-employment-details", { state: { employment } });
   };
 
-  const handleDelete = async (id) => {
+  const handleDeleteClick = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this employment detail?")) return;
+  
     try {
       const response = await fetch(`http://127.0.0.1:5000/employment-details/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
+  
       if (response.ok) {
-        setEmploymentDetails(employmentDetails.filter((item) => item.id !== id));
+        setEmploymentDetails(employmentDetails.filter((employment) => employment.id !== id));
       } else {
         console.error("Failed to delete employment detail:", response.statusText);
       }
@@ -45,6 +48,7 @@ export default function FetchedEmploymentDetails() {
       console.error("Error deleting employment detail:", error);
     }
   };
+  
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md w-full">
@@ -82,11 +86,12 @@ export default function FetchedEmploymentDetails() {
                 <FaEdit className="mr-1" /> Edit
               </button>
               <button
-                className="flex items-center text-red-600 hover:text-red-800 text-sm"
-                onClick={() => handleDelete(employment.id)}
-              >
-                <FaTrash className="mr-1" /> Remove
-              </button>
+              className="flex items-center text-red-600 hover:text-red-800 text-sm"
+              onClick={() => handleDeleteClick(employment.id)}
+          >
+  <FaTrash className="mr-1" /> Remove
+</button>
+
             </div>
           </div>
         ))

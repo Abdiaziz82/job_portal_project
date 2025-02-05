@@ -31,11 +31,14 @@ export default function FetchedReferees() {
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this referee?")) return;
+  
     try {
       const response = await fetch(`http://127.0.0.1:5000/referees/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
+  
       if (response.ok) {
         setReferees(referees.filter((referee) => referee.id !== id));
       } else {
@@ -45,6 +48,7 @@ export default function FetchedReferees() {
       console.error("Error deleting referee:", error);
     }
   };
+  
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md w-full">
@@ -93,11 +97,12 @@ export default function FetchedReferees() {
                 <FaEdit className="mr-1" /> Edit
               </button>
               <button
-                className="flex items-center text-red-600 hover:underline"
-                onClick={() => handleDelete(referee.id)}
-              >
-                <FaTrash className="mr-1" /> Remove
-              </button>
+            className="flex items-center text-red-600 hover:underline"
+            onClick={() => handleDelete(referee.id)}
+           >
+  <FaTrash className="mr-1" /> Remove
+</button>
+
             </div>
           </div>
         ))

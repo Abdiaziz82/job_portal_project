@@ -30,6 +30,25 @@ export default function FetchedRelevantCourses() {
     navigate("edit-relevant-course", { state: { course } });
   };
 
+  const handleDeleteClick = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this course?")) return;
+  
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/relevant-courses/${id}`, {
+        method: "DELETE",
+        credentials: "include",
+      });
+  
+      if (response.ok) {
+        setCourses(courses.filter((course) => course.id !== id));
+      } else {
+        console.error("Failed to delete course:", response.statusText);
+      }
+    } catch (error) {
+      console.error("Error deleting course:", error);
+    }
+  };
+  
   return (
     <div className="p-6 bg-white rounded-lg shadow-md w-full">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
@@ -82,9 +101,13 @@ export default function FetchedRelevantCourses() {
               >
                 <FaEdit className="mr-1" /> Edit
               </button>
-              <button className="flex items-center text-red-600 hover:underline">
-                <FaTrash className="mr-1" /> Remove
-              </button>
+              <button
+               className="flex items-center text-red-600 hover:text-red-800 text-sm"
+               onClick={() => handleDeleteClick(course.id)}
+               >
+  <FaTrash className="mr-1" /> Remove
+</button>
+
             </div>
           </div>
         ))

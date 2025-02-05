@@ -9,7 +9,7 @@ const AdminHeader = () => {
   const handleLogout = async () => {
     try {
       // Send a request to the server to log out and delete the JWT cookie
-      await axios.post('http://localhost:5000/admin/logout', {}, { withCredentials: true });
+      await axios.post('http://127.0.0.1:5000/admin/logout', {}, { withCredentials: true });
 
       // Clear admin JWT cookie from the browser (in case the backend didn't clear it)
       document.cookie = "admin_jwt=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";

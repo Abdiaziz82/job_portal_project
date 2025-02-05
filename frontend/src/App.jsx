@@ -14,7 +14,7 @@ import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import Logout from "./pages/Logout";
 import PersonalDetails from "./pages/PersonalDetails";
-import WorkExperience from "./pages/WorkExperience";
+// import WorkExperience from "./pages/WorkExperience";
 import Certificates from "./pages/Certificates";
 import Education from "./pages/Education";
 import Referees from "./pages/Referees";
@@ -73,8 +73,8 @@ function App() {
                   <Route path="saved-jobs" element={<SavedJobs />} />
                   <Route path="profile" element={<Profile />}>
                     <Route path="personal-details" element={<PersonalDetails />} />
-                    <Route path="Next of Kin" element={<NextOfKinForm />} />
-                    <Route path="work-experience" element={<WorkExperience />} />
+                    <Route path="next-of-kin" element={<NextOfKinForm />} />
+                    {/* <Route path="work-experience" element={<WorkExperience />} /> */}
                     <Route path="certificates" element={<Certificates />} />
                     <Route path="education" element={<Education />} />
                     <Route path="RelevantCoursesForm" element={<RelevantCoursesForm />} />
