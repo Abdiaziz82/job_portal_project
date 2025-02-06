@@ -648,6 +648,26 @@ def update_personal_details(current_user):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+@routes.route('/personal-details', methods=['DELETE'])
+@login_required
+def delete_personal_details(current_user):
+    """Deletes personal details for the logged-in user"""
+    try:
+        # Fetch the personal details for the current user
+        details = PersonalDetails.query.filter_by(user_id=current_user.id).first()
+        if not details:
+            return jsonify({'error': 'No personal details found'}), 404
+
+        # Delete the personal details
+        db.session.delete(details)
+        db.session.commit()
+
+        return jsonify({'message': 'Personal details deleted successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
     
 @routes.route('/work-experience', methods=['POST'])
 @login_required  # Ensure the user is logged in
@@ -821,6 +841,28 @@ def update_certificate(current_user, id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
+@routes.route('/certificates/<int:certificate_id>', methods=['DELETE'])
+@login_required
+def delete_certificate(current_user, certificate_id):
+    """Deletes a specific certificate for the logged-in user"""
+    try:
+        certificate = Certificate.query.filter_by(user_id=current_user.id, id=certificate_id).first()
+        if not certificate:
+            return jsonify({'error': 'Certificate not found'}), 404
+
+        # Remove file from storage if it exists
+        if certificate.file_path and os.path.exists(certificate.file_path):
+            os.remove(certificate.file_path)
+
+        db.session.delete(certificate)
+        db.session.commit()
+
+        return jsonify({'message': 'Certificate deleted successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
 
     
 @routes.route('/upload-educational-background', methods=['POST'])
@@ -954,6 +996,23 @@ def update_educational_background(current_user, id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+@routes.route('/education/<int:id>', methods=['DELETE'])
+@login_required
+def delete_education(current_user, id):
+    """Endpoint to delete an educational background by ID."""
+    try:
+        education = EducationalBackground.query.filter_by(id=id, user_id=current_user.id).first()
+        if not education:
+            return jsonify({'error': 'Educational background not found'}), 404
+
+        db.session.delete(education)
+        db.session.commit()
+        return jsonify({'message': 'Educational background deleted successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to delete educational background', 'details': str(e)}), 500
+
 
 @routes.route('/education/<int:id>/upload-file', methods=['POST'])
 @login_required
@@ -1115,6 +1174,25 @@ def update_referee(current_user, id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
     
+@routes.route('/referees/<int:id>', methods=['DELETE'])
+@login_required
+def delete_referee(current_user, id):
+    """Endpoint to delete a referee by ID for the logged-in user."""
+    try:
+        # Query the referee by id and ensure it belongs to the logged-in user
+        referee = Referee.query.filter_by(id=id, user_id=current_user.id).first()
+
+        if not referee:
+            return jsonify({'error': 'Referee not found or not owned by the current user'}), 404
+
+        db.session.delete(referee)
+        db.session.commit()
+
+        return jsonify({'message': 'Referee deleted successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to delete referee', 'details': str(e)}), 500
+    
 @routes.route('/next-of-kin', methods=['POST'])
 @login_required  # Ensure the user is logged in
 def add_next_of_kin(current_user):
@@ -1195,6 +1273,27 @@ def update_next_of_kin(current_user, id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+@routes.route('/next-of-kin/<int:kin_id>', methods=['DELETE'])
+@login_required
+def delete_next_of_kin(current_user, kin_id):
+    """Deletes a specific Next of Kin entry for the logged-in user"""
+    try:
+        kin = NextOfKin.query.filter_by(user_id=current_user.id, id=kin_id).first()
+        if not kin:
+            return jsonify({'error': 'Next of Kin not found'}), 404
+
+        db.session.delete(kin)
+        db.session.commit()
+
+        return jsonify({'message': 'Next of Kin deleted successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+
+
     
 @routes.route('/professional-qualifications', methods=['POST'])
 @login_required
@@ -1286,6 +1385,23 @@ def update_professional_qualification(current_user, id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+@routes.route('/professional-qualifications/<int:id>', methods=['DELETE'])
+@login_required
+def delete_professional_qualification(current_user, id):
+    """Endpoint to delete a professional qualification by ID."""
+    try:
+        qualification = ProfessionalQualifications.query.filter_by(id=id, user_id=current_user.id).first()
+        if not qualification:
+            return jsonify({'error': 'Qualification not found'}), 404
+
+        db.session.delete(qualification)
+        db.session.commit()
+        return jsonify({'message': 'Professional qualification deleted successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to delete qualification', 'details': str(e)}), 500
+
     
 @routes.route('/relevant-courses-professional-body', methods=['POST'])
 @login_required
@@ -1383,6 +1499,23 @@ def update_relevant_course(current_user, id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+@routes.route('/relevant-courses/<int:id>', methods=['DELETE'])
+@login_required
+def delete_relevant_course(current_user, id):
+    """Endpoint to delete a relevant course by ID."""
+    try:
+        course = RelevantCoursesAndProfessionalBody.query.filter_by(id=id, user_id=current_user.id).first()
+        if not course:
+            return jsonify({'error': 'Course not found'}), 404
+
+        db.session.delete(course)
+        db.session.commit()
+        return jsonify({'message': 'Relevant course deleted successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to delete course', 'details': str(e)}), 500
+
     
 @routes.route('/employment-details', methods=['POST'])
 @login_required  # Ensure the user is logged in
@@ -1498,3 +1631,22 @@ def update_employment_details(current_user, id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
+
+@routes.route('/employment-details/<int:id>', methods=['DELETE'])
+@login_required
+def delete_employment_detail(current_user, id):
+    """Endpoint to delete employment details by ID for the logged-in user."""
+    try:
+        # Query the employment details by the id and the user_id
+        employment = EmploymentDetails.query.filter_by(id=id, user_id=current_user.id).first()
+
+        if not employment:
+            return jsonify({'error': 'Employment detail not found or not owned by the current user'}), 404
+
+        db.session.delete(employment)
+        db.session.commit()
+
+        return jsonify({'message': 'Employment detail deleted successfully'}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': 'Failed to delete employment detail', 'details': str(e)}), 500
