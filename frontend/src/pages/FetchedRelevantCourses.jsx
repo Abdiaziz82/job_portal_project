@@ -32,13 +32,13 @@ export default function FetchedRelevantCourses() {
 
   const handleDeleteClick = async (id) => {
     if (!window.confirm("Are you sure you want to delete this course?")) return;
-  
+
     try {
       const response = await fetch(`http://127.0.0.1:5000/relevant-courses/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
-  
+
       if (response.ok) {
         setCourses(courses.filter((course) => course.id !== id));
       } else {
@@ -48,7 +48,7 @@ export default function FetchedRelevantCourses() {
       console.error("Error deleting course:", error);
     }
   };
-  
+
   return (
     <div className="p-6 bg-white rounded-lg shadow-md w-full">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
@@ -63,52 +63,76 @@ export default function FetchedRelevantCourses() {
           {courses.length > 0 ? `Update Courses` : `Add Courses`}
         </Link>
       </div>
+
+      {courses.length > 0 && <div className="border-t-2 border-gray-300 my-6"></div>}
+
       {courses.length > 0 ? (
-        courses.map((course) => (
+        courses.map((course, index) => (
           <div key={course.id} className="mt-4 space-y-2 border-b pb-4">
             <h3 className="text-md font-semibold">{course.course_name}</h3>
-            <p className="text-sm text-gray-600">
-              <strong>Institution:</strong> {course.institution}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Year:</strong> {course.year}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Details:</strong> {course.details}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Duration:</strong> {course.duration}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Professional Body:</strong> {course.body_name}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Membership No:</strong> {course.membership_no}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Membership Type:</strong> {course.membership_type}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Renewal Date:</strong> {course.renewal_date}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Created At:</strong> {course.created_at}
-            </p>
-            <div className="flex space-x-4 mt-2">
-              <button
-                className="flex items-center text-blue-600 hover:underline"
+            <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
+              {/* Left Group */}
+              <div className="space-y-3">
+                <div className="flex items-start">
+                  <strong className="text-sm text-gray-700 w-40">Institution:</strong>
+                  <span className="text-sm text-gray-600 flex-1">{course.institution}</span>
+                </div>
+                <div className="flex items-start">
+                  <strong className="text-sm text-gray-700 w-40">Year:</strong>
+                  <span className="text-sm text-gray-600 flex-1">{course.year}</span>
+                </div>
+                <div className="flex items-start">
+                  <strong className="text-sm text-gray-700 w-40">Details:</strong>
+                  <span className="text-sm text-gray-600 flex-1">{course.details}</span>
+                </div>
+                <div className="flex items-start">
+                  <strong className="text-sm text-gray-700 w-40">Duration:</strong>
+                  <span className="text-sm text-gray-600 flex-1">{course.duration}</span>
+                </div>
+              </div>
+              {/* Right Group */}
+              <div className="space-y-3">
+                <div className="flex items-start">
+                  <strong className="text-sm text-gray-700 w-40">Professional Body:</strong>
+                  <span className="text-sm text-gray-600 flex-1">{course.body_name}</span>
+                </div>
+                <div className="flex items-start">
+                  <strong className="text-sm text-gray-700 w-40">Membership No:</strong>
+                  <span className="text-sm text-gray-600 flex-1">{course.membership_no}</span>
+                </div>
+                <div className="flex items-start">
+                  <strong className="text-sm text-gray-700 w-40">Membership Type:</strong>
+                  <span className="text-sm text-gray-600 flex-1">{course.membership_type}</span>
+                </div>
+                <div className="flex items-start">
+                  <strong className="text-sm text-gray-700 w-40">Renewal Date:</strong>
+                  <span className="text-sm text-gray-600 flex-1">{course.renewal_date}</span>
+                </div>
+                <div className="flex items-start">
+                  <strong className="text-sm text-gray-700 w-40">Created At:</strong>
+                  <span className="text-sm text-gray-600 flex-1">{course.created_at}</span>
+                </div>
+              </div>
+            </div>
+            <div className="flex space-x-4 mt-4">
+              <div
+                className="flex items-center bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-all shadow-sm cursor-pointer"
                 onClick={() => handleEditClick(course)}
               >
-                <FaEdit className="mr-1" /> Edit
-              </button>
-              <button
-               className="flex items-center text-red-600 hover:text-red-800 text-sm"
-               onClick={() => handleDeleteClick(course.id)}
-               >
-  <FaTrash className="mr-1" /> Remove
-</button>
-
+                <FaEdit className="mr-2" />
+                <span>Edit</span>
+              </div>
+              <div
+                className="flex items-center bg-red-600 text-white px-5 py-2.5 rounded-lg hover:bg-red-700 transition-all shadow-sm cursor-pointer"
+                onClick={() => handleDeleteClick(course.id)}
+              >
+                <FaTrash className="mr-2" />
+                <span>Remove</span>
+              </div>
             </div>
+            {index !== courses.length - 1 && (
+              <div className="border-t-2 border-gray-300 my-6"></div>
+            )}
           </div>
         ))
       ) : (

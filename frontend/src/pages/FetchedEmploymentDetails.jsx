@@ -52,52 +52,57 @@ export default function FetchedEmploymentDetails() {
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md w-full">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
-        <h2 className="text-lg font-semibold text-gray-800 mb-2 sm:mb-0">
-          Employment Details
-        </h2>
-        <Link
-          to="EmploymentDetailsForm"
-          className="flex items-center bg-green-700 text-white px-3 py-1 rounded-md hover:bg-green-800 transition text-sm sm:text-base whitespace-nowrap"
-        >
-          <FaPlus className="mr-2" />
-          {employmentDetails.length > 0 ? `Update Employment Details` : `Add Employment Details`}
-        </Link>
-      </div>
-      {employmentDetails.length > 0 ? (
-        employmentDetails.map((employment) => (
-          <div key={employment.id} className="mt-4 space-y-2 border-b pb-4">
-            <h3 className="text-md font-semibold">{employment.designation}</h3>
-            <p className="text-sm text-gray-600"><strong>Year:</strong> {employment.year}</p>
-            <p className="text-sm text-gray-600"><strong>Job Group:</strong> {employment.job_group}</p>
-            <p className="text-sm text-gray-600"><strong>Gross Salary:</strong> {employment.gross_salary}</p>
-            <p className="text-sm text-gray-600"><strong>Ministry:</strong> {employment.ministry}</p>
-            <p className="text-sm text-gray-600"><strong>From Date:</strong> {employment.from_date}</p>
-            <p className="text-sm text-gray-600"><strong>To Date:</strong> {employment.to_date}</p>
-            <p className="text-sm text-gray-600"><strong>Duties:</strong> {employment.duties}</p>
-            <p className="text-sm text-gray-600"><strong>Publications:</strong> {employment.publications}</p>
-            <p className="text-sm text-gray-600"><strong>Skills & Experience:</strong> {employment.skills_experience}</p>
-            
-            <div className="flex space-x-4 mt-2">
-              <button
-                className="flex items-center text-blue-600 hover:text-blue-800 text-sm"
-                onClick={() => handleEditClick(employment)}
-              >
-                <FaEdit className="mr-1" /> Edit
-              </button>
-              <button
-              className="flex items-center text-red-600 hover:text-red-800 text-sm"
-              onClick={() => handleDeleteClick(employment.id)}
-          >
-  <FaTrash className="mr-1" /> Remove
-</button>
-
-            </div>
-          </div>
-        ))
-      ) : (
-        <p className="text-sm text-gray-600">No employment details added yet.</p>
-      )}
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+      <h2 className="text-xl font-semibold text-gray-800">Employment Details</h2>
+      <Link
+        to="EmploymentDetailsForm"
+        className="flex items-center bg-green-700 text-white px-4 py-2 rounded-md hover:bg-green-800 transition text-sm sm:text-base"
+      >
+        <FaPlus className="mr-2" />
+        {employmentDetails.length > 0 ? `Update Employment Details` : `Add Employment Details`}
+      </Link>
     </div>
+  
+    {employmentDetails.length > 0 ? (
+      employmentDetails.map((employment) => (
+        <div 
+          key={employment.id} 
+          className="p-4 border-t border-gray-300 bg-white"
+        >
+          <h3 className="text-lg font-semibold text-gray-900">{employment.designation}</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2 text-sm text-gray-700">
+            <p><strong>Year:</strong> {employment.year}</p>
+            <p><strong>Job Group:</strong> {employment.job_group}</p>
+            <p><strong>Gross Salary:</strong> {employment.gross_salary}</p>
+            <p><strong>Ministry:</strong> {employment.ministry}</p>
+            <p><strong>From Date:</strong> {employment.from_date}</p>
+            <p><strong>To Date:</strong> {employment.to_date}</p>
+            <p><strong>Duties:</strong> {employment.duties}</p>
+            <p><strong>Publications:</strong> {employment.publications}</p>
+            <p><strong>Skills & Experience:</strong> {employment.skills_experience}</p>
+          </div>
+  
+          <div className="flex space-x-4 mt-4">
+            <button
+              className="flex items-center bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-all shadow-sm cursor-pointer"
+              onClick={() => handleEditClick(employment)}
+            >
+              <FaEdit className="mr-1" /> Edit
+            </button>
+            <button
+              className="flex items-center bg-red-600 text-white px-5 py-2.5 rounded-lg hover:bg-red-700 transition-all shadow-sm cursor-pointer"
+              onClick={() => handleDeleteClick(employment.id)}
+            >
+              <FaTrash className="mr-1" /> Remove
+            </button>
+          </div>
+        </div>
+      ))
+    ) : (
+      <p className="text-center text-gray-600 text-sm">No employment details added yet.</p>
+    )}
+  </div>
+  
+  
   );
 }

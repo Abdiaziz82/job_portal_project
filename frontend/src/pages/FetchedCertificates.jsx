@@ -65,45 +65,45 @@ export default function FetchedCertificates() {
           Add Certificate
         </Link>
       </div>
-
-      <div className="border-t-2 border-gray-300 my-6"></div>
-
+  
+      {certificates.length > 0 && <div className="border-t-2 border-gray-300 my-6"></div>}
+  
       {certificates.length > 0 ? (
         certificates.map((certificate, index) => (
           <div key={certificate.id}>
-            <div className="mt-4 space-y-3">
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
               <div className="flex items-start">
                 <strong className="text-sm text-gray-700 w-40">Certificate Type:</strong>
                 <span className="text-sm text-gray-600 flex-1">{certificate.certificate_type}</span>
               </div>
-
+  
               <div className="flex items-start">
                 <strong className="text-sm text-gray-700 w-40">Specialization:</strong>
                 <span className="text-sm text-gray-600 flex-1">{certificate.specialization}</span>
               </div>
-
+  
               <div className="flex items-start">
                 <strong className="text-sm text-gray-700 w-40">Institution:</strong>
                 <span className="text-sm text-gray-600 flex-1">{certificate.institution_name}</span>
               </div>
-
+  
               <div className="flex items-start">
                 <strong className="text-sm text-gray-700 w-40">Year of Completion:</strong>
                 <span className="text-sm text-gray-600 flex-1">{certificate.year_of_completion}</span>
               </div>
-
+  
               <div className="flex items-start">
                 <strong className="text-sm text-gray-700 w-40">Grade:</strong>
                 <span className="text-sm text-gray-600 flex-1">{certificate.grade}</span>
               </div>
-
+  
               <div className="flex items-start">
                 <strong className="text-sm text-gray-700 w-40">Additional Awards:</strong>
                 <span className="text-sm text-gray-600 flex-1">{certificate.additional_awards}</span>
               </div>
-
+  
               {certificate.file_path && (
-                <div className="flex items-start">
+                <div className="flex items-start sm:col-span-2">
                   <strong className="text-sm text-gray-700 w-40">File:</strong>
                   <a
                     href={certificate.file_path}
@@ -115,33 +115,32 @@ export default function FetchedCertificates() {
                   </a>
                 </div>
               )}
-
-              <div className="flex space-x-4 mt-4">
-                <div
-                  className="flex items-center bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-all shadow-sm cursor-pointer"
-                  onClick={() => handleEditClick(certificate)}
-                >
-                  <FaEdit className="mr-2" />
-                  <span>Edit</span>
-                </div>
-                <div
-                  className="flex items-center bg-red-600 text-white px-5 py-2.5 rounded-lg hover:bg-red-700 transition-all shadow-sm cursor-pointer"
-                  onClick={() => handleDelete(certificate.id)}
-                >
-                  <FaTrash className="mr-2" />
-                  <span>Remove</span>
-                </div>
+            </div>
+  
+            <div className="flex space-x-4 mt-4">
+              <div
+                className="flex items-center bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-all shadow-sm cursor-pointer"
+                onClick={() => handleEditClick(certificate)}
+              >
+                <FaEdit className="mr-2" />
+                <span>Edit</span>
+              </div>
+              <div
+                className="flex items-center bg-red-600 text-white px-5 py-2.5 rounded-lg hover:bg-red-700 transition-all shadow-sm cursor-pointer"
+                onClick={() => handleDelete(certificate.id)}
+              >
+                <FaTrash className="mr-2" />
+                <span>Remove</span>
               </div>
             </div>
-
+  
             {index !== certificates.length - 1 && <div className="border-t-2 border-gray-300 my-6"></div>}
           </div>
         ))
       ) : (
         <p className="text-sm text-gray-600">No certificates added yet.</p>
       )}
-
-      <div className="border-t-2 border-gray-300 my-6"></div>
     </div>
   );
+  
 }

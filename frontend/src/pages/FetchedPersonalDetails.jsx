@@ -53,7 +53,7 @@ export default function FetchedPersonalDetails() {
   };
 
   return (
-    <div className="p-8 bg-white rounded-xl border border-gray-100 shadow-lg w-full">
+    <div className="p-8 bg-white rounded-xl border border-gray-100 shadow-lg w-full max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
           Personal Details
@@ -112,7 +112,7 @@ export default function FetchedPersonalDetails() {
             </div>
 
             {/* Thick Horizontal Divider */}
-            
+            <div className="border-t-2 border-gray-300 my-6"></div>
 
             {/* Additional Details Section */}
             <div className="space-y-4">
@@ -151,16 +151,16 @@ export default function FetchedPersonalDetails() {
           </div>
 
           {/* Action Buttons */}
-          <div className="flex space-x-4 mt-8">
+          <div className="flex flex-row space-x-4 mt-8">
             <button
-              className="flex items-center bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-all shadow-sm"
+              className="flex items-center justify-center bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-all shadow-sm"
               onClick={handleEditClick}
             >
               <FaEdit className="mr-2" />
               <span>Edit</span>
             </button>
             <button
-              className="flex items-center bg-red-600 text-white px-5 py-2.5 rounded-lg hover:bg-red-700 transition-all shadow-sm"
+              className="flex items-center justify-center bg-red-600 text-white px-5 py-2.5 rounded-lg hover:bg-red-700 transition-all shadow-sm"
               onClick={handleDelete}
             >
               <FaTrash className="mr-2" />

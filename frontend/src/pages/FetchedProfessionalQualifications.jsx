@@ -48,7 +48,6 @@ export default function FetchedProfessionalQualifications() {
       console.error("Error deleting qualification:", error);
     }
   };
-  
 
   return (
     <div className="p-6 bg-white rounded-lg shadow-md w-full">
@@ -64,43 +63,63 @@ export default function FetchedProfessionalQualifications() {
           Add Qualifications
         </Link>
       </div>
+
+      {qualifications.length > 0 && <div className="border-t-2 border-gray-300 my-6"></div>}
+
       {qualifications.length > 0 ? (
-        qualifications.map((qualification) => (
-          <div key={qualification.id} className="mt-4 space-y-2">
-            <h3 className="text-md font-semibold">{qualification.award}</h3>
-            <p className="text-sm text-gray-600">
-              <strong>Institution:</strong> {qualification.institution}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Specialization:</strong> {qualification.specialization}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Grade:</strong> {qualification.grade}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Year From:</strong> {qualification.year_from}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Year To:</strong> {qualification.year_to}
-            </p>
-            <p className="text-sm text-gray-600">
-              <strong>Created At:</strong> {qualification.created_at}
-            </p>
-            <div className="flex space-x-4 mt-2">
-              <button
-                className="flex items-center text-blue-600 hover:underline"
+        qualifications.map((qualification, index) => (
+          <div key={qualification.id}>
+            <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
+              <div className="flex items-start">
+                <strong className="text-sm text-gray-700 w-40">Award:</strong>
+                <span className="text-sm text-gray-600 flex-1">{qualification.award}</span>
+              </div>
+              <div className="flex items-start">
+                <strong className="text-sm text-gray-700 w-40">Institution:</strong>
+                <span className="text-sm text-gray-600 flex-1">{qualification.institution}</span>
+              </div>
+              <div className="flex items-start">
+                <strong className="text-sm text-gray-700 w-40">Specialization:</strong>
+                <span className="text-sm text-gray-600 flex-1">{qualification.specialization}</span>
+              </div>
+              <div className="flex items-start">
+                <strong className="text-sm text-gray-700 w-40">Grade:</strong>
+                <span className="text-sm text-gray-600 flex-1">{qualification.grade}</span>
+              </div>
+              <div className="flex items-start">
+                <strong className="text-sm text-gray-700 w-40">Year From:</strong>
+                <span className="text-sm text-gray-600 flex-1">{qualification.year_from}</span>
+              </div>
+              <div className="flex items-start">
+                <strong className="text-sm text-gray-700 w-40">Year To:</strong>
+                <span className="text-sm text-gray-600 flex-1">{qualification.year_to}</span>
+              </div>
+              <div className="flex items-start sm:col-span-2">
+                <strong className="text-sm text-gray-700 w-40">Created At:</strong>
+                <span className="text-sm text-gray-600 flex-1">{qualification.created_at}</span>
+              </div>
+            </div>
+
+            <div className="flex space-x-4 mt-4">
+              <div
+                className="flex items-center bg-blue-600 text-white px-5 py-2.5 rounded-lg hover:bg-blue-700 transition-all shadow-sm cursor-pointer"
                 onClick={() => handleEditClick(qualification)}
               >
-                <FaEdit className="mr-1" /> Edit
-              </button>
-              <button
-               className="flex items-center text-red-600 hover:text-red-800 text-sm"
-               onClick={() => handleDeleteClick(qualification.id)}
+                <FaEdit className="mr-2" />
+                <span>Edit</span>
+              </div>
+              <div
+                className="flex items-center bg-red-600 text-white px-5 py-2.5 rounded-lg hover:bg-red-700 transition-all shadow-sm cursor-pointer"
+                onClick={() => handleDeleteClick(qualification.id)}
               >
-  <FaTrash className="mr-1" /> Remove
-</button>
-
+                <FaTrash className="mr-2" />
+                <span>Remove</span>
+              </div>
             </div>
+
+            {index !== qualifications.length - 1 && (
+              <div className="border-t-2 border-gray-300 my-6"></div>
+            )}
           </div>
         ))
       ) : (
