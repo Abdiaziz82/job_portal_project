@@ -366,7 +366,6 @@ def admin_login():
     return jsonify({'error': 'Invalid email or password'}), 401
    
    
-   
 @routes.route('/admin/authcheck', methods=['GET'])
 def admin_auth_check():
     admin_token = request.cookies.get('admin_jwt')
@@ -398,7 +397,7 @@ def create_job():
         terms_of_service=data['termsOfService'],
         number_of_posts=int(data['numberOfPosts']),
         application_deadline=data['applicationDeadline'],
-        application_instructions=data['instructions']  # Use the frontend field name
+        grade=int(data['grade'])  
     )
     db.session.add(job)
     db.session.commit()
@@ -411,9 +410,8 @@ def create_job():
         "termsOfService": job.terms_of_service,
         "numberOfPosts": job.number_of_posts,
         "applicationDeadline": job.application_deadline,
-        "applicationInstructions": job.application_instructions  # Include in the response
+        "grade": job.grade  
     }), 201
-
 
 
 @routes.route('/api/jobs', methods=['GET'])
@@ -428,14 +426,32 @@ def get_jobs():
             "termsOfService": job.terms_of_service,
             "numberOfPosts": job.number_of_posts,
             "applicationDeadline": job.application_deadline,
-            "applicationInstructions": job.application_instructions  # Include the new field
+            "grade": job.grade  
         }
         for job in jobs
     ]
     return jsonify(jobs_list), 200
 
-    
-    
+@routes.route('/api/jobs/<int:id>', methods=['GET'])
+def get_job_by_id(id):
+    job = Job.query.get(id)
+    if job:
+        job_details = {
+            "id": job.id,
+            "position": job.position,
+            "description": job.description,
+            "advert": job.advert,
+            "termsOfService": job.terms_of_service,
+            "numberOfPosts": job.number_of_posts,
+            "applicationDeadline": job.application_deadline,
+            "grade": job.grade
+        }
+        return jsonify(job_details), 200
+    return jsonify({"message": "Job not found"}), 404
+
+
+
+
 @routes.route('/api/jobs/<int:job_id>', methods=['PUT'])
 def update_job(job_id):
     job = Job.query.get(job_id)
@@ -449,7 +465,7 @@ def update_job(job_id):
     job.terms_of_service = data.get('termsOfService', job.terms_of_service)
     job.number_of_posts = int(data.get('numberOfPosts', job.number_of_posts))
     job.application_deadline = data.get('applicationDeadline', job.application_deadline)
-    job.application_instructions = data.get('instructions', job.application_instructions)  # New field
+    job.grade = int(data.get('grade', job.grade))  
     db.session.commit()
 
     return jsonify({
@@ -460,8 +476,9 @@ def update_job(job_id):
         "termsOfService": job.terms_of_service,
         "numberOfPosts": job.number_of_posts,
         "applicationDeadline": job.application_deadline,
-        "applicationInstructions": job.application_instructions  # Include in the response
+        "grade": job.grade  # Updated field in response
     }), 200
+
 
 @routes.route('/api/jobs/<int:job_id>', methods=['DELETE'])
 def delete_job(job_id):

@@ -232,7 +232,7 @@ class Job(db.Model):
     terms_of_service = db.Column(db.Text, nullable=False)
     application_deadline = db.Column(db.Date, nullable=False)
     number_of_posts = db.Column(db.Integer, nullable=False)
-    application_instructions = db.Column(db.Text, nullable=False)  # New field
+    grade = db.Column(db.Integer, nullable=False)  
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
