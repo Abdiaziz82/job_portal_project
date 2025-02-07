@@ -8,7 +8,7 @@ const ManageJobs = () => {
     termsOfService: "",
     numberOfPosts: "",
     applicationDeadline: "",
-    instructions: "",
+    grade: "", 
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,7 +46,7 @@ const ManageJobs = () => {
         termsOfService: "",
         numberOfPosts: "",
         applicationDeadline: "",
-        instructions: "",
+        grade: "", 
       });
 
       alert("Job posted successfully!");
@@ -165,18 +165,18 @@ const ManageJobs = () => {
           />
         </div>
 
-        {/* Instructions */}
+        {/* Grade */}
         <div>
-          <label htmlFor="instructions" className="block text-sm font-medium">
-            Application Instructions
+          <label htmlFor="grade" className="block text-sm font-medium">
+            Grade
           </label>
-          <textarea
-            id="instructions"
-            name="instructions"
-            value={formData.instructions}
+          <input
+            type="number"
+            id="grade"
+            name="grade"
+            value={formData.grade}
             onChange={handleChange}
             required
-            rows="2"
             className="w-full mt-2 p-3 border border-gray-300 rounded-md"
           />
         </div>

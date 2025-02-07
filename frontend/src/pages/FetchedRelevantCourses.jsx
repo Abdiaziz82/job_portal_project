@@ -60,7 +60,7 @@ export default function FetchedRelevantCourses() {
           className="flex items-center bg-green-700 text-white px-3 py-1 rounded-md hover:bg-green-800 transition text-sm sm:text-base whitespace-nowrap"
         >
           <FaPlus className="mr-2" />
-          {courses.length > 0 ? `Update Courses` : `Add Courses`}
+          Add Courses and Professional bodies
         </Link>
       </div>
 

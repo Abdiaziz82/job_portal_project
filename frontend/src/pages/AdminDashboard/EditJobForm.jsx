@@ -59,10 +59,10 @@ const EditJobForm = ({ formData, handleChange, handleUpdate, onCancel }) => {
           required
         />
         <textarea
-          name="applicationInstructions"
-          value={formData.applicationInstructions}
+          name="grade"
+          value={formData.grade}
           onChange={handleChange}
-          placeholder="Application Instructions"
+          placeholder="Grade"
           rows="2"
           className="w-full p-2 border rounded-md"
           required

@@ -60,7 +60,7 @@ export default function FetchedPersonalDetails() {
         </h2>
         <Link
           to="personal-details"
-          className="flex items-center bg-green-600 text-white px-5 py-2.5 rounded-lg hover:bg-green-700 transition-all text-sm sm:text-base whitespace-nowrap shadow-sm"
+          className="flex items-center bg-green-700 text-white px-5 py-2.5 rounded-lg hover:bg-green-700 transition-all text-sm sm:text-base whitespace-nowrap shadow-sm"
         >
           <FaPlus className="mr-2" />
           Add Personal Details

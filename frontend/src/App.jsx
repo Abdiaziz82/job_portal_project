@@ -42,6 +42,7 @@ import EditEducationalBackground from "./pages/EditEducationalBackground";
 import EditEmploymentDetails from "./pages/EditEmploymentDetails";
 import EditRelevantCourse from "./pages/EditRelevantCourse";
 import EditReferee from "./pages/EditReferee";
+import JobDetails from "./pages/JobDetails";
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:token" element={<ResetPassword />} />
+                
 
                 {/* User Dashboard */}
                 <Route
@@ -68,7 +70,8 @@ function App() {
                   }
                 >
                   <Route index element={<Dashboard />} />
-                  <Route path="browse-jobs" element={<BrowseJobs />} />
+                  <Route path="browse-jobs/*" element={<BrowseJobs />} />
+                  
                   <Route path="my-applications" element={<MyApplications />} />
                   <Route path="saved-jobs" element={<SavedJobs />} />
                   <Route path="profile" element={<Profile />}>

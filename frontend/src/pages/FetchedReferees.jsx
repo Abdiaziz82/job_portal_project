@@ -63,7 +63,7 @@ export default function FetchedReferees() {
           className="flex items-center bg-green-700 text-white px-3 py-1 rounded-md hover:bg-green-800 transition text-sm sm:text-base whitespace-nowrap"
         >
           <FaPlus className="mr-2" />
-          {referees.length > 0 ? `Update Referees` : `Add Referees`}
+          Add Referees
         </Link>
       </div>
 

@@ -12,7 +12,7 @@ const CreatedJobs = () => {
     termsOfService: "",
     numberOfPosts: "",
     applicationDeadline: "",
-    applicationInstructions: "",
+    grade: "", // Updated field
   });
 
   useEffect(() => {
@@ -79,7 +79,7 @@ const CreatedJobs = () => {
         termsOfService: "",
         numberOfPosts: "",
         applicationDeadline: "",
-        applicationInstructions: "",
+        grade: "", // Updated field
       });
     } catch (error) {
       console.error("Error updating job:", error);
@@ -95,7 +95,7 @@ const CreatedJobs = () => {
       termsOfService: "",
       numberOfPosts: "",
       applicationDeadline: "",
-      applicationInstructions: "",
+      grade: "", // Updated field
     });
   };
 
@@ -131,8 +131,7 @@ const CreatedJobs = () => {
                 <strong>Terms of Service:</strong> {job.termsOfService}
               </p>
               <p className="text-sm text-gray-600">
-                <strong>Application Instructions:</strong>{" "}
-                {job.applicationInstructions}
+                <strong>Grade:</strong> {job.grade}
               </p>
               <p className="text-sm text-gray-600">
                 <strong>Number of Posts:</strong> {job.numberOfPosts}

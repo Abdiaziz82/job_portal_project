@@ -59,7 +59,7 @@ export default function FetchedEmploymentDetails() {
         className="flex items-center bg-green-700 text-white px-4 py-2 rounded-md hover:bg-green-800 transition text-sm sm:text-base"
       >
         <FaPlus className="mr-2" />
-        {employmentDetails.length > 0 ? `Update Employment Details` : `Add Employment Details`}
+        Add Employment Details
       </Link>
     </div>
   

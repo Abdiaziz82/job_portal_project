@@ -57,7 +57,7 @@ export default function FetchedNextOfKin() {
         </h2>
         <Link
           to="next-of-kin"
-          className="flex items-center bg-green-700 text-white px-3 py-1 rounded-md hover:bg-green-800 transition text-sm sm:text-base whitespace-nowrap"
+          className="flex items-center bg-green-700 text-white px-5 py-2.5 rounded-lg hover:bg-green-700 transition-all text-sm sm:text-base whitespace-nowrap shadow-sm"
         >
           <FaPlus className="mr-2" />
           Add Next of Kin
