@@ -234,6 +234,10 @@ class Job(db.Model):
     number_of_posts = db.Column(db.Integer, nullable=False)
     grade = db.Column(db.Integer, nullable=False)  
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    
+    # New fields
+    requirements = db.Column(db.Text, nullable=False)
+    duties = db.Column(db.Text, nullable=False)  # Includes both duties & responsibilities
 
     def __repr__(self):
         return f'<Job {self.position}>'

@@ -397,7 +397,9 @@ def create_job():
         terms_of_service=data['termsOfService'],
         number_of_posts=int(data['numberOfPosts']),
         application_deadline=data['applicationDeadline'],
-        grade=int(data['grade'])  
+        grade=int(data['grade']),
+        requirements=data['requirements'],  
+        duties=data['duties']  
     )
     db.session.add(job)
     db.session.commit()
@@ -410,7 +412,9 @@ def create_job():
         "termsOfService": job.terms_of_service,
         "numberOfPosts": job.number_of_posts,
         "applicationDeadline": job.application_deadline,
-        "grade": job.grade  
+        "grade": job.grade,
+        "requirements": job.requirements,  
+        "duties": job.duties  
     }), 201
 
 
@@ -426,11 +430,14 @@ def get_jobs():
             "termsOfService": job.terms_of_service,
             "numberOfPosts": job.number_of_posts,
             "applicationDeadline": job.application_deadline,
-            "grade": job.grade  
+            "grade": job.grade,
+            "requirements": job.requirements, 
+            "duties": job.duties  
         }
         for job in jobs
     ]
     return jsonify(jobs_list), 200
+
 
 @routes.route('/api/jobs/<int:id>', methods=['GET'])
 def get_job_by_id(id):
@@ -444,12 +451,12 @@ def get_job_by_id(id):
             "termsOfService": job.terms_of_service,
             "numberOfPosts": job.number_of_posts,
             "applicationDeadline": job.application_deadline,
-            "grade": job.grade
+            "grade": job.grade,
+            "requirements": job.requirements,  
+            "duties": job.duties  
         }
         return jsonify(job_details), 200
     return jsonify({"message": "Job not found"}), 404
-
-
 
 
 @routes.route('/api/jobs/<int:job_id>', methods=['PUT'])
@@ -465,7 +472,9 @@ def update_job(job_id):
     job.terms_of_service = data.get('termsOfService', job.terms_of_service)
     job.number_of_posts = int(data.get('numberOfPosts', job.number_of_posts))
     job.application_deadline = data.get('applicationDeadline', job.application_deadline)
-    job.grade = int(data.get('grade', job.grade))  
+    job.grade = int(data.get('grade', job.grade))
+    job.requirements = data.get('requirements', job.requirements)  
+    job.duties = data.get('duties', job.duties)  
     db.session.commit()
 
     return jsonify({
@@ -476,7 +485,9 @@ def update_job(job_id):
         "termsOfService": job.terms_of_service,
         "numberOfPosts": job.number_of_posts,
         "applicationDeadline": job.application_deadline,
-        "grade": job.grade  # Updated field in response
+        "grade": job.grade,
+        "requirements": job.requirements,  
+        "duties": job.duties  
     }), 200
 
 
@@ -497,6 +508,7 @@ def delete_job(job_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": "An error occurred while deleting the job.", "details": str(e)}), 500
+
 
     
 # Admin logout
