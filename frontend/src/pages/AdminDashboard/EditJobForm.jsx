@@ -67,6 +67,24 @@ const EditJobForm = ({ formData, handleChange, handleUpdate, onCancel }) => {
           className="w-full p-2 border rounded-md"
           required
         />
+        <textarea
+          name="requirements"
+          value={formData.requirements}
+          onChange={handleChange}
+          placeholder="Requirements"
+          rows="3"
+          className="w-full p-2 border rounded-md"
+          required
+        />
+        <textarea
+          name="duties"
+          value={formData.duties}
+          onChange={handleChange}
+          placeholder="Duties"
+          rows="3"
+          className="w-full p-2 border rounded-md"
+          required
+        />
         <div className="flex space-x-4">
           <button
             type="submit"

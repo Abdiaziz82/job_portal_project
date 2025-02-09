@@ -12,7 +12,9 @@ const CreatedJobs = () => {
     termsOfService: "",
     numberOfPosts: "",
     applicationDeadline: "",
-    grade: "", // Updated field
+    grade: "",
+    requirements: "", // New field
+    duties: "", // New field
   });
 
   useEffect(() => {
@@ -79,7 +81,9 @@ const CreatedJobs = () => {
         termsOfService: "",
         numberOfPosts: "",
         applicationDeadline: "",
-        grade: "", // Updated field
+        grade: "",
+        requirements: "", // Reset new field
+        duties: "", // Reset new field
       });
     } catch (error) {
       console.error("Error updating job:", error);
@@ -95,7 +99,9 @@ const CreatedJobs = () => {
       termsOfService: "",
       numberOfPosts: "",
       applicationDeadline: "",
-      grade: "", // Updated field
+      grade: "",
+      requirements: "", 
+      duties: "", 
     });
   };
 
@@ -136,6 +142,12 @@ const CreatedJobs = () => {
               <p className="text-sm text-gray-600">
                 <strong>Number of Posts:</strong> {job.numberOfPosts}
               </p>
+              <p className="text-sm text-gray-600">
+                <strong>Requirements:</strong> {job.requirements}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>Duties:</strong> {job.duties}
+              </p>
             </div>
 
             {/* Card Footer */}
@@ -163,23 +175,24 @@ const CreatedJobs = () => {
 
       {/* Modal for Editing Job */}
       {editingJob && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg shadow-lg w-11/12 sm:w-2/3 lg:w-1/2 p-6 relative">
-            <button
-              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
-              onClick={handleCancelEdit}
-            >
-              &#x2715;
-            </button>
-            <EditJobForm
-              formData={formData}
-              handleChange={handleChange}
-              handleUpdate={handleUpdate}
-              onCancel={handleCancelEdit}
-            />
-          </div>
-        </div>
-      )}
+  <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+    <div className="bg-white rounded-lg shadow-lg w-11/12 sm:w-2/3 lg:w-1/2 p-6 relative max-h-[80vh] overflow-y-auto">
+      <button
+        className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
+        onClick={handleCancelEdit}
+      >
+        &#x2715;
+      </button>
+      <EditJobForm
+        formData={formData}
+        handleChange={handleChange}
+        handleUpdate={handleUpdate}
+        onCancel={handleCancelEdit}
+      />
+    </div>
+  </div>
+)}
+
     </div>
   );
 };

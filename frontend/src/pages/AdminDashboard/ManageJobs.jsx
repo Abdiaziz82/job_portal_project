@@ -8,7 +8,9 @@ const ManageJobs = () => {
     termsOfService: "",
     numberOfPosts: "",
     applicationDeadline: "",
-    grade: "", 
+    grade: "",
+    requirements: "",  
+    duties: "", 
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -46,7 +48,9 @@ const ManageJobs = () => {
         termsOfService: "",
         numberOfPosts: "",
         applicationDeadline: "",
-        grade: "", 
+        grade: "",
+        requirements: "", 
+        duties: "",
       });
 
       alert("Job posted successfully!");
@@ -151,7 +155,10 @@ const ManageJobs = () => {
 
         {/* Application Deadline */}
         <div>
-          <label htmlFor="applicationDeadline" className="block text-sm font-medium">
+          <label
+            htmlFor="applicationDeadline"
+            className="block text-sm font-medium"
+          >
             Application Deadline
           </label>
           <input
@@ -177,6 +184,38 @@ const ManageJobs = () => {
             value={formData.grade}
             onChange={handleChange}
             required
+            className="w-full mt-2 p-3 border border-gray-300 rounded-md"
+          />
+        </div>
+
+        {/* Requirements (New Field) */}
+        <div>
+          <label htmlFor="requirements" className="block text-sm font-medium">
+            Requirements
+          </label>
+          <textarea
+            id="requirements"
+            name="requirements"
+            value={formData.requirements}
+            onChange={handleChange}
+            required
+            rows="4"
+            className="w-full mt-2 p-3 border border-gray-300 rounded-md"
+          />
+        </div>
+
+        {/* Duties (New Field) */}
+        <div>
+          <label htmlFor="duties" className="block text-sm font-medium">
+            Duties
+          </label>
+          <textarea
+            id="duties"
+            name="duties"
+            value={formData.duties}
+            onChange={handleChange}
+            required
+            rows="4"
             className="w-full mt-2 p-3 border border-gray-300 rounded-md"
           />
         </div>
