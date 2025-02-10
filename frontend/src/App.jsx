@@ -43,10 +43,14 @@ import EditEmploymentDetails from "./pages/EditEmploymentDetails";
 import EditRelevantCourse from "./pages/EditRelevantCourse";
 import EditReferee from "./pages/EditReferee";
 import JobDetails from "./pages/JobDetails";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function App() {
   return (
+    
     <Router>
+       <ToastContainer position="top-center" autoClose={5000} />
       <Routes>
         {/* USER ROUTES */}
         <Route
