@@ -9,7 +9,7 @@ const JobDetails = () => {
   const navigate = useNavigate();
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [hasApplied, setHasApplied] = useState(false); 
+  const [hasApplied, setHasApplied] = useState(false);
 
   useEffect(() => {
     fetch(`http://127.0.0.1:5000/api/jobs/${id}`, {
@@ -28,27 +28,31 @@ const JobDetails = () => {
         credentials: "include",
         headers: { "Content-Type": "application/json" },
       });
-  
+
       const data = await response.json();
-  
+
       if (!response.ok) {
-        throw new Error(data.error || "Failed to apply for the job");
+        // Handle backend errors
+        if (data.error && data.error.includes("Please fill and update your profile")) {
+          toast.error("⚠️ Profile incomplete! Update your profile before applying.");
+        } else if (data.error && data.error.includes("You have already applied for this job")) {
+          toast.warning("⚠️ You have already applied for this job.");
+        } else {
+          toast.error(data.error || "Failed to apply for the job");
+        }
+        return;
       }
-  
+
+      // Success
       toast.success("✅ Application submitted successfully!");
       setHasApplied(true);
     } catch (error) {
       console.error("Error applying:", error);
-      
-      if (error.message.includes("Please fill and update your profile")) {
-        toast.error("⚠️ Profile incomplete! Update your profile before applying.");
-      } else {
-        toast.error(error.message);
-      }
+      toast.error("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
-  
 
   if (!job) {
     return <p className="text-center text-gray-500 mt-12">Loading job details...</p>;
@@ -58,7 +62,9 @@ const JobDetails = () => {
 
   return (
     <div className="container mx-auto mt-12 px-4 md:px-8">
-      <h2 className="text-3xl font-bold text-green-700 text-center">{position} ({numberOfPosts} posts)</h2>
+      <h2 className="text-3xl font-bold text-green-700 text-center">
+        {position} ({numberOfPosts} posts)
+      </h2>
       <p className="text-lg text-gray-600 text-center mt-2">
         <span className="font-semibold text-black">Application Deadline:</span> {applicationDeadline}
       </p>
@@ -106,7 +112,8 @@ const JobDetails = () => {
           onClick={applyForJob}
           disabled={hasApplied || loading}
         >
-          <i className="fa fa-paper-plane mr-2"></i> {loading ? "Applying..." : hasApplied ? "Already Applied" : "Apply for this Job"}
+          <i className="fa fa-paper-plane mr-2"></i>{" "}
+          {loading ? "Applying..." : hasApplied ? "Already Applied" : "Apply for this Job"}
         </button>
 
         <button

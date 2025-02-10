@@ -1619,10 +1619,10 @@ def delete_employment_detail(current_user, id):
         return jsonify({'error': 'Failed to delete employment detail', 'details': str(e)}), 500
         
 @routes.route('/apply-job/<int:job_id>', methods=['POST'])
-@login_required  # Ensure the user is logged in
+@login_required
 def apply_for_job(current_user, job_id):
     """Allows a user to apply for a job if their profile is complete"""
-    
+
     # Function to check if the user's profile is complete
     def is_profile_complete(user_id):
         """Check if the user has completed all required profile sections."""
@@ -1730,3 +1730,30 @@ def get_user_job_applications(current_user):
     except Exception as e:
         return jsonify({"error": "Failed to fetch job applications", "details": str(e)}), 500
 
+@routes.route('/admin/user-profile/<int:user_id>/<int:job_id>', methods=['GET'])
+@login_required
+def get_user_profile(current_user, user_id, job_id):
+    """Fetch all details of a user by their ID who applied for a specific job."""
+    
+    # Ensure the user applied for this job
+    application = JobApplication.query.filter_by(user_id=user_id, job_id=job_id).first()
+    if not application:
+        return jsonify({"error": "No application found for this job"}), 404
+
+    # Fetch the user details
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    profile = {
+        "personal_details": user.personal_details.serialize() if user.personal_details else None,
+        "certificates": [cert.serialize() for cert in user.certificates],
+        "education": [edu.serialize() for edu in user.education],
+        "referees": [ref.serialize() for ref in user.referees],
+        "next_of_kin": user.next_of_kin.serialize() if user.next_of_kin else None,
+        "professional_qualifications": [pq.serialize() for pq in user.professional_qualifications],
+        "relevant_courses": [rc.serialize() for rc in user.relevant_courses],
+        "employment_details": [emp.serialize() for emp in user.employment_details]
+    }
+
+    return jsonify(profile), 200

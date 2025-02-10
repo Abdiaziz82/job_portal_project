@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const ViewApplications = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetch("http://127.0.0.1:5000/admin/job-applications", {
@@ -78,10 +80,16 @@ const ViewApplications = () => {
                     Accept
                   </button>
                   <button
-                    className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700"
+                    className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 mr-2"
                     onClick={() => handleStatusUpdate(app.id, "Rejected")}
                   >
                     Reject
+                  </button>
+                  <button
+                    className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+                    onClick={() => navigate(`/view-profile/${app.user_id}/${app.job_id}`)}
+                  >
+                    View Profile
                   </button>
                 </td>
               </tr>
