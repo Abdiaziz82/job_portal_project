@@ -1660,7 +1660,7 @@ def apply_for_job(current_user, job_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
-    
+
 @routes.route('/admin/job-applications', methods=['GET'])
 @login_required  # Ensure only logged-in admins can access
 def get_all_job_applications(applications):
