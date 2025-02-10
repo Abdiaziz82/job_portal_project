@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, make_response, current_app
-from models import db, User ,Job , PersonalDetails , WorkExperience ,Certificate ,EducationalBackground ,Referee ,NextOfKin , ProfessionalQualifications ,RelevantCoursesAndProfessionalBody, EmploymentDetails
+from models import db, User ,Job , PersonalDetails , WorkExperience ,Certificate ,EducationalBackground ,Referee ,NextOfKin , ProfessionalQualifications ,RelevantCoursesAndProfessionalBody, EmploymentDetails ,JobApplication
 from flask_bcrypt import Bcrypt
 import jwt
 from datetime import datetime, timedelta
@@ -698,69 +698,7 @@ def delete_personal_details(current_user):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
     
-@routes.route('/work-experience', methods=['POST'])
-@login_required  # Ensure the user is logged in
-def add_work_experience(current_user):
-    # Check if the user already has work experience (if needed, customize to allow multiple)
-    existing_experience = WorkExperience.query.filter_by(user_id=current_user.id).first()
-    if existing_experience:
-        return jsonify({'error': 'Work experience already exists for this user'}), 400
 
-    # Get JSON data from the request
-    data = request.get_json()
-
-    # Validate required fields (excluding user_id, as it's automatically set)
-    if not data or 'job_title' not in data or 'company_name' not in data:
-        return jsonify({'error': 'Missing required fields (job_title, company_name)'}), 400
-
-    try:
-        # Parse dates if provided
-        start_date = datetime.strptime(data['start_date'], '%Y-%m-%d').date() if 'start_date' in data else None
-        end_date = datetime.strptime(data['end_date'], '%Y-%m-%d').date() if 'end_date' in data else None
-
-        # Create a new WorkExperience object
-        new_experience = WorkExperience(
-            user_id=current_user.id,  # Automatically set user_id to the current user's ID
-            job_title=data['job_title'],
-            company_name=data['company_name'],
-            start_date=start_date,
-            end_date=end_date,
-            responsibilities=data.get('responsibilities'),
-            achievements=data.get('achievements'),
-            skills_acquired=data.get('skills_acquired')
-        )
-
-        # Add to the database session and commit
-        db.session.add(new_experience)
-        db.session.commit()
-
-        # Return success response
-        return jsonify({'message': 'Work experience added successfully', 'id': new_experience.id}), 201
-
-    except Exception as e:
-        # Handle errors
-        db.session.rollback()
-        return jsonify({'error': str(e)}), 500
-    
-@routes.route('/work-experience', methods=['GET'])
-@login_required
-def get_work_experience(current_user):
-    try:
-        # Fetch work experiences for the logged-in user
-        experiences = WorkExperience.query.filter_by(user_id=current_user.id).all()
-        return jsonify([{
-            'id': exp.id,
-            'job_title': exp.job_title,
-            'company_name': exp.company_name,
-            'start_date': exp.start_date.isoformat() if exp.start_date else None,
-            'end_date': exp.end_date.isoformat() if exp.end_date else None,
-            'responsibilities': exp.responsibilities,
-            'achievements': exp.achievements,
-            'skills_acquired': exp.skills_acquired
-        } for exp in experiences]), 200
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
-    
 @routes.route('/upload-certificate', methods=['POST'])
 @login_required
 def upload_certificate(current_user):
@@ -1679,3 +1617,116 @@ def delete_employment_detail(current_user, id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Failed to delete employment detail', 'details': str(e)}), 500
+        
+@routes.route('/apply-job/<int:job_id>', methods=['POST'])
+@login_required  # Ensure the user is logged in
+def apply_for_job(current_user, job_id):
+    """Allows a user to apply for a job if their profile is complete"""
+    
+    # Function to check if the user's profile is complete
+    def is_profile_complete(user_id):
+        """Check if the user has completed all required profile sections."""
+        required_models = [
+            PersonalDetails, Certificate, EducationalBackground,
+            Referee, NextOfKin, ProfessionalQualifications, RelevantCoursesAndProfessionalBody, EmploymentDetails
+        ]
+
+        for model in required_models:
+            if not model.query.filter_by(user_id=user_id).first():
+                return False
+        return True
+
+    try:
+        # Check if profile is complete before allowing application
+        if not is_profile_complete(current_user.id):
+            return jsonify({'error': 'Please fill and update your profile before applying'}), 400
+
+        # Check if the user has already applied for the job
+        existing_application = JobApplication.query.filter_by(user_id=current_user.id, job_id=job_id).first()
+        if existing_application:
+            return jsonify({'error': 'You have already applied for this job'}), 400
+
+        # Create a new job application
+        application = JobApplication(
+            user_id=current_user.id,
+            job_id=job_id,
+            status='Pending'  # Initial status
+        )
+        db.session.add(application)
+        db.session.commit()
+
+        return jsonify({'message': 'Application submitted successfully!'}), 201
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
+@routes.route('/admin/job-applications', methods=['GET'])
+@login_required  # Ensure only logged-in admins can access
+def get_all_job_applications(applications):
+    """Fetch all job applications with applicant details and job titles."""
+    try:
+        applications = JobApplication.query.all()
+
+        applications_data = [
+            {
+                "id": app.id,
+                "applicant_name": f"{app.user.first_name} {app.user.last_name}",
+                "job_title": app.job.position,
+                "status": app.status,
+                "applied_at": app.applied_at.strftime("%Y-%m-%d %H:%M:%S") if app.applied_at else None
+            }
+            for app in applications
+        ]
+
+        return jsonify(applications_data), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch job applications", "details": str(e)}), 500
+    
+@routes.route('/admin/job-applications/<int:application_id>', methods=['PUT'])
+@login_required  # Ensure only admins can access
+def update_application_status(current_user, application_id):
+    """Allow admin to accept or reject job applications."""
+    from flask import request  # Import inside the function to avoid circular imports
+    try:
+        data = request.get_json()
+        new_status = data.get("status")
+
+        if new_status not in ["Accepted", "Rejected"]:
+            return jsonify({"error": "Invalid status. Use 'Accepted' or 'Rejected'."}), 400
+
+        application = JobApplication.query.get(application_id)
+
+        if not application:
+            return jsonify({"error": "Application not found."}), 404
+
+        application.status = new_status
+        db.session.commit()
+
+        return jsonify({"message": f"Application {new_status} successfully."}), 200
+
+    except Exception as e:
+        return jsonify({"error": "Failed to update application status", "details": str(e)}), 500
+
+@routes.route('/user/job-applications', methods=['GET'])
+@login_required
+def get_user_job_applications(current_user):
+    """Fetch job applications for the logged-in user."""
+    try:
+        applications = JobApplication.query.filter_by(user_id=current_user.id).all()
+
+        applications_data = [
+            {
+                "id": app.id,
+                "job_title": app.job.position,  # Fetching job title from the Job model
+                "applied_at": app.applied_at.strftime("%Y-%m-%d %H:%M"),
+                "status": app.status
+            }
+            for app in applications
+        ]
+
+        return jsonify(applications_data), 200
+
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch job applications", "details": str(e)}), 500
+

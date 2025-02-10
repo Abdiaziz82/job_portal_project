@@ -241,3 +241,13 @@ class Job(db.Model):
 
     def __repr__(self):
         return f'<Job {self.position}>'
+    
+class JobApplication(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    job_id = db.Column(db.Integer, db.ForeignKey('jobs.id'), nullable=False)
+    status = db.Column(db.String(20), default='Pending')  # Pending, Accepted, Rejected
+    applied_at = db.Column(db.DateTime, default=datetime.utcnow)
+
+    user = db.relationship('User', backref='applications')
+    job = db.relationship('Job', backref='applications')
