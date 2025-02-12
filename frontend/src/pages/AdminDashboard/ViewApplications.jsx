@@ -4,24 +4,34 @@ import { useNavigate } from "react-router-dom";
 const ViewApplications = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
     fetch("http://127.0.0.1:5000/admin/job-applications", {
       credentials: "include",
     })
-      .then((response) => response.json())
+      .then((response) => {
+        if (!response.ok) throw new Error("Failed to fetch applications");
+        return response.json();
+      })
       .then((data) => {
         setApplications(data);
         setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching applications:", error);
+        setError(error.message);
         setLoading(false);
       });
   }, []);
 
   const handleStatusUpdate = (id, status) => {
+    if (!id) {
+      alert("Invalid application ID");
+      return;
+    }
+
     fetch(`http://127.0.0.1:5000/admin/job-applications/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -41,6 +51,7 @@ const ViewApplications = () => {
       })
       .catch((error) => {
         console.error("Error updating status:", error);
+        alert("Failed to update application status.");
       });
   };
 
@@ -50,6 +61,8 @@ const ViewApplications = () => {
 
       {loading ? (
         <p className="text-gray-500">Loading applications...</p>
+      ) : error ? (
+        <p className="text-red-500">{error}</p>
       ) : applications.length === 0 ? (
         <p className="text-gray-500">No job applications found.</p>
       ) : (
@@ -86,11 +99,18 @@ const ViewApplications = () => {
                     Reject
                   </button>
                   <button
-                    className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
-                    onClick={() => navigate(`/view-profile/${app.user_id}/${app.job_id}`)}
-                  >
-                    View Profile
-                  </button>
+  className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+  onClick={() => {
+    if (!app.user_id) {
+      alert("User ID not found. Please check the application data.");
+      return;
+    }
+    navigate(`/admin/dashboard/view-profile/${app.user_id}`);
+  }}
+>
+  View Profile
+</button>
+
                 </td>
               </tr>
             ))}

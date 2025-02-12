@@ -126,7 +126,7 @@ function App() {
 
                 <Route path="view-applications" element={<ViewApplications />} />
                 <Route path="manage-users" element={<ManageUsers />} />
-                <Route path="view-profile/:userId/:jobId" element={<ViewProfile />} />
+                <Route path="view-profile/:userId" element={<ViewProfile />} />
               </Route>
             </Routes>
           }
