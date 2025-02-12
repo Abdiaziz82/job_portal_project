@@ -57,7 +57,7 @@ const ViewProfile = () => {
       {profileData.personal_details && (
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-gray-700">Personal Details</h3>
-          <p><strong>Name:</strong> {profileData.personal_details.full_name}</p>
+          <p><strong>Name:</strong> {profileData.personal_details.full_names}</p>
           <p><strong>Email:</strong> {profileData.personal_details.email_address}</p>
           <p><strong>Phone:</strong> {profileData.personal_details.mobile_number}</p>
           <p><strong>Gender:</strong> {profileData.personal_details.gender}</p>
