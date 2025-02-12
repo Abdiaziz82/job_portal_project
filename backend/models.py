@@ -19,7 +19,7 @@ class User(db.Model):
 class PersonalDetails(db.Model):
     __tablename__ = 'personal_details'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Link to users table
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     full_names = db.Column(db.String(200), nullable=False)
     title = db.Column(db.String(50), nullable=True)
     date_of_birth = db.Column(db.Date, nullable=True)
@@ -31,30 +31,30 @@ class PersonalDetails(db.Model):
     postal_address = db.Column(db.String(100), nullable=True)
     mobile_number = db.Column(db.String(20), nullable=True)
     email_address = db.Column(db.String(100), nullable=False)
-
-    # New Fields
     alternative_contact_name = db.Column(db.String(200), nullable=True)
     alternative_contact_phone = db.Column(db.String(20), nullable=True)
-    disability = db.Column(db.String(3), nullable=False, default="no")  # "yes" or "no"
+    disability = db.Column(db.String(3), nullable=False, default="no")
     disability_details = db.Column(db.Text, nullable=True)
     disability_registration = db.Column(db.String(100), nullable=True)
-    criminal_conviction = db.Column(db.String(3), nullable=False, default="no")  # "yes" or "no"
+    criminal_conviction = db.Column(db.String(3), nullable=False, default="no")
     criminal_offence_details = db.Column(db.Text, nullable=True)
-    dismissal_from_employment = db.Column(db.String(3), nullable=False, default="no")  # "yes" or "no"
+    dismissal_from_employment = db.Column(db.String(3), nullable=False, default="no")
     dismissal_reason = db.Column(db.Text, nullable=True)
     dismissal_date = db.Column(db.Date, nullable=True)
 
-    # Relationship to access user details
     user = db.relationship('User', backref=db.backref('personal_details', lazy=True))
+
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
     def __repr__(self):
         return f'<PersonalDetails for User {self.user_id}>'
+
     
 class NextOfKin(db.Model):
     __tablename__ = 'next_of_kin'
-    
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign key linking to User
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     kin_name = db.Column(db.String(255), nullable=False)
     kin_address = db.Column(db.Text, nullable=False)
     kin_tel = db.Column(db.String(20), nullable=False)
@@ -62,117 +62,101 @@ class NextOfKin(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relationship to User (only defined in this model)
     user = db.relationship('User', backref=db.backref('next_of_kin', lazy=True))
+
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
     def __repr__(self):
         return f'<NextOfKin {self.kin_name} ({self.kin_relationship}) for User {self.user_id}>'
-        
-class WorkExperience(db.Model):
-    __tablename__ = 'work_experience'
-    id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign key linking to User
-    job_title = db.Column(db.String(255), nullable=False)
-    company_name = db.Column(db.String(255), nullable=False)
-    start_date = db.Column(db.Date, nullable=False)
-    end_date = db.Column(db.Date, nullable=True)  # Nullable for ongoing roles
-    responsibilities = db.Column(db.Text, nullable=True)
-    achievements = db.Column(db.Text, nullable=True)
-    skills_acquired = db.Column(db.Text, nullable=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relationship to User (only defined in this model)
-    user = db.relationship('User', backref=db.backref('work_experience', lazy=True))
 
-    def __repr__(self):
-        return f'<WorkExperience {self.job_title} at {self.company_name} for User {self.user_id}>'
     
 class Certificate(db.Model):
     __tablename__ = 'certificates'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign key linking to User
-    certificate_type = db.Column(db.String(50), nullable=False)  # KCSE, Diploma, Degree, etc.
-    specialization = db.Column(db.String(100), nullable=False)  # Program specialization (e.g., Computer Science)
-    institution_name = db.Column(db.String(200), nullable=False)  # Name of the institution
-    year_of_completion = db.Column(db.Integer, nullable=False)  # Year of completion
-    grade = db.Column(db.String(50), nullable=True)  # Grade/Score (e.g., A, First Class)
-    additional_awards = db.Column(db.String(255), nullable=True)  # Additional awards
-    file_path = db.Column(db.String(255), nullable=True)  # Path to the uploaded certificate file
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Timestamp for creation
-    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)  # Timestamp for updates
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    certificate_type = db.Column(db.String(50), nullable=False)
+    specialization = db.Column(db.String(100), nullable=False)
+    institution_name = db.Column(db.String(200), nullable=False)
+    year_of_completion = db.Column(db.Integer, nullable=False)
+    grade = db.Column(db.String(50), nullable=True)
+    additional_awards = db.Column(db.String(255), nullable=True)
+    file_path = db.Column(db.String(255), nullable=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relationship to User (only defined in this model)
     user = db.relationship('User', backref=db.backref('certificates', lazy=True))
+
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
     def __repr__(self):
         return f'<Certificate {self.certificate_type} from {self.institution_name} for User {self.user_id}>'
-    
+
 class EducationalBackground(db.Model):
     __tablename__ = 'educational_backgrounds'
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign key to the User table
-    school_name = db.Column(db.String(200), nullable=False)  # High school name
-    year_completed = db.Column(db.Integer, nullable=False)  # Year graduated
-    high_school_grade = db.Column(db.String(50))  # High school grade/class
-    high_school_activities = db.Column(db.Text)  # Extracurricular activities
-    university_name = db.Column(db.String(200))  # University name
-    degree_program = db.Column(db.String(100))  # Degree/Program
-    field_of_study = db.Column(db.String(100))  # Field of study
-    university_grade = db.Column(db.String(50))  # University grade/class
-    start_date = db.Column(db.Date)  # University start date
-    end_date = db.Column(db.Date)  # University end date
-    file_path = db.Column(db.String(500))  # Path to uploaded certificates or transcripts
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    school_name = db.Column(db.String(200), nullable=False)
+    year_completed = db.Column(db.Integer, nullable=False)
+    high_school_grade = db.Column(db.String(50))
+    high_school_activities = db.Column(db.Text)
+    university_name = db.Column(db.String(200))
+    degree_program = db.Column(db.String(100))
+    field_of_study = db.Column(db.String(100))
+    university_grade = db.Column(db.String(50))
+    start_date = db.Column(db.Date)
+    end_date = db.Column(db.Date)
+    file_path = db.Column(db.String(500))
 
-    # Relationship to the User model
     user = db.relationship('User', backref=db.backref('educational_backgrounds', lazy=True))
+
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
 class ProfessionalQualifications(db.Model):
     __tablename__ = 'professional_qualifications'
-
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign key to User
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     year_from = db.Column(db.Integer, nullable=False)
     year_to = db.Column(db.Integer, nullable=False)
     institution = db.Column(db.String(255), nullable=False)
     award = db.Column(db.String(255), nullable=False)
     specialization = db.Column(db.String(255), nullable=False)
     grade = db.Column(db.String(50), nullable=False)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Timestamp for record creation
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relationship to User
     user = db.relationship('User', backref=db.backref('professional_qualifications', lazy=True))
 
-    def __repr__(self):
-        return f"<ProfessionalQualifications {self.id}>"
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+
     
 class RelevantCoursesAndProfessionalBody(db.Model):
     __tablename__ = 'relevant_courses_and_professional_bodies'
-
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign key to User
-    year = db.Column(db.Integer)  # Year of the course
-    institution = db.Column(db.String(255))  # Institution offering the course
-    course_name = db.Column(db.String(255))  # Name of the course
-    details = db.Column(db.Text)  # Course details
-    duration = db.Column(db.String(255))  # Duration of the course
-    body_name = db.Column(db.String(255))  # Name of the professional body
-    membership_no = db.Column(db.String(255))  # Membership number for the professional body
-    membership_type = db.Column(db.String(255))  # Type of membership (e.g., Full, Associate)
-    renewal_date = db.Column(db.Date)  # Date when membership needs to be renewed
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)  # Timestamp for record creation
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    year = db.Column(db.Integer)
+    institution = db.Column(db.String(255))
+    course_name = db.Column(db.String(255))
+    details = db.Column(db.Text)
+    duration = db.Column(db.String(255))
+    body_name = db.Column(db.String(255))
+    membership_no = db.Column(db.String(255))
+    membership_type = db.Column(db.String(255))
+    renewal_date = db.Column(db.Date)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-    # Relationship to User
     user = db.relationship('User', backref=db.backref('relevant_courses_and_professional_bodies', lazy=True))
 
-    def __repr__(self):
-        return f"<RelevantCoursesAndProfessionalBody {self.id} - {self.course_name} / {self.body_name}>"
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
 class EmploymentDetails(db.Model):
     __tablename__ = 'employment_details'
-
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Foreign key linking to User
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     year = db.Column(db.String(10), nullable=True)
     designation = db.Column(db.String(255), nullable=True)
     job_group = db.Column(db.String(100), nullable=True)
@@ -186,17 +170,18 @@ class EmploymentDetails(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relationship to User (only defined in this model)
     user = db.relationship('User', backref=db.backref('employment_details', lazy=True))
+
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
 
     def __repr__(self):
         return f'<EmploymentDetails {self.designation} for User {self.user_id}>'
-    
+
 class Referee(db.Model):
     __tablename__ = 'referees'
-
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Link referees to a user
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     full_name = db.Column(db.String(255), nullable=False)
     occupation = db.Column(db.String(255), nullable=False)
     address = db.Column(db.String(255), nullable=False)
@@ -208,9 +193,12 @@ class Referee(db.Model):
 
     user = db.relationship('User', backref=db.backref('referees', lazy=True))
 
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+
     def __repr__(self):
         return f"<Referee {self.full_name} - {self.occupation}>"
-    
+
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String(120), unique=True, nullable=False)

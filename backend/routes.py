@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, make_response, current_app
-from models import db, User ,Job , PersonalDetails , WorkExperience ,Certificate ,EducationalBackground ,Referee ,NextOfKin , ProfessionalQualifications ,RelevantCoursesAndProfessionalBody, EmploymentDetails ,JobApplication
+from models import db, User ,Job , PersonalDetails , Certificate ,EducationalBackground ,Referee ,NextOfKin , ProfessionalQualifications ,RelevantCoursesAndProfessionalBody, EmploymentDetails ,JobApplication
 from flask_bcrypt import Bcrypt
 import jwt
 from datetime import datetime, timedelta
@@ -1671,6 +1671,7 @@ def get_all_job_applications(applications):
         applications_data = [
             {
                 "id": app.id,
+                "user_id": app.user.id,
                 "applicant_name": f"{app.user.first_name} {app.user.last_name}",
                 "job_title": app.job.position,
                 "status": app.status,
@@ -1685,7 +1686,7 @@ def get_all_job_applications(applications):
     
 @routes.route('/admin/job-applications/<int:application_id>', methods=['PUT'])
 @login_required  # Ensure only admins can access
-def update_application_status(current_user, application_id):
+def update_application_status( application_id):
     """Allow admin to accept or reject job applications."""
     from flask import request  # Import inside the function to avoid circular imports
     try:
@@ -1730,30 +1731,24 @@ def get_user_job_applications(current_user):
     except Exception as e:
         return jsonify({"error": "Failed to fetch job applications", "details": str(e)}), 500
 
-@routes.route('/admin/user-profile/<int:user_id>/<int:job_id>', methods=['GET'])
+@routes.route('/applications/<int:user_id>', methods=['GET'])
 @login_required
-def get_user_profile(current_user, user_id, job_id):
-    """Fetch all details of a user by their ID who applied for a specific job."""
-    
-    # Ensure the user applied for this job
-    application = JobApplication.query.filter_by(user_id=user_id, job_id=job_id).first()
-    if not application:
-        return jsonify({"error": "No application found for this job"}), 404
+def get_application_details(current_user ,user_id):  # ✅ No extra user_id passed now
+    print(f"Fetching details for user ID: {user_id}")
 
-    # Fetch the user details
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({"error": "User not found"}), 404
+    personal_details = PersonalDetails.query.filter_by(user_id=user_id).first()
+    if not personal_details:
+        return jsonify({"error": "User profile not found"}), 404
 
-    profile = {
-        "personal_details": user.personal_details.serialize() if user.personal_details else None,
-        "certificates": [cert.serialize() for cert in user.certificates],
-        "education": [edu.serialize() for edu in user.education],
-        "referees": [ref.serialize() for ref in user.referees],
-        "next_of_kin": user.next_of_kin.serialize() if user.next_of_kin else None,
-        "professional_qualifications": [pq.serialize() for pq in user.professional_qualifications],
-        "relevant_courses": [rc.serialize() for rc in user.relevant_courses],
-        "employment_details": [emp.serialize() for emp in user.employment_details]
+    response = {
+        "personal_details": personal_details.to_dict() if personal_details else None,
+        "next_of_kin": [kin.to_dict() for kin in NextOfKin.query.filter_by(user_id=user_id).all()],
+        "certificates": [cert.to_dict() for cert in Certificate.query.filter_by(user_id=user_id).all()],
+        "education": [edu.to_dict() for edu in EducationalBackground.query.filter_by(user_id=user_id).all()],
+        "professional_qualifications": [qual.to_dict() for qual in ProfessionalQualifications.query.filter_by(user_id=user_id).all()],
+        "relevant_courses": [course.to_dict() for course in RelevantCoursesAndProfessionalBody.query.filter_by(user_id=user_id).all()],
+        "employment_details": [job.to_dict() for job in EmploymentDetails.query.filter_by(user_id=user_id).all()],
+        "referees": [ref.to_dict() for ref in Referee.query.filter_by(user_id=user_id).all()],
     }
 
-    return jsonify(profile), 200
+    return jsonify(response), 200
