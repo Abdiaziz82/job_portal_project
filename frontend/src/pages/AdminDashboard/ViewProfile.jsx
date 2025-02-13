@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 
 const ViewProfile = () => {
-  const { userId } = useParams(); // ✅ Extract userId from URL
+  const { userId } = useParams(); 
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -18,7 +18,7 @@ const ViewProfile = () => {
     const fetchProfileData = async () => {
       try {
         const response = await fetch(
-          `http://127.0.0.1:5000/applications/${userId}`, // ✅ userId is now properly used
+          `http://127.0.0.1:5000/applications/${userId}`, 
           {
             method: "GET",
             credentials: "include",
