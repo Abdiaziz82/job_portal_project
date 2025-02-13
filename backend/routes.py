@@ -1719,7 +1719,7 @@ def get_user_job_applications(current_user):
         applications_data = [
             {
                 "id": app.id,
-                "job_title": app.job.position,  # Fetching job title from the Job model
+                "job_title": app.job.position, 
                 "applied_at": app.applied_at.strftime("%Y-%m-%d %H:%M"),
                 "status": app.status
             }
@@ -1733,7 +1733,7 @@ def get_user_job_applications(current_user):
 
 @routes.route('/applications/<int:user_id>', methods=['GET'])
 @login_required
-def get_application_details(current_user ,user_id):  # ✅ No extra user_id passed now
+def get_application_details(current_user, user_id):
     print(f"Fetching details for user ID: {user_id}")
 
     personal_details = PersonalDetails.query.filter_by(user_id=user_id).first()
@@ -1743,8 +1743,22 @@ def get_application_details(current_user ,user_id):  # ✅ No extra user_id pass
     response = {
         "personal_details": personal_details.to_dict() if personal_details else None,
         "next_of_kin": [kin.to_dict() for kin in NextOfKin.query.filter_by(user_id=user_id).all()],
-        "certificates": [cert.to_dict() for cert in Certificate.query.filter_by(user_id=user_id).all()],
-        "education": [edu.to_dict() for edu in EducationalBackground.query.filter_by(user_id=user_id).all()],
+        "certificates": [
+            {
+                **cert.to_dict(),
+                "file_path": url_for('routes.uploaded_file', filename=os.path.basename(cert.file_path), _external=True) 
+                if cert.file_path else None
+            }
+            for cert in Certificate.query.filter_by(user_id=user_id).all()
+        ],
+        "education": [
+            {
+                **edu.to_dict(),
+                "file_path": url_for('routes.uploaded_file', filename=os.path.basename(edu.file_path), _external=True) 
+                if edu.file_path else None
+            }
+            for edu in EducationalBackground.query.filter_by(user_id=user_id).all()
+        ],
         "professional_qualifications": [qual.to_dict() for qual in ProfessionalQualifications.query.filter_by(user_id=user_id).all()],
         "relevant_courses": [course.to_dict() for course in RelevantCoursesAndProfessionalBody.query.filter_by(user_id=user_id).all()],
         "employment_details": [job.to_dict() for job in EmploymentDetails.query.filter_by(user_id=user_id).all()],
@@ -1752,3 +1766,4 @@ def get_application_details(current_user ,user_id):  # ✅ No extra user_id pass
     }
 
     return jsonify(response), 200
+
