@@ -122,17 +122,13 @@ const ViewProfile = () => {
               <p><strong>University Grade:</strong> {edu.university_grade}</p>
               <p><strong>Start Date:</strong> {edu.start_date}</p>
               <p><strong>End Date:</strong> {edu.end_date}</p>
-               <div className="flex items-start sm:col-span-2 mt-4">
-                <strong className="text-sm text-gray-700 w-40">Document:</strong>
-                <a
-                  href={edu.file_path}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-blue-600 hover:underline"
-                >
-                  View Educational Document
-                </a>
-              </div>
+              <p><strong>File:</strong> {edu.file_path ? (
+  <a href={edu.file_path} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
+    View File
+  </a>
+) : "No file uploaded"}
+</p>
+
             </div>
           ))}
         </div>
@@ -161,33 +157,39 @@ const ViewProfile = () => {
 
       {/* ✅ Certificates */}
       {profileData.certificates?.length > 0 && (
-        <div className="mb-8 p-6 bg-gray-50 rounded-lg shadow-sm">
-          <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-            <FaCertificate className="mr-2" /> Certificates
-          </h3>
-          {profileData.certificates.map((cert, index) => (
-            <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <p><strong>Type:</strong> {cert.certificate_type}</p>
-              <p><strong>Specialization:</strong> {cert.specialization}</p>
-              <p><strong>Institution:</strong> {cert.institution_name}</p>
-              <p><strong>Year:</strong> {cert.year_of_completion}</p>
-              <p><strong>Grade:</strong> {cert.grade}</p>
-              <p><strong>Additional Awards:</strong> {cert.additional_awards}</p>
-              <div className="flex items-start sm:col-span-2">
-                  <strong className="text-sm text-gray-700 w-40">File:</strong>
-                  <a
-                    href={cert.file_path}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:underline"
-                  >
-                    View Certificate
-                  </a>
-                </div>
-            </div>
-          ))}
-        </div>
-      )}
+  <div className="mb-8 p-6 bg-gray-50 rounded-lg shadow-sm">
+    <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
+      <FaCertificate className="mr-2" /> Certificates
+    </h3>
+    {profileData.certificates.map((cert, index) => (
+      <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <p><strong>Type:</strong> {cert.certificate_type}</p>
+        <p><strong>Specialization:</strong> {cert.specialization}</p>
+        <p><strong>Institution:</strong> {cert.institution_name}</p>
+        <p><strong>Year:</strong> {cert.year_of_completion}</p>
+        <p><strong>Grade:</strong> {cert.grade}</p>
+        <p><strong>Additional Awards:</strong> {cert.additional_awards}</p>
+        
+        {cert.file_path ? (
+          <p>
+            <strong>Certificate:</strong>{" "}
+            <a
+              href={cert.file_path}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              View Certificate
+            </a>
+          </p>
+        ) : (
+          <p><strong>Certificate:</strong> No file uploaded</p>
+        )}
+      </div>
+    ))}
+  </div>
+)}
+
 
       {/* ✅ Professional Qualifications */}
       {profileData.professional_qualifications?.length > 0 && (

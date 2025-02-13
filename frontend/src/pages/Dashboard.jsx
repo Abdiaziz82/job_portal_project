@@ -1,6 +1,55 @@
 import { FaSuitcase, FaRegPaperPlane, FaBell } from "react-icons/fa";
+import { useState,useEffect } from "react";
 
 const Dashboard = () => {
+
+  const [jobCount, setJobCount] = useState(0);
+  const [openJobs, setOpenJobs] = useState(0);
+
+  useEffect(() => {
+    const fetchJobApplications = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:5000/user/job-applications", {
+          method: "GET",
+          credentials: "include", // Ensures cookies (JWT) are sent
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch job applications");
+        }
+
+        const data = await response.json();
+        setJobCount(data.length); // Count the number of applied jobs
+      } catch (error) {
+        console.error("Error fetching job applications:", error);
+      }
+    };
+
+    fetchJobApplications();
+  }, []);
+
+  useEffect(() => {
+    const fetchOpenJobs = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:5000/api/jobs", {
+          method: "GET",
+          credentials: "include", // Ensures cookies (if needed) are sent
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch open jobs");
+        }
+
+        const data = await response.json();
+        setOpenJobs(data.length); // Count the total number of jobs
+      } catch (error) {
+        console.error("Error fetching open jobs:", error);
+      }
+    };
+
+    fetchOpenJobs();
+  }, []);
+
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
       {/* Dashboard Title */}
@@ -10,25 +59,25 @@ const Dashboard = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
         {/* Jobs Applied Card */}
         <div className="bg-white p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 flex items-center justify-between space-x-6">
-          <div className="bg-green-600 p-5 rounded-full text-white">
-            <FaRegPaperPlane className="text-3xl" />
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold text-gray-700">Jobs Applied</h2>
-            <p className="text-3xl font-bold text-green-700">12</p>
-          </div>
-        </div>
+      <div className="bg-green-600 p-5 rounded-full text-white">
+        <FaRegPaperPlane className="text-3xl" />
+      </div>
+      <div>
+        <h2 className="text-xl font-semibold text-gray-700">Jobs Applied</h2>
+        <p className="text-3xl font-bold text-green-700">{jobCount}</p>
+      </div>
+    </div>
 
         {/* Jobs Open Card */}
         <div className="bg-white p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 flex items-center justify-between space-x-6">
-          <div className="bg-blue-600 p-5 rounded-full text-white">
-            <FaSuitcase className="text-3xl" />
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold text-gray-700">Jobs Open</h2>
-            <p className="text-3xl font-bold text-blue-700">5</p>
-          </div>
-        </div>
+      <div className="bg-blue-600 p-5 rounded-full text-white">
+        <FaSuitcase className="text-3xl" />
+      </div>
+      <div>
+        <h2 className="text-xl font-semibold text-gray-700">Jobs Open</h2>
+        <p className="text-3xl font-bold text-blue-700">{openJobs}</p>
+      </div>
+    </div>
 
         {/* Saved Jobs Card */}
         <div className="bg-white p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 flex items-center justify-between space-x-6">
