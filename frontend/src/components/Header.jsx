@@ -74,12 +74,12 @@ const Header = () => {
 
     {/* Desktop Navigation */}
     <nav className="hidden md:flex space-x-8 text-lg font-medium ml-auto">
-      <a
-        href="#open-jobs"
-        className="hover:text-green-300 transition duration-300"
-      >
-        Open Jobs
-      </a>
+    <Link
+  to="open-jobs"
+  className="hover:text-green-300 transition duration-300"
+>
+  Open Jobs
+</Link>
       <a
         href="#portal-guide"
         className="hover:text-green-300 transition duration-300"

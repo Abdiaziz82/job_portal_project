@@ -14,7 +14,6 @@ import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
 import Logout from "./pages/Logout";
 import PersonalDetails from "./pages/PersonalDetails";
-// import WorkExperience from "./pages/WorkExperience";
 import Certificates from "./pages/Certificates";
 import Education from "./pages/Education";
 import Referees from "./pages/Referees";
@@ -45,6 +44,8 @@ import EditReferee from "./pages/EditReferee";
 import JobDetails from "./pages/JobDetails";
 
 import ViewProfile from "./pages/AdminDashboard/ViewProfile";
+import Openjobs from "./pages/Openjobs";
+import MoreJobDetails from "./pages/MoreJobDetails";
 
 function App() {
   return (
@@ -58,10 +59,14 @@ function App() {
           element={
             <UserLayout>
               <Routes>
+              <Route path="/" element={<Login />} />
+              
                 <Route path="/signup" element={<SignUp />} />
+                <Route path="/open-jobs" element={<Openjobs />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:token" element={<ResetPassword />} />
+               
                 
 
                 {/* User Dashboard */}
