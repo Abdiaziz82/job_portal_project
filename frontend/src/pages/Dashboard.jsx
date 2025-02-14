@@ -155,7 +155,7 @@ const Dashboard = () => {
 
       {/*  Job Alerts Section */}
       <div className="mt-16">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">New Job Alerts</h2>
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Recent Job Alerts</h2>
       <div className="bg-white p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300">
         {jobs.length > 0 ? (
           <ul className="space-y-6">
@@ -165,7 +165,7 @@ const Dashboard = () => {
                   ADVERT NO: {job.advert}: {job.position} - GaU GRADE {job.grade}
                 </span>
                 <span className="text-sm text-gray-500">
-                  {timeSincePosted(job.createdAt)}
+                 Posted {timeSincePosted(job.createdAt)}
                 </span>
               </li>
             ))}
