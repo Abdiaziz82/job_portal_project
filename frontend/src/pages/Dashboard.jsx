@@ -6,6 +6,7 @@ const Dashboard = () => {
   const [jobCount, setJobCount] = useState(0);
   const [openJobs, setOpenJobs] = useState(0);
   const [jobs, setJobs] = useState([]);
+  const [savedJobsCount, setSavedJobsCount] = useState(0);
 
   useEffect(() => {
     const fetchJobApplications = async () => {
@@ -91,6 +92,25 @@ const Dashboard = () => {
     return `${Math.floor(diffInSeconds / 86400)} days ago`;
   };
 
+  useEffect(() => {
+    fetch("http://127.0.0.1:5000/saved-jobs", {
+      method: "GET",
+      credentials: "include", // Ensure authentication cookies/JWT are sent
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.message) {
+          setSavedJobsCount(0); // No saved jobs
+        } else {
+          setSavedJobsCount(data.length); // Set the number of saved jobs
+        }
+      })
+      .catch((error) => {
+        console.error("Error fetching saved jobs:", error);
+        setSavedJobsCount(0);
+      });
+  }, []);
+
 
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
@@ -123,14 +143,14 @@ const Dashboard = () => {
 
         {/* Saved Jobs Card */}
         <div className="bg-white p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 flex items-center justify-between space-x-6">
-          <div className="bg-yellow-500 p-5 rounded-full text-white">
-            <FaBell className="text-3xl" />
-          </div>
-          <div>
-            <h2 className="text-xl font-semibold text-gray-700">Saved Jobs</h2>
-            <p className="text-3xl font-bold text-yellow-600">3</p>
-          </div>
-        </div>
+      <div className="bg-yellow-500 p-5 rounded-full text-white">
+        <FaBell className="text-3xl" />
+      </div>
+      <div>
+        <h2 className="text-xl font-semibold text-gray-700">Saved Jobs</h2>
+        <p className="text-3xl font-bold text-yellow-600">{savedJobsCount}</p>
+      </div>
+    </div>
       </div>
 
       {/*  Job Alerts Section */}
