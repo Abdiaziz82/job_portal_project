@@ -122,6 +122,52 @@ def login():
 
     return response, 200
 
+@routes.route('/users', methods=['GET'])
+@login_required  # Ensure only logged-in admins can access
+def get_users(current_user):
+    """Fetch all registered users."""
+    users = User.query.all()
+
+    if not users:
+        return jsonify({"message": "No users found"}), 200
+
+    return jsonify([{
+        "id": user.id,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "email_address": user.email_address,
+        "mobile_number": user.mobile_number
+    } for user in users]), 200
+
+
+@routes.route('/delete-user/<int:user_id>', methods=['DELETE'])
+@login_required
+def delete_user(current_user, user_id):
+    """Delete a user by ID."""
+    print("Received delete request for user ID:", user_id)  # Debugging
+
+    user = User.query.get(user_id)
+    if not user:
+        return jsonify({"error": "User not found"}), 404
+
+    try:
+        # Delete all related records
+        PersonalDetails.query.filter_by(user_id=user_id).delete()
+        Certificate.query.filter_by(user_id=user_id).delete()
+        EducationalBackground.query.filter_by(user_id=user_id).delete()
+        Referee.query.filter_by(user_id=user_id).delete()
+        NextOfKin.query.filter_by(user_id=user_id).delete()
+        ProfessionalQualifications.query.filter_by(user_id=user_id).delete()
+        RelevantCoursesAndProfessionalBody.query.filter_by(user_id=user_id).delete()
+        EmploymentDetails.query.filter_by(user_id=user_id).delete()
+
+        # Now delete the user
+        db.session.delete(user)
+        db.session.commit()
+        return jsonify({"message": "User and all related records deleted successfully"}), 200
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": str(e)}), 500
 
 @routes.route('/forgot-password', methods=['POST'])
 def forgot_password():
