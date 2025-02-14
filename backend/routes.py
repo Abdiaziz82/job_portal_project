@@ -1,5 +1,5 @@
 from flask import Blueprint, jsonify, request, make_response, current_app
-from models import db, User ,Job , PersonalDetails , Certificate ,EducationalBackground ,Referee ,NextOfKin , ProfessionalQualifications ,RelevantCoursesAndProfessionalBody, EmploymentDetails ,JobApplication
+from models import db, User ,Job , PersonalDetails , Certificate ,EducationalBackground ,Referee ,NextOfKin , ProfessionalQualifications ,RelevantCoursesAndProfessionalBody, EmploymentDetails ,JobApplication ,SavedJobs
 from flask_bcrypt import Bcrypt
 import jwt
 from datetime import datetime, timedelta
@@ -414,7 +414,8 @@ def create_job():
         "applicationDeadline": job.application_deadline,
         "grade": job.grade,
         "requirements": job.requirements,  
-        "duties": job.duties  
+        "duties": job.duties,
+        "createdAt": job.created_at  # Include the created_at field in the response
     }), 201
 
 
@@ -429,14 +430,16 @@ def get_jobs():
             "advert": job.advert,
             "termsOfService": job.terms_of_service,
             "numberOfPosts": job.number_of_posts,
-            "applicationDeadline": job.application_deadline,
+            "applicationDeadline": job.application_deadline,  # ✅ FIXED TYPO
             "grade": job.grade,
             "requirements": job.requirements, 
-            "duties": job.duties  
+            "duties": job.duties,
+            "createdAt": job.created_at
         }
         for job in jobs
     ]
     return jsonify(jobs_list), 200
+
 
 
 @routes.route('/api/jobs/<int:id>', methods=['GET'])
@@ -453,11 +456,11 @@ def get_job_by_id(id):
             "applicationDeadline": job.application_deadline,
             "grade": job.grade,
             "requirements": job.requirements,  
-            "duties": job.duties  
+            "duties": job.duties,
+            "createdAt": job.created_at  # Include the created_at field in the response
         }
         return jsonify(job_details), 200
     return jsonify({"message": "Job not found"}), 404
-
 
 @routes.route('/api/jobs/<int:job_id>', methods=['PUT'])
 def update_job(job_id):
@@ -508,6 +511,67 @@ def delete_job(job_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": "An error occurred while deleting the job.", "details": str(e)}), 500
+
+@routes.route('/save-job', methods=['POST'])
+@login_required  # Ensure the user is logged in
+def save_job(current_user):
+    # Get JSON data from the request
+    data = request.get_json()
+
+    # Validate required field (job_id)
+    if not data or 'job_id' not in data:
+        return jsonify({'error': 'Missing required field: job_id'}), 400
+
+    try:
+        # Check if the job exists
+        job = Job.query.get(data['job_id'])
+        if not job:
+            return jsonify({'error': 'Job not found'}), 404
+
+        # Check if the job is already saved by the user
+        existing_save = SavedJobs.query.filter_by(user_id=current_user.id, job_id=data['job_id']).first()
+        if existing_save:
+            return jsonify({'error': 'Job already saved'}), 400
+
+        # Create a new SavedJobs object
+        saved_job = SavedJobs(
+            user_id=current_user.id,  # Automatically set user_id to the current user's ID
+            job_id=data['job_id']
+        )
+
+        # Add to the database session and commit
+        db.session.add(saved_job)
+        db.session.commit()
+
+        # Return success response
+        return jsonify({
+            'message': 'Job saved successfully',
+            'job_id': saved_job.job_id
+        }), 201
+
+    except Exception as e:
+        # Handle errors
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@routes.route('/saved-jobs', methods=['GET'])
+@login_required
+def get_saved_jobs(current_user):
+    """Fetch all saved jobs for the logged-in user."""
+    saved_jobs = SavedJobs.query.filter_by(user_id=current_user.id).all()
+
+    if not saved_jobs:
+        return jsonify({"message": "No saved jobs found"}), 200
+
+    return jsonify([{
+        "id": job.id,
+        "job_id": job.job_id,
+        "position": job.job.position,
+        "advert": job.job.advert,
+        "grade": job.job.grade,
+        "applicationDeadline": job.job.application_deadline,
+        
+    } for job in saved_jobs]), 200
 
 
     

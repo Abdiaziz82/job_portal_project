@@ -221,11 +221,9 @@ class Job(db.Model):
     application_deadline = db.Column(db.Date, nullable=False)
     number_of_posts = db.Column(db.Integer, nullable=False)
     grade = db.Column(db.Integer, nullable=False)  
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    
-    # New fields
     requirements = db.Column(db.Text, nullable=False)
-    duties = db.Column(db.Text, nullable=False)  # Includes both duties & responsibilities
+    duties = db.Column(db.Text, nullable=False) 
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     def __repr__(self):
         return f'<Job {self.position}>'
@@ -239,3 +237,21 @@ class JobApplication(db.Model):
 
     user = db.relationship('User', backref='applications')
     job = db.relationship('Job', backref='applications')
+
+class SavedJobs(db.Model):
+    __tablename__ = 'saved_jobs'
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    job_id = db.Column(db.Integer, db.ForeignKey('jobs.id'), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    user = db.relationship('User', backref=db.backref('saved_jobs', lazy=True))
+    job = db.relationship('Job', backref=db.backref('saved_by_users', lazy=True))
+
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+
+    def __repr__(self):
+        return f'<SavedJobs User {self.user_id} saved Job {self.job_id}>'
