@@ -5,6 +5,7 @@ const Dashboard = () => {
 
   const [jobCount, setJobCount] = useState(0);
   const [openJobs, setOpenJobs] = useState(0);
+  const [jobs, setJobs] = useState([]);
 
   useEffect(() => {
     const fetchJobApplications = async () => {
@@ -50,6 +51,47 @@ const Dashboard = () => {
     fetchOpenJobs();
   }, []);
 
+  useEffect(() => {
+    const fetchJobs = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:5000/api/jobs", {
+          method: "GET",
+          credentials: "include", // Ensure cookies are sent if required
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch jobs");
+        }
+
+        const data = await response.json();
+        setJobs(data); // Store jobs in state
+      } catch (error) {
+        console.error("Error fetching jobs:", error);
+      }
+    };
+
+    fetchJobs();
+  }, []);
+
+  // Function to calculate time difference
+  const timeSincePosted = (createdAt) => {
+    const createdDate = new Date(createdAt);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - createdDate) / 1000);
+
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds} seconds ago`;
+    }
+    if (diffInSeconds < 3600) {
+      return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    }
+    if (diffInSeconds < 86400) {
+      return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    }
+    return `${Math.floor(diffInSeconds / 86400)} days ago`;
+  };
+
+
   return (
     <div className="p-8 bg-gray-100 min-h-screen">
       {/* Dashboard Title */}
@@ -91,30 +133,28 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* New Job Alerts Section */}
+      {/*  Job Alerts Section */}
       <div className="mt-16">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">New Job Alerts</h2>
-        <div className="bg-white p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">New Job Alerts</h2>
+      <div className="bg-white p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300">
+        {jobs.length > 0 ? (
           <ul className="space-y-6">
-            <li className="flex justify-between text-gray-700">
-              <span className="text-lg font-semibold">Software Engineer at University Research Center</span>
-              <span className="text-sm text-gray-500">Posted 1 hour ago</span>
-            </li>
-            <li className="flex justify-between text-gray-700">
-              <span className="text-lg font-semibold">Research Assistant Application Open for Environmental Studies</span>
-              <span className="text-sm text-gray-500">Posted 2 hours ago</span>
-            </li>
-            <li className="flex justify-between text-gray-700">
-              <span className="text-lg font-semibold">Teaching Assistant Role in Computer Science Department</span>
-              <span className="text-sm text-gray-500">Posted 4 hours ago</span>
-            </li>
-            <li className="flex justify-between text-gray-700">
-              <span className="text-lg font-semibold">Internship Program in University Library</span>
-              <span className="text-sm text-gray-500">Posted 6 hours ago</span>
-            </li>
+            {jobs.map((job) => (
+              <li key={job.id} className="flex justify-between text-gray-700">
+                <span className="text-lg font-semibold">
+                  ADVERT NO: {job.advert}: {job.position} - GaU GRADE {job.grade}
+                </span>
+                <span className="text-sm text-gray-500">
+                  {timeSincePosted(job.createdAt)}
+                </span>
+              </li>
+            ))}
           </ul>
-        </div>
+        ) : (
+          <p className="text-gray-500">No jobs available at the moment.</p>
+        )}
       </div>
+    </div>
     </div>
   );
 };

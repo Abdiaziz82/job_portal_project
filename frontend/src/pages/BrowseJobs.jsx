@@ -7,16 +7,33 @@ const BrowseJobs = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/api/jobs") // Adjust API URL if needed
+    fetch("http://127.0.0.1:5000/api/jobs")
       .then((response) => response.json())
       .then((data) => setJobs(data))
       .catch((error) => console.error("Error fetching jobs:", error));
   }, []);
 
+  const handleSaveJob = (jobId) => {
+    fetch("http://127.0.0.1:5000/save-job", {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ job_id: jobId }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.message) {
+          alert(data.message);
+        }
+      })
+      .catch((error) => console.error("Error saving job:", error));
+  };
+
   return (
     <div className="container mx-auto mt-12 px-4">
       <Routes>
-        {/* Default Browse Jobs Page */}
         <Route
           index
           element={
@@ -25,7 +42,6 @@ const BrowseJobs = () => {
                 Available Jobs
               </h2>
 
-              {/* Job Cards Grid */}
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {jobs.length > 0 ? (
                   jobs.map((job) => (
@@ -33,12 +49,10 @@ const BrowseJobs = () => {
                       key={job.id}
                       className="bg-white shadow-lg rounded-lg p-6 border border-gray-200 hover:shadow-xl transition-all duration-300"
                     >
-                      {/* Job Title */}
                       <h3 className="text-xl font-semibold text-green-700 mb-3">
                         {job.position}
                       </h3>
 
-                      {/* Job Info */}
                       <div className="text-sm text-gray-600 space-y-2">
                         <p>
                           <strong className="text-gray-700">Advert:</strong> {job.advert}
@@ -54,12 +68,19 @@ const BrowseJobs = () => {
                         </p>
                       </div>
 
-                      {/* View More Button */}
                       <button
                         className="mt-4 w-full bg-green-700 text-white py-2 px-4 rounded-lg hover:bg-green-800 transition"
                         onClick={() => navigate(`/dashboard/browse-jobs/${job.id}`)}
                       >
                         View More Details
+                      </button>
+
+                      {/* Save Job Button */}
+                      <button
+                        className="mt-2 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition"
+                        onClick={() => handleSaveJob(job.id)}
+                      >
+                        Save Job
                       </button>
                     </div>
                   ))
@@ -72,8 +93,6 @@ const BrowseJobs = () => {
             </>
           }
         />
-
-        {/* Nested Route for Job Details */}
         <Route path=":id" element={<JobDetails />} />
       </Routes>
     </div>
