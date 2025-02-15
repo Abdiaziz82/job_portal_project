@@ -1,4 +1,4 @@
-import { FaSuitcase, FaRegPaperPlane, FaBell } from "react-icons/fa";
+import { FaSuitcase, FaRegPaperPlane, FaBell, FaCheckCircle } from "react-icons/fa";
 import { useState, useEffect } from "react";
 
 const Dashboard = () => {
@@ -6,7 +6,9 @@ const Dashboard = () => {
   const [openJobs, setOpenJobs] = useState(0);
   const [jobs, setJobs] = useState([]);
   const [savedJobsCount, setSavedJobsCount] = useState(0);
+  const [acceptedApplications, setAcceptedApplications] = useState(0);
 
+  // Fetch job applications
   useEffect(() => {
     const fetchJobApplications = async () => {
       try {
@@ -29,6 +31,30 @@ const Dashboard = () => {
     fetchJobApplications();
   }, []);
 
+  // Fetch accepted applications
+  useEffect(() => {
+    const fetchAcceptedApplications = async () => {
+      try {
+        const response = await fetch("http://127.0.0.1:5000/user/job-applications?status=accepted", {
+          method: "GET",
+          credentials: "include",
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch accepted applications");
+        }
+
+        const data = await response.json();
+        setAcceptedApplications(data.length); // Set the number of accepted applications
+      } catch (error) {
+        console.error("Error fetching accepted applications:", error);
+      }
+    };
+
+    fetchAcceptedApplications();
+  }, []);
+
+  // Fetch open jobs
   useEffect(() => {
     const fetchOpenJobs = async () => {
       try {
@@ -51,6 +77,7 @@ const Dashboard = () => {
     fetchOpenJobs();
   }, []);
 
+  // Fetch all jobs for the job alerts section
   useEffect(() => {
     const fetchJobs = async () => {
       try {
@@ -73,23 +100,7 @@ const Dashboard = () => {
     fetchJobs();
   }, []);
 
-  const timeSincePosted = (createdAt) => {
-    const createdDate = new Date(createdAt);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now - createdDate) / 1000);
-
-    if (diffInSeconds < 60) {
-      return `${diffInSeconds} seconds ago`;
-    }
-    if (diffInSeconds < 3600) {
-      return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-    }
-    if (diffInSeconds < 86400) {
-      return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-    }
-    return `${Math.floor(diffInSeconds / 86400)} days ago`;
-  };
-
+  // Fetch saved jobs
   useEffect(() => {
     fetch("http://127.0.0.1:5000/saved-jobs", {
       method: "GET",
@@ -109,13 +120,31 @@ const Dashboard = () => {
       });
   }, []);
 
+  // Function to calculate time difference
+  const timeSincePosted = (createdAt) => {
+    const createdDate = new Date(createdAt);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - createdDate) / 1000);
+
+    if (diffInSeconds < 60) {
+      return `${diffInSeconds} seconds ago`;
+    }
+    if (diffInSeconds < 3600) {
+      return `${Math.floor(diffInSeconds / 60)} minutes ago`;
+    }
+    if (diffInSeconds < 86400) {
+      return `${Math.floor(diffInSeconds / 3600)} hours ago`;
+    }
+    return `${Math.floor(diffInSeconds / 86400)} days ago`;
+  };
+
   return (
     <div className="p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen font-sans">
       {/* Dashboard Title */}
       <h1 className="text-3xl font-bold text-gray-800 mb-8">Job Portal Dashboard</h1>
 
       {/* Stats Cards Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         {/* Jobs Applied Card */}
         <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
           <div className="flex items-center space-x-4">
@@ -151,6 +180,19 @@ const Dashboard = () => {
             <div>
               <h2 className="text-lg font-semibold text-gray-600">Saved Jobs</h2>
               <p className="text-2xl font-bold text-gray-800">{savedJobsCount}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Accepted Applications Card */}
+        <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="flex items-center space-x-4">
+            <div className="bg-purple-100 p-3 rounded-lg">
+              <FaCheckCircle className="text-2xl text-purple-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-600">Accepted Applications</h2>
+              <p className="text-2xl font-bold text-gray-800">{acceptedApplications}</p>
             </div>
           </div>
         </div>

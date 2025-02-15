@@ -5,7 +5,7 @@ import {
   FaBriefcase,
   FaSave,
   FaUser,
-  FaBell,
+  FaKey, // Icon for Change Password
   FaSignOutAlt,
   FaBars,
   FaTimes,
@@ -22,9 +22,9 @@ const UserDashboard = () => {
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <div
-        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white text-gray-700 shadow-lg transform ${
+        className={`fixed inset-y-0 left-0 z-40 w-64 bg-white text-gray-700 transform ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } transition-transform duration-300 md:translate-x-0`}
+        } transition-transform duration-300 md:translate-x-0 border-r-2 border-gray-150`}
       >
         {/* Sidebar Header */}
         <div className="sticky top-0 bg-green-600 text-white p-4 flex justify-between items-center shadow-md">
@@ -39,57 +39,57 @@ const UserDashboard = () => {
 
         {/* Sidebar Links */}
         <nav className="flex flex-col space-y-6 p-6 mt-4 overflow-y-auto h-[calc(100vh-64px)]">
-  <Link
-    to=""
-    className="flex items-center space-x-4 p-3 text-base font-medium rounded hover:bg-green-100"
-  >
-    <FaHome className="text-green-600 text-xl" />
-    <span>Dashboard</span>
-  </Link>
-  <Link
-    to="browse-jobs"
-    className="flex items-center space-x-4 p-3 text-base font-medium rounded hover:bg-green-100"
-  >
-    <FaBriefcase className="text-green-600 text-xl" />
-    <span>Browse Jobs</span>
-  </Link>
-  <Link
-    to="my-applications"
-    className="flex items-center space-x-4 p-3 text-base font-medium rounded hover:bg-green-100"
-  >
-    <FaSave className="text-green-600 text-xl" />
-    <span>My Applications</span>
-  </Link>
-  <Link
-    to="saved-jobs"
-    className="flex items-center space-x-4 p-3 text-base font-medium rounded hover:bg-green-100"
-  >
-    <FaSave className="text-green-600 text-xl" />
-    <span>Saved Jobs</span>
-  </Link>
-  <Link
-    to="profile"
-    className="flex items-center space-x-4 p-3 text-base font-medium rounded hover:bg-green-100"
-  >
-    <FaUser className="text-green-600 text-xl" />
-    <span>Profile</span>
-  </Link>
-  <Link
-    to="notifications"
-    className="flex items-center space-x-4 p-3 text-base font-medium rounded hover:bg-green-100"
-  >
-    <FaBell className="text-green-600 text-xl" />
-    <span>Notifications</span>
-  </Link>
-  <Link
-    to="logout"
-    className="flex items-center space-x-4 p-3 text-base font-medium rounded hover:bg-red-100"
-  >
-    <FaSignOutAlt className="text-red-500 text-xl" />
-    <span>Logout</span>
-  </Link>
-</nav>
-
+          <Link
+            to=""
+            className="flex items-center space-x-4 p-3 text-base font-medium rounded hover:bg-green-100"
+          >
+            <FaHome className="text-green-600 text-xl" />
+            <span>Dashboard</span>
+          </Link>
+          <Link
+            to="browse-jobs"
+            className="flex items-center space-x-4 p-3 text-base font-medium rounded hover:bg-green-100"
+          >
+            <FaBriefcase className="text-green-600 text-xl" />
+            <span>Browse Jobs</span>
+          </Link>
+          <Link
+            to="my-applications"
+            className="flex items-center space-x-4 p-3 text-base font-medium rounded hover:bg-green-100"
+          >
+            <FaSave className="text-green-600 text-xl" />
+            <span>My Applications</span>
+          </Link>
+          <Link
+            to="saved-jobs"
+            className="flex items-center space-x-4 p-3 text-base font-medium rounded hover:bg-green-100"
+          >
+            <FaSave className="text-green-600 text-xl" />
+            <span>Saved Jobs</span>
+          </Link>
+          <Link
+            to="profile"
+            className="flex items-center space-x-4 p-3 text-base font-medium rounded hover:bg-green-100"
+          >
+            <FaUser className="text-green-600 text-xl" />
+            <span>Profile</span>
+          </Link>
+          {/* Change Password Link */}
+          <Link
+            to="change-password"
+            className="flex items-center space-x-4 p-3 text-base font-medium rounded hover:bg-green-100"
+          >
+            <FaKey className="text-green-600 text-xl" />
+            <span>Change Password</span>
+          </Link>
+          <Link
+            to="logout"
+            className="flex items-center space-x-4 p-3 text-base font-medium rounded hover:bg-red-100"
+          >
+            <FaSignOutAlt className="text-red-500 text-xl" />
+            <span>Logout</span>
+          </Link>
+        </nav>
       </div>
 
       {/* Overlay for Sidebar */}

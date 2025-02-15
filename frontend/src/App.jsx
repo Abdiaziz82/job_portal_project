@@ -47,6 +47,7 @@ import ViewProfile from "./pages/AdminDashboard/ViewProfile";
 
 import MoreJobDetails from "./pages/MoreJobDetails";
 import OpenJobs from "./pages/Openjobs";
+import ChangePassword from "./pages/ChangePassword";
 
 function App() {
   return (
@@ -85,7 +86,9 @@ function App() {
                   
                   <Route path="my-applications" element={<MyApplications />} />
                   <Route path="saved-jobs" element={<SavedJobs />} />
+                 
                   <Route path="profile" element={<Profile />}>
+                  
                     <Route path="personal-details" element={<PersonalDetails />} />
                     <Route path="next-of-kin" element={<NextOfKinForm />} />
                     {/* <Route path="work-experience" element={<WorkExperience />} /> */}
@@ -104,7 +107,8 @@ function App() {
                     <Route path="edit-relevant-course" element={<EditRelevantCourse />} />
                     <Route path="edit-referee" element={<EditReferee />} />
                   </Route>
-                  <Route path="notifications" element={<Notifications />} />
+                  
+                  <Route path="change-password" element={< ChangePassword />} />
                   <Route path="logout" element={<Logout />} />
                 </Route>
               </Routes>
