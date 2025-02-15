@@ -122,22 +122,7 @@ def login():
 
     return response, 200
 
-@routes.route('/users', methods=['GET'])
-@login_required  # Ensure only logged-in admins can access
-def get_users(current_user):
-    """Fetch all registered users."""
-    users = User.query.all()
 
-    if not users:
-        return jsonify({"message": "No users found"}), 200
-
-    return jsonify([{
-        "id": user.id,
-        "first_name": user.first_name,
-        "last_name": user.last_name,
-        "email_address": user.email_address,
-        "mobile_number": user.mobile_number
-    } for user in users]), 200
 
 
 @routes.route('/delete-user/<int:user_id>', methods=['DELETE'])
@@ -391,9 +376,9 @@ def admin_login():
     admin_password_hash = current_app.config['ADMIN_PASSWORD']  # Hashed password
 
     if data['email_address'] == admin_email and bcrypt.check_password_hash(admin_password_hash, data['password']):
-        # Generate Admin JWT Token
+        # Generate Admin JWT Token with correct role field
         admin_token = jwt.encode({
-            'admin': True,
+            'role': 'admin',  # ✅ Correct role format
             'exp': datetime.utcnow() + timedelta(seconds=current_app.config['JWT_EXPIRATION_DELTA'])
         }, current_app.config['SECRET_KEY'], algorithm='HS256')
 
@@ -410,7 +395,7 @@ def admin_login():
         return response, 200
 
     return jsonify({'error': 'Invalid email or password'}), 401
-   
+
    
 @routes.route('/admin/authcheck', methods=['GET'])
 def admin_auth_check():
@@ -421,7 +406,7 @@ def admin_auth_check():
     try:
         # Decode admin JWT
         data = jwt.decode(admin_token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
-        if data.get('admin'):
+        if data.get('role') == 'admin':  # ✅ Use 'role' instead of 'admin'
             return jsonify({"message": "Admin authenticated"}), 200
         else:
             return jsonify({"error": "Invalid admin privileges"}), 403
@@ -429,7 +414,23 @@ def admin_auth_check():
         return jsonify({"error": "Admin token expired"}), 401
     except jwt.InvalidTokenError:
         return jsonify({"error": "Invalid admin token"}), 401
-    
+
+@routes.route('/users', methods=['GET'])
+@admin_required  # Ensure only the admin can access
+def get_users():
+    """Fetch all registered users."""
+    users = User.query.all()
+
+    if not users:
+        return jsonify({"message": "No users found"}), 200
+
+    return jsonify([{
+        "id": user.id,
+        "first_name": user.first_name,
+        "last_name": user.last_name,
+        "email_address": user.email_address,
+        "mobile_number": user.mobile_number
+    } for user in users]), 200
 
 # Admin-only route for managing jobs@routes.route('/api/jobs', methods=['POST'])
 @routes.route('/api/jobs', methods=['POST'])
@@ -507,6 +508,8 @@ def get_job_by_id(id):
         }
         return jsonify(job_details), 200
     return jsonify({"message": "Job not found"}), 404
+
+
 
 @routes.route('/api/jobs/<int:job_id>', methods=['PUT'])
 def update_job(job_id):
@@ -1772,25 +1775,36 @@ def apply_for_job(current_user, job_id):
         return jsonify({'error': str(e)}), 500
 
 @routes.route('/admin/job-applications', methods=['GET'])
-@login_required  # Ensure only logged-in admins can access
-def get_all_job_applications(applications):
-    """Fetch all job applications with applicant details and job titles."""
+@admin_required
+def get_all_job_applications():
     try:
         applications = JobApplication.query.all()
 
-        applications_data = [
-            {
+        # Count applications by status
+        status_counts = {
+            "Pending": 0,
+            "Accepted": 0,
+            "Rejected": 0,
+        }
+
+        applications_data = []
+        for app in applications:
+            if app.status in status_counts:
+                status_counts[app.status] += 1
+
+            applications_data.append({
                 "id": app.id,
                 "user_id": app.user.id,
                 "applicant_name": f"{app.user.first_name} {app.user.last_name}",
                 "job_title": app.job.position,
                 "status": app.status,
                 "applied_at": app.applied_at.strftime("%Y-%m-%d %H:%M:%S") if app.applied_at else None
-            }
-            for app in applications
-        ]
+            })
 
-        return jsonify(applications_data), 200
+        return jsonify({
+            "applications": applications_data,
+            "status_counts": status_counts
+        }), 200
     except Exception as e:
         return jsonify({"error": "Failed to fetch job applications", "details": str(e)}), 500
     
@@ -1824,7 +1838,13 @@ def update_application_status( application_id):
 def get_user_job_applications(current_user):
     """Fetch job applications for the logged-in user."""
     try:
-        applications = JobApplication.query.filter_by(user_id=current_user.id).all()
+        status_filter = request.args.get('status')  # Get status filter from query params
+        query = JobApplication.query.filter_by(user_id=current_user.id)
+
+        if status_filter:
+            query = query.filter_by(status=status_filter)  # Apply status filter if provided
+
+        applications = query.all()
 
         applications_data = [
             {
@@ -1840,7 +1860,7 @@ def get_user_job_applications(current_user):
 
     except Exception as e:
         return jsonify({"error": "Failed to fetch job applications", "details": str(e)}), 500
-
+    
 @routes.route('/applications/<int:user_id>', methods=['GET'])
 @login_required
 def get_application_details(current_user, user_id):
