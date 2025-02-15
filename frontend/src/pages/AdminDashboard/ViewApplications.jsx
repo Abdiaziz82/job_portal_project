@@ -16,7 +16,12 @@ const ViewApplications = () => {
         return response.json();
       })
       .then((data) => {
-        setApplications(data);
+        // Ensure the response contains the `applications` array
+        if (data.applications && Array.isArray(data.applications)) {
+          setApplications(data.applications);
+        } else {
+          throw new Error("Invalid data format: applications array not found");
+        }
         setLoading(false);
       })
       .catch((error) => {
@@ -99,18 +104,17 @@ const ViewApplications = () => {
                     Reject
                   </button>
                   <button
-  className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
-  onClick={() => {
-    if (!app.user_id) {
-      alert("User ID not found. Please check the application data.");
-      return;
-    }
-    navigate(`/admin/dashboard/view-profile/${app.user_id}`);
-  }}
->
-  View Profile
-</button>
-
+                    className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
+                    onClick={() => {
+                      if (!app.user_id) {
+                        alert("User ID not found. Please check the application data.");
+                        return;
+                      }
+                      navigate(`/admin/dashboard/view-profile/${app.user_id}`);
+                    }}
+                  >
+                    View Profile
+                  </button>
                 </td>
               </tr>
             ))}

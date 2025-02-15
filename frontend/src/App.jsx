@@ -44,8 +44,9 @@ import EditReferee from "./pages/EditReferee";
 import JobDetails from "./pages/JobDetails";
 
 import ViewProfile from "./pages/AdminDashboard/ViewProfile";
-import Openjobs from "./pages/Openjobs";
+
 import MoreJobDetails from "./pages/MoreJobDetails";
+import OpenJobs from "./pages/Openjobs";
 
 function App() {
   return (
@@ -62,12 +63,13 @@ function App() {
               <Route path="/" element={<Login />} />
               
                 <Route path="/signup" element={<SignUp />} />
-                <Route path="/open-jobs" element={<Openjobs />} />
+                {/* <Route path="/open-jobs" element={<Openjobs />} /> */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:token" element={<ResetPassword />} />
                
-                
+                <Route path="/open-jobs" element={<OpenJobs />} />
+                <Route path="/open-jobs/:id" element={<MoreJobDetails />} />
 
                 {/* User Dashboard */}
                 <Route

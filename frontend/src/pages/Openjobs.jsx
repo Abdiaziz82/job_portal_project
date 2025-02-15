@@ -55,7 +55,7 @@ const OpenJobs = () => {
 
               <button
                 className="mt-4 w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-2 px-4 rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 flex items-center justify-center"
-                onClick={() => navigate(`/jobs/${job.id}`)}
+                onClick={() => navigate(`/open-jobs/${job.id}`)}
               >
                 <span>View More</span>
                 <svg

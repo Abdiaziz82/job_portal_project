@@ -1,8 +1,7 @@
 import { FaSuitcase, FaRegPaperPlane, FaBell } from "react-icons/fa";
-import { useState,useEffect } from "react";
+import { useState, useEffect } from "react";
 
 const Dashboard = () => {
-
   const [jobCount, setJobCount] = useState(0);
   const [openJobs, setOpenJobs] = useState(0);
   const [jobs, setJobs] = useState([]);
@@ -13,7 +12,7 @@ const Dashboard = () => {
       try {
         const response = await fetch("http://127.0.0.1:5000/user/job-applications", {
           method: "GET",
-          credentials: "include", // Ensures cookies (JWT) are sent
+          credentials: "include",
         });
 
         if (!response.ok) {
@@ -21,7 +20,7 @@ const Dashboard = () => {
         }
 
         const data = await response.json();
-        setJobCount(data.length); // Count the number of applied jobs
+        setJobCount(data.length);
       } catch (error) {
         console.error("Error fetching job applications:", error);
       }
@@ -35,7 +34,7 @@ const Dashboard = () => {
       try {
         const response = await fetch("http://127.0.0.1:5000/api/jobs", {
           method: "GET",
-          credentials: "include", // Ensures cookies (if needed) are sent
+          credentials: "include",
         });
 
         if (!response.ok) {
@@ -43,7 +42,7 @@ const Dashboard = () => {
         }
 
         const data = await response.json();
-        setOpenJobs(data.length); // Count the total number of jobs
+        setOpenJobs(data.length);
       } catch (error) {
         console.error("Error fetching open jobs:", error);
       }
@@ -57,7 +56,7 @@ const Dashboard = () => {
       try {
         const response = await fetch("http://127.0.0.1:5000/api/jobs", {
           method: "GET",
-          credentials: "include", // Ensure cookies are sent if required
+          credentials: "include",
         });
 
         if (!response.ok) {
@@ -65,7 +64,7 @@ const Dashboard = () => {
         }
 
         const data = await response.json();
-        setJobs(data); // Store jobs in state
+        setJobs(data);
       } catch (error) {
         console.error("Error fetching jobs:", error);
       }
@@ -74,7 +73,6 @@ const Dashboard = () => {
     fetchJobs();
   }, []);
 
-  // Function to calculate time difference
   const timeSincePosted = (createdAt) => {
     const createdDate = new Date(createdAt);
     const now = new Date();
@@ -95,14 +93,14 @@ const Dashboard = () => {
   useEffect(() => {
     fetch("http://127.0.0.1:5000/saved-jobs", {
       method: "GET",
-      credentials: "include", // Ensure authentication cookies/JWT are sent
+      credentials: "include",
     })
       .then((response) => response.json())
       .then((data) => {
         if (data.message) {
-          setSavedJobsCount(0); // No saved jobs
+          setSavedJobsCount(0);
         } else {
-          setSavedJobsCount(data.length); // Set the number of saved jobs
+          setSavedJobsCount(data.length);
         }
       })
       .catch((error) => {
@@ -111,70 +109,79 @@ const Dashboard = () => {
       });
   }, []);
 
-
   return (
-    <div className="p-8 bg-gray-100 min-h-screen">
+    <div className="p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen font-sans">
       {/* Dashboard Title */}
-      <h1 className="text-4xl font-extrabold text-gray-800 mb-10 text-center">Your Job Portal Dashboard</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-8">Job Portal Dashboard</h1>
 
       {/* Stats Cards Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         {/* Jobs Applied Card */}
-        <div className="bg-white p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 flex items-center justify-between space-x-6">
-      <div className="bg-green-600 p-5 rounded-full text-white">
-        <FaRegPaperPlane className="text-3xl" />
-      </div>
-      <div>
-        <h2 className="text-xl font-semibold text-gray-700">Jobs Applied</h2>
-        <p className="text-3xl font-bold text-green-700">{jobCount}</p>
-      </div>
-    </div>
+        <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="flex items-center space-x-4">
+            <div className="bg-green-100 p-3 rounded-lg">
+              <FaRegPaperPlane className="text-2xl text-green-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-600">Jobs Applied</h2>
+              <p className="text-2xl font-bold text-gray-800">{jobCount}</p>
+            </div>
+          </div>
+        </div>
 
         {/* Jobs Open Card */}
-        <div className="bg-white p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 flex items-center justify-between space-x-6">
-      <div className="bg-blue-600 p-5 rounded-full text-white">
-        <FaSuitcase className="text-3xl" />
-      </div>
-      <div>
-        <h2 className="text-xl font-semibold text-gray-700">Jobs Open</h2>
-        <p className="text-3xl font-bold text-blue-700">{openJobs}</p>
-      </div>
-    </div>
+        <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="flex items-center space-x-4">
+            <div className="bg-blue-100 p-3 rounded-lg">
+              <FaSuitcase className="text-2xl text-blue-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-600">Jobs Open</h2>
+              <p className="text-2xl font-bold text-gray-800">{openJobs}</p>
+            </div>
+          </div>
+        </div>
 
         {/* Saved Jobs Card */}
-        <div className="bg-white p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300 flex items-center justify-between space-x-6">
-      <div className="bg-yellow-500 p-5 rounded-full text-white">
-        <FaBell className="text-3xl" />
-      </div>
-      <div>
-        <h2 className="text-xl font-semibold text-gray-700">Saved Jobs</h2>
-        <p className="text-3xl font-bold text-yellow-600">{savedJobsCount}</p>
-      </div>
-    </div>
+        <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="flex items-center space-x-4">
+            <div className="bg-yellow-100 p-3 rounded-lg">
+              <FaBell className="text-2xl text-yellow-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-600">Saved Jobs</h2>
+              <p className="text-2xl font-bold text-gray-800">{savedJobsCount}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/*  Job Alerts Section */}
-      <div className="mt-16">
-      <h2 className="text-2xl font-bold text-gray-800 mb-6">Recent Job Alerts</h2>
-      <div className="bg-white p-6 rounded-xl shadow-xl hover:shadow-2xl transition-shadow duration-300">
-        {jobs.length > 0 ? (
-          <ul className="space-y-6">
-            {jobs.map((job) => (
-              <li key={job.id} className="flex justify-between text-gray-700">
-                <span className="text-lg font-semibold">
-                  ADVERT NO: {job.advert}: {job.position} - GaU GRADE {job.grade}
-                </span>
+      {/* Job Alerts Section */}
+      <div className="bg-white p-6 rounded-xl shadow-sm">
+        <h2 className="text-2xl font-bold text-gray-800 mb-6">Recent Job Alerts</h2>
+        <div className="space-y-4">
+          {jobs.length > 0 ? (
+            jobs.map((job) => (
+              <div
+                key={job.id}
+                className="flex justify-between items-center p-4 rounded-lg hover:bg-gray-50 transition-all duration-200"
+              >
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-700">
+                    {job.position} - GaU GRADE {job.grade}
+                  </h3>
+                  <p className="text-sm text-gray-500">ADVERT NO: {job.advert}</p>
+                </div>
                 <span className="text-sm text-gray-500">
-                 Posted {timeSincePosted(job.createdAt)}
+                  Posted {timeSincePosted(job.createdAt)}
                 </span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="text-gray-500">No jobs available at the moment.</p>
-        )}
+              </div>
+            ))
+          ) : (
+            <p className="text-gray-500">No jobs available at the moment.</p>
+          )}
+        </div>
       </div>
-    </div>
     </div>
   );
 };
