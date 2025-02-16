@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { FaRegCheckCircle, FaArrowLeft } from "react-icons/fa";
 
 const MoreJobDetails = () => {
   const { id } = useParams();
@@ -31,61 +32,97 @@ const MoreJobDetails = () => {
       });
   }, [id]);
 
-  if (loading) return <div className="text-center mt-8">Loading job details...</div>;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-700"></div>
+      </div>
+    );
+
   if (error)
     return (
-      <div className="text-center text-red-600 mt-8">
-        <p>{error}</p>
+      <div className="text-center mt-12">
+        <p className="text-red-600 text-lg font-semibold">{error}</p>
         <button
-          className="mt-4 bg-gradient-to-r from-green-600 to-green-700 text-white py-2 px-4 rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300"
+          className="mt-4 bg-green-700 text-white py-2 px-6 rounded-lg hover:bg-green-800 transition-all flex items-center justify-center mx-auto"
           onClick={() => navigate(-1)}
         >
-          Go Back
+          <FaArrowLeft className="mr-2" /> Go Back
         </button>
       </div>
     );
 
+  // Function to handle Apply Job Now button click
+  const handleApplyNow = () => {
+    navigate("/login"); // Redirect to the login page
+  };
+
   return (
-    <div className="container mx-auto mt-12 px-4">
-      <h2 className="text-3xl font-bold text-green-700 text-center mb-8">Job Details</h2>
+    <div className="container mx-auto mt-12 px-4 md:px-8 w-full max-w-7xl pb-12">
+      {/* Header Section */}
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-green-700 mb-2">{job.position}</h1>
+        <p className="text-lg text-gray-600">
+          <span className="font-semibold text-gray-800">Number of Posts:</span> {job.numberOfPosts}
+        </p>
+        <p className="text-lg text-gray-600">
+          <span className="font-semibold text-gray-800">Grade:</span> {job.grade}
+        </p>
+        <p className="text-lg text-gray-600">
+          <span className="font-semibold text-gray-800">Deadline:</span>{" "}
+          {new Date(job.applicationDeadline).toLocaleDateString()}
+        </p>
+      </div>
 
-      <div className="bg-white shadow-lg rounded-xl overflow-hidden border border-gray-100 flex flex-col p-6">
-        <h3 className="text-2xl font-bold text-green-700 mb-4">{job.position}</h3>
+      {/* Action Buttons at the Top */}
+      <div className="flex justify-end gap-4 mb-8">
+        <button
+          className="py-3 px-8 rounded-lg shadow-md bg-gray-600 hover:bg-gray-700 text-white transition-all flex items-center space-x-2"
+          onClick={() => navigate(-1)}
+        >
+          <FaArrowLeft className="text-lg" />
+          <span>Go Back</span>
+        </button>
+        <button
+          className={`py-3 px-8 rounded-lg shadow-md transition-all flex items-center space-x-2 ${
+            loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-700 hover:bg-green-800"
+          } text-white`}
+          onClick={handleApplyNow} // Use the handleApplyNow function
+          disabled={loading}
+        >
+          <FaRegCheckCircle className="text-lg" />
+          <span>{loading ? "Applying..." : "Apply Job Now"}</span>
+        </button>
+      </div>
 
-        <div className="text-sm text-gray-600 space-y-4">
-          <p>
-            <strong className="text-gray-700">Advert:</strong> {job.advert}
-          </p>
-          <p>
-            <strong className="text-gray-700">Terms of Service:</strong> {job.termsOfService}
-          </p>
-          <p>
-            <strong className="text-gray-700">Number of Posts:</strong> {job.numberOfPosts}
-          </p>
-          <p className="text-red-600 font-semibold">
-            <strong>Deadline:</strong> {new Date(job.applicationDeadline).toLocaleDateString()}
-          </p>
-          <p>
-            <strong className="text-gray-700">Grade:</strong> {job.grade}
-          </p>
-          <p>
-            <strong className="text-gray-700">Requirements:</strong> {job.requirements}
-          </p>
-          <p>
-            <strong className="text-gray-700">Duties:</strong> {job.duties}
-          </p>
-          <p>
-            <strong className="text-gray-700">Created At:</strong> {new Date(job.createdAt).toLocaleDateString()}
-          </p>
+      {/* Job Details Card */}
+      <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 w-full">
+        {/* Job Description */}
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold text-green-700 mb-4">Job Description</h2>
+          <p className="text-gray-700 leading-relaxed text-justify">{job.advert}</p>
         </div>
 
-        <div className="mt-6 flex gap-4">
-          <button
-            className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-2 px-4 rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300"
-            onClick={() => navigate(-1)}
-          >
-            Go Back
-          </button>
+        {/* Requirements Section */}
+        {job.requirements && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-green-700 mb-4">Requirements</h2>
+            <p className="text-gray-700 whitespace-pre-line leading-relaxed">{job.requirements}</p>
+          </div>
+        )}
+
+        {/* Duties Section */}
+        {job.duties && (
+          <div className="mb-8">
+            <h2 className="text-2xl font-bold text-green-700 mb-4">Duties</h2>
+            <p className="text-gray-700 whitespace-pre-line leading-relaxed">{job.duties}</p>
+          </div>
+        )}
+
+        {/* Posted On Section */}
+        <div className="mt-8">
+          <h3 className="text-xl font-semibold text-green-700 mb-2">Posted On</h3>
+          <p className="text-gray-700">{new Date(job.createdAt).toLocaleDateString()}</p>
         </div>
       </div>
     </div>

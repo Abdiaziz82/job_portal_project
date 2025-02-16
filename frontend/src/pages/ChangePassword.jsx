@@ -1,32 +1,54 @@
 import React, { useState } from "react";
+import axios from "axios";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import { EyeIcon, EyeOffIcon } from "lucide-react"; // Using lucide-react for icons
 
 const ChangePassword = () => {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  const [showCurrentPassword, setShowCurrentPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Basic validation
     if (!currentPassword || !newPassword || !confirmPassword) {
-      setError("All fields are required.");
+      toast.error("All fields are required.", { position: "top-center" });
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      setError("New password and confirm password do not match.");
+      toast.error("New password and confirm password do not match.", { position: "top-center" });
       return;
     }
 
-    // Simulate a successful password change
-    setError("");
-    setSuccess("Your password has been changed successfully!");
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
+    try {
+      const response = await fetch("http://127.0.0.1:5000/change-password", {
+        method: "POST",
+        credentials: "include", // Ensures cookies (JWT) are sent with the request
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          current_password: currentPassword,
+          new_password: newPassword,
+          confirm_password: confirmPassword,
+        }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        toast.error(data.error, { position: "top-center" });
+      } else {
+        toast.success(data.message, { position: "top-center" });
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      }
+    } catch (error) {
+      toast.error("Something went wrong. Please try again.", { position: "top-center" });
+    }
   };
 
   return (
@@ -36,77 +58,72 @@ const ChangePassword = () => {
           Change Password
         </h2>
 
-        {/* Error Message */}
-        {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-6">
-            {error}
-          </div>
-        )}
-
-        {/* Success Message */}
-        {success && (
-          <div className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-6">
-            {success}
-          </div>
-        )}
-
         {/* Change Password Form */}
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Current Password */}
-          <div>
-            <label
-              htmlFor="currentPassword"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
+          <div className="relative">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Current Password
             </label>
             <input
-              type="password"
-              id="currentPassword"
+              type={showCurrentPassword ? "text" : "password"}
               value={currentPassword}
               onChange={(e) => setCurrentPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent pr-10"
               placeholder="Enter your current password"
               required
             />
+            <button
+              type="button"
+              className="absolute right-3 top-9 text-gray-500"
+              onClick={() => setShowCurrentPassword(!showCurrentPassword)}
+            >
+              {showCurrentPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
+            </button>
           </div>
 
           {/* New Password */}
-          <div>
-            <label
-              htmlFor="newPassword"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
+          <div className="relative">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               New Password
             </label>
             <input
-              type="password"
-              id="newPassword"
+              type={showNewPassword ? "text" : "password"}
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent pr-10"
               placeholder="Enter your new password"
               required
             />
+            <button
+              type="button"
+              className="absolute right-3 top-9 text-gray-500"
+              onClick={() => setShowNewPassword(!showNewPassword)}
+            >
+              {showNewPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
+            </button>
           </div>
 
           {/* Confirm New Password */}
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="block text-sm font-medium text-gray-700 mb-2"
-            >
+          <div className="relative">
+            <label className="block text-sm font-medium text-gray-700 mb-2">
               Confirm New Password
             </label>
             <input
-              type="password"
-              id="confirmPassword"
+              type={showConfirmPassword ? "text" : "password"}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent pr-10"
               placeholder="Confirm your new password"
               required
             />
+            <button
+              type="button"
+              className="absolute right-3 top-9 text-gray-500"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              {showConfirmPassword ? <EyeOffIcon size={20} /> : <EyeIcon size={20} />}
+            </button>
           </div>
 
           {/* Submit Button */}
@@ -120,6 +137,9 @@ const ChangePassword = () => {
           </div>
         </form>
       </div>
+
+      {/* Toast Notification - Centered */}
+      <ToastContainer position="top-center" autoClose={5000} hideProgressBar />
     </div>
   );
 };
