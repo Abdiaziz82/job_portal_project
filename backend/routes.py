@@ -153,6 +153,39 @@ def delete_user(current_user, user_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+    
+@routes.route('/change-password', methods=['POST'])
+@login_required
+def change_password(current_user):
+    data = request.get_json()
+    current_password = data.get('current_password')
+    new_password = data.get('new_password')
+    confirm_password = data.get('confirm_password')
+
+    # Ensure all fields are provided
+    if not current_password or not new_password or not confirm_password:
+        return jsonify({"error": "All fields are required"}), 400
+
+    # Verify the current password
+    if not bcrypt.check_password_hash(current_user.password, current_password):
+        return jsonify({"error": "Current password is incorrect"}), 400
+
+    # Ensure new password is at least 8 characters
+    if len(new_password) < 8:
+        return jsonify({"error": "New password must be at least 8 characters long"}), 400
+
+    # Ensure new password and confirm password match
+    if new_password != confirm_password:
+        return jsonify({"error": "New password and confirm password do not match"}), 400
+
+    # Hash the new password
+    hashed_password = bcrypt.generate_password_hash(new_password).decode('utf-8')
+
+    # Update the user's password
+    current_user.password = hashed_password
+    db.session.commit()
+
+    return jsonify({"message": "Password changed successfully!"}), 200
 
 @routes.route('/forgot-password', methods=['POST'])
 def forgot_password():
@@ -621,6 +654,29 @@ def get_saved_jobs(current_user):
         "applicationDeadline": job.job.application_deadline,
         
     } for job in saved_jobs]), 200
+
+@routes.route('/remove-saved-job', methods=['DELETE'])
+@login_required
+def remove_saved_job(current_user):
+    """Remove a saved job for the logged-in user."""
+    data = request.get_json()
+
+    if not data or 'job_id' not in data:
+        return jsonify({'error': 'Missing required field: job_id'}), 400
+
+    try:
+        saved_job = SavedJobs.query.filter_by(user_id=current_user.id, job_id=data['job_id']).first()
+        if not saved_job:
+            return jsonify({'error': 'Job not found in saved jobs'}), 404
+
+        db.session.delete(saved_job)
+        db.session.commit()
+
+        return jsonify({'message': 'Job removed from saved jobs'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
 
 
     
