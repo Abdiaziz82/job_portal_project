@@ -36,8 +36,9 @@ export default function Certificate() {
 
       // Append each selected file to the form data
       if (files) {
-        Array.from(files).forEach((file) => formData.append("file", file));
+        Array.from(files).forEach((file) => formData.append("files[]", file));
       }
+      
 
       // Send request to the backend
       const response = await fetch("http://127.0.0.1:5000/upload-certificate", {

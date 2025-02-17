@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
-
+import { FaFilePdf } from "react-icons/fa";
 export default function FetchedCertificates() {
   const [certificates, setCertificates] = useState([]);
   const navigate = useNavigate();
@@ -102,19 +102,26 @@ export default function FetchedCertificates() {
                 <span className="text-sm text-gray-600 flex-1">{certificate.additional_awards}</span>
               </div>
   
-              {certificate.file_path && (
-                <div className="flex items-start sm:col-span-2">
-                  <strong className="text-sm text-gray-700 w-40">File:</strong>
-                  <a
-                    href={certificate.file_path}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-sm text-blue-600 hover:underline"
-                  >
-                    View Certificate
-                  </a>
-                </div>
-              )}
+              {certificate.file_paths.length > 0 && (
+  <div className="flex flex-col sm:col-span-2">
+    <strong className="text-sm text-gray-700 w-40">Files:</strong>
+    <div className="flex flex-wrap gap-2 mt-1">
+      {certificate.file_paths.map((file, i) => (
+        <a
+          key={i}
+          href={file}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 bg-blue-600 text-white text-xs px-3 py-1 rounded-md shadow-sm transition-all hover:bg-blue-700 duration-200"
+        >
+          <FaFilePdf className="text-white text-sm" />
+          <span>View {i + 1}</span>
+        </a>
+      ))}
+    </div>
+  </div>
+)}
+
             </div>
   
             <div className="flex space-x-4 mt-4">
