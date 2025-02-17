@@ -145,6 +145,19 @@ const Dashboard = () => {
 
       {/* Stats Cards Section */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+         {/* Jobs Open Card */}
+      <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
+          <div className="flex items-center space-x-4">
+            <div className="bg-blue-100 p-3 rounded-lg">
+              <FaSuitcase className="text-2xl text-blue-600" />
+            </div>
+            <div>
+              <h2 className="text-lg font-semibold text-gray-600">Jobs Open</h2>
+              <p className="text-2xl font-bold text-gray-800">{openJobs}</p>
+            </div>
+          </div>
+        </div>
+
         {/* Jobs Applied Card */}
         <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
           <div className="flex items-center space-x-4">
@@ -158,19 +171,8 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Jobs Open Card */}
-        <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
-          <div className="flex items-center space-x-4">
-            <div className="bg-blue-100 p-3 rounded-lg">
-              <FaSuitcase className="text-2xl text-blue-600" />
-            </div>
-            <div>
-              <h2 className="text-lg font-semibold text-gray-600">Jobs Open</h2>
-              <p className="text-2xl font-bold text-gray-800">{openJobs}</p>
-            </div>
-          </div>
-        </div>
-
+        
+      
         {/* Saved Jobs Card */}
         <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300">
           <div className="flex items-center space-x-4">

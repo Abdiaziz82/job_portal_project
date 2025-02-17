@@ -1,6 +1,18 @@
 import { useParams } from "react-router-dom";
 import React, { useEffect, useState } from "react";
-import { FaUser, FaUsers, FaGraduationCap, FaBriefcase, FaCertificate, FaUserTie, FaBook, FaAddressBook } from "react-icons/fa";
+import {
+  FaUser,
+  FaUsers,
+  FaGraduationCap,
+  FaBriefcase,
+  FaCertificate,
+  FaUserTie,
+  FaBook,
+  FaAddressBook,
+  FaEye,
+  FaDownload,
+  FaFilePdf,
+} from "react-icons/fa";
 
 const ViewProfile = () => {
   const { userId } = useParams();
@@ -122,13 +134,23 @@ const ViewProfile = () => {
               <p><strong>University Grade:</strong> {edu.university_grade}</p>
               <p><strong>Start Date:</strong> {edu.start_date}</p>
               <p><strong>End Date:</strong> {edu.end_date}</p>
-              <p><strong>File:</strong> {edu.file_path ? (
-  <a href={edu.file_path} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-    View File
-  </a>
-) : "No file uploaded"}
-</p>
-
+              <p>
+                <strong>Document:</strong>{" "}
+                {edu.file_path ? (
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => window.open(edu.file_path, "_blank")}
+                      className="flex items-center space-x-2 p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                      title="View or Download Document"
+                    >
+                      <FaFilePdf className="inline-block" />
+                      <span>View/Download</span>
+                    </button>
+                  </div>
+                ) : (
+                  <span className="text-gray-500">No document uploaded</span>
+                )}
+              </p>
             </div>
           ))}
         </div>
@@ -157,39 +179,39 @@ const ViewProfile = () => {
 
       {/* ✅ Certificates */}
       {profileData.certificates?.length > 0 && (
-  <div className="mb-8 p-6 bg-gray-50 rounded-lg shadow-sm">
-    <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
-      <FaCertificate className="mr-2" /> Certificates
-    </h3>
-    {profileData.certificates.map((cert, index) => (
-      <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-        <p><strong>Type:</strong> {cert.certificate_type}</p>
-        <p><strong>Specialization:</strong> {cert.specialization}</p>
-        <p><strong>Institution:</strong> {cert.institution_name}</p>
-        <p><strong>Year:</strong> {cert.year_of_completion}</p>
-        <p><strong>Grade:</strong> {cert.grade}</p>
-        <p><strong>Additional Awards:</strong> {cert.additional_awards}</p>
-        
-        {cert.file_path ? (
-          <p>
-            <strong>Certificate:</strong>{" "}
-            <a
-              href={cert.file_path}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-blue-600 hover:underline"
-            >
-              View Certificate
-            </a>
-          </p>
-        ) : (
-          <p><strong>Certificate:</strong> No file uploaded</p>
-        )}
-      </div>
-    ))}
-  </div>
-)}
-
+        <div className="mb-8 p-6 bg-gray-50 rounded-lg shadow-sm">
+          <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
+            <FaCertificate className="mr-2" /> Certificates
+          </h3>
+          {profileData.certificates.map((cert, index) => (
+            <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+              <p><strong>Type:</strong> {cert.certificate_type}</p>
+              <p><strong>Specialization:</strong> {cert.specialization}</p>
+              <p><strong>Institution:</strong> {cert.institution_name}</p>
+              <p><strong>Year:</strong> {cert.year_of_completion}</p>
+              <p><strong>Grade:</strong> {cert.grade}</p>
+              <p><strong>Additional Awards:</strong> {cert.additional_awards}</p>
+              <p>
+                <strong>Certificate:</strong>{" "}
+                {cert.file_path ? (
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => window.open(cert.file_path, "_blank")}
+                      className="flex items-center space-x-2 p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
+                      title="View or Download Certificate"
+                    >
+                      <FaFilePdf className="inline-block" />
+                      <span>View/Download</span>
+                    </button>
+                  </div>
+                ) : (
+                  <span className="text-gray-500">No certificate uploaded</span>
+                )}
+              </p>
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* ✅ Professional Qualifications */}
       {profileData.professional_qualifications?.length > 0 && (

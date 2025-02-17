@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { FaRegCheckCircle } from "react-icons/fa";
+import { FaRegCheckCircle, FaCalendarAlt, FaTasks, FaListAlt, FaArrowLeft } from "react-icons/fa";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -85,19 +85,27 @@ const JobDetails = () => {
       {/* Toast Notifications */}
       <ToastContainer position="top-center" />
 
-      <h2 className="text-3xl font-bold text-green-700 text-center">
-        {position} ({numberOfPosts} posts)
-      </h2>
-      <p className="text-lg text-gray-600 text-center mt-2">
-        <span className="font-semibold text-black">Application Deadline:</span> {applicationDeadline}
-      </p>
+      {/* Job Title and Deadline */}
+      <div className="text-center mb-8">
+        <h2 className="text-2xl md:text-3xl font-bold text-green-700 mb-2">
+          {position} ({numberOfPosts} posts)
+        </h2>
+        <p className="text-base md:text-lg text-gray-600 flex flex-col md:flex-row items-center justify-center">
+          <span className="flex items-center mr-2">
+            <FaCalendarAlt className="mr-2" />
+            <span className="font-semibold text-black">Application Deadline:</span>
+          </span>
+          <span>{applicationDeadline}</span>
+        </p>
+      </div>
 
-      <div className="bg-white p-8 rounded-lg shadow-lg mb-8 w-full relative pt-14">
-        {/* Apply Now Button */}
+      {/* Job Details Card */}
+      <div className="bg-white rounded-lg shadow-lg p-6 md:p-8 mb-8 relative">
+        {/* Apply Now Button - Top Right */}
         <button
-          className={`py-2 px-4 rounded-lg transition absolute top-4 right-4 flex items-center space-x-2 ${
+          className={`absolute top-4 right-4 py-2 px-4 md:py-3 md:px-6 rounded-lg transition flex items-center space-x-2 ${
             hasApplied || loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-700 hover:bg-green-800"
-          } text-white`}
+          } text-white font-semibold text-sm md:text-base`}
           onClick={confirmApplication}
           disabled={hasApplied || loading}
         >
@@ -105,43 +113,57 @@ const JobDetails = () => {
           <span>{loading ? "Applying..." : hasApplied ? "Already Applied" : "Apply Now for this Job"}</span>
         </button>
 
-        <div className="text-lg text-gray-600 mb-6">
-          <h3 className="text-xl font-semibold text-green-700 mb-2">Job Description:</h3>
-          <div className="text-lg text-black leading-relaxed w-full text-justify break-words">{description}</div>
+        {/* Job Description */}
+        <div className="mb-6">
+          <h3 className="text-xl font-semibold text-green-700 mb-3 flex items-center">
+            <FaTasks className="mr-2" />
+            Job Description
+          </h3>
+          <p className="text-gray-700 leading-relaxed text-sm md:text-base">{description}</p>
         </div>
 
+        {/* Requirements */}
         {requirements && (
-          <div className="text-lg text-gray-600 mb-6">
-            <h3 className="text-xl font-semibold text-green-700 mb-2">Requirements:</h3>
-            <div className="text-black whitespace-pre-line leading-relaxed">{requirements}</div>
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold text-green-700 mb-3 flex items-center">
+              <FaListAlt className="mr-2" />
+              Requirements
+            </h3>
+            <p className="text-gray-700 whitespace-pre-line leading-relaxed text-sm md:text-base">{requirements}</p>
           </div>
         )}
 
+        {/* Duties */}
         {duties && (
-          <div className="text-lg text-gray-600">
-            <h3 className="text-xl font-semibold text-green-700 mb-2">Duties:</h3>
-            <div className="text-black whitespace-pre-line leading-relaxed">{duties}</div>
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold text-green-700 mb-3 flex items-center">
+              <FaListAlt className="mr-2" />
+              Duties
+            </h3>
+            <p className="text-gray-700 whitespace-pre-line leading-relaxed text-sm md:text-base">{duties}</p>
           </div>
         )}
       </div>
 
-      <div className="flex justify-center gap-6 mb-12 w-full">
+      {/* Bottom Buttons */}
+      <div className="flex flex-col md:flex-row justify-center gap-4 md:gap-6 mb-12">
         <button
-          className={`py-2 px-5 rounded-lg transition w-full md:w-auto shadow-md hover:shadow-lg focus:outline-none ${
-            hasApplied || loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-700 hover:bg-green-800 text-white"
-          }`}
+          className={`py-2 px-4 md:py-3 md:px-6 rounded-lg transition flex items-center justify-center space-x-2 ${
+            hasApplied || loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-700 hover:bg-green-800"
+          } text-white font-semibold text-sm md:text-base`}
           onClick={confirmApplication}
           disabled={hasApplied || loading}
         >
-          <i className="fa fa-paper-plane mr-2"></i>{" "}
-          {loading ? "Applying..." : hasApplied ? "Already Applied" : "Apply for this Job"}
+          <FaRegCheckCircle className="text-white" />
+          <span>{loading ? "Applying..." : hasApplied ? "Already Applied" : "Apply for this Job"}</span>
         </button>
 
         <button
-          className="bg-gray-500 text-white py-2 px-5 rounded-lg hover:bg-gray-600 transition w-full md:w-auto shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50"
+          className="bg-gray-500 text-white py-2 px-4 md:py-3 md:px-6 rounded-lg hover:bg-gray-600 transition flex items-center justify-center space-x-2 font-semibold text-sm md:text-base"
           onClick={() => navigate(-1)}
         >
-          Go Back
+          <FaArrowLeft className="text-white" />
+          <span>Go Back</span>
         </button>
       </div>
     </div>
