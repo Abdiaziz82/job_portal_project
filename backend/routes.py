@@ -678,8 +678,6 @@ def remove_saved_job(current_user):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
-
-    
 # Admin logout
 @routes.route('/admin/logout', methods=['POST'])
 def admin_logout():
@@ -1865,8 +1863,8 @@ def get_all_job_applications():
         return jsonify({"error": "Failed to fetch job applications", "details": str(e)}), 500
     
 @routes.route('/admin/job-applications/<int:application_id>', methods=['PUT'])
-@login_required  # Ensure only admins can access
-def update_application_status( application_id):
+@admin_required # Ensure only admins can access
+def update_application_status(application_id):
     """Allow admin to accept or reject job applications."""
     from flask import request  # Import inside the function to avoid circular imports
     try:
