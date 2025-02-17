@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { FaRegCheckCircle } from "react-icons/fa";
-import { toast } from "react-toastify"; // Import React Toastify
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const JobDetails = () => {
@@ -12,12 +12,10 @@ const JobDetails = () => {
   const [hasApplied, setHasApplied] = useState(false);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:5000/api/jobs/${id}`, {
-      credentials: "include",
-    })
+    fetch(`http://127.0.0.1:5000/api/jobs/${id}`, { credentials: "include" })
       .then((response) => response.json())
       .then((data) => setJob(data))
-      .catch((error) => console.error("Error fetching job details:", error));
+      .catch(() => toast.error("Error fetching job details"));
   }, [id]);
 
   const applyForJob = async () => {
@@ -32,26 +30,48 @@ const JobDetails = () => {
       const data = await response.json();
 
       if (!response.ok) {
-        // Handle backend errors
-        if (data.error && data.error.includes("Please fill and update your profile")) {
-          toast.error("⚠️ Profile incomplete! Update your profile before applying.");
-        } else if (data.error && data.error.includes("You have already applied for this job")) {
-          toast.warning("⚠️ You have already applied for this job.");
-        } else {
-          toast.error(data.error || "Failed to apply for the job");
-        }
+        toast.error(data.error || "Failed to apply for the job");
         return;
       }
 
-      // Success
       toast.success("✅ Application submitted successfully!");
       setHasApplied(true);
     } catch (error) {
-      console.error("Error applying:", error);
       toast.error("An unexpected error occurred. Please try again.");
     } finally {
       setLoading(false);
     }
+  };
+
+  const confirmApplication = () => {
+    toast.info(
+      <div className="w-full flex flex-col items-center">
+        <p className="font-medium text-gray-800 text-center">
+          Before submitting your application, ensure your profile is fully updated.
+        </p>
+        <div className="flex justify-center gap-4 mt-3">
+          <button
+            className="bg-green-700 text-white py-1 px-4 rounded-md hover:bg-green-800 transition"
+            onClick={() => {
+              toast.dismiss();
+              applyForJob();
+            }}
+          >
+            Apply Now
+          </button>
+          <button
+            className="bg-gray-500 text-white py-1 px-4 rounded-md hover:bg-gray-600 transition"
+            onClick={() => {
+              toast.dismiss();
+              navigate("/dashboard/profile");
+            }}
+          >
+            Go to Profile
+          </button>
+        </div>
+      </div>,
+      { position: "top-center", autoClose: false, closeOnClick: false }
+    );
   };
 
   if (!job) {
@@ -62,6 +82,9 @@ const JobDetails = () => {
 
   return (
     <div className="container mx-auto mt-12 px-4 md:px-8">
+      {/* Toast Notifications */}
+      <ToastContainer position="top-center" />
+
       <h2 className="text-3xl font-bold text-green-700 text-center">
         {position} ({numberOfPosts} posts)
       </h2>
@@ -75,7 +98,7 @@ const JobDetails = () => {
           className={`py-2 px-4 rounded-lg transition absolute top-4 right-4 flex items-center space-x-2 ${
             hasApplied || loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-700 hover:bg-green-800"
           } text-white`}
-          onClick={applyForJob}
+          onClick={confirmApplication}
           disabled={hasApplied || loading}
         >
           <FaRegCheckCircle className="text-white" />
@@ -84,9 +107,7 @@ const JobDetails = () => {
 
         <div className="text-lg text-gray-600 mb-6">
           <h3 className="text-xl font-semibold text-green-700 mb-2">Job Description:</h3>
-          <div className="text-lg text-black leading-relaxed w-full text-justify break-words">
-            {description}
-          </div>
+          <div className="text-lg text-black leading-relaxed w-full text-justify break-words">{description}</div>
         </div>
 
         {requirements && (
@@ -104,12 +125,12 @@ const JobDetails = () => {
         )}
       </div>
 
-      <div className="flex justify-center gap-6 mb-12">
+      <div className="flex justify-center gap-6 mb-12 w-full">
         <button
           className={`py-2 px-5 rounded-lg transition w-full md:w-auto shadow-md hover:shadow-lg focus:outline-none ${
             hasApplied || loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-700 hover:bg-green-800 text-white"
           }`}
-          onClick={applyForJob}
+          onClick={confirmApplication}
           disabled={hasApplied || loading}
         >
           <i className="fa fa-paper-plane mr-2"></i>{" "}

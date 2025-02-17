@@ -54,7 +54,7 @@ export default function EmploymentDetailsForm() {
   
       if (response.ok) {
         alert("Employment details added successfully!");
-        navigate("/dashboard"); // Redirect user upon success (optional)
+        navigate("/dashboard/profile"); // Redirect user upon success (optional)
       } else {
         alert(`Error: ${data.error}`);
       }

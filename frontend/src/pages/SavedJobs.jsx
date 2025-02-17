@@ -28,27 +28,30 @@ export default function SavedJobs() {
 
   const handleRemoveJob = (jobId) => {
     console.log("Attempting to remove job:", jobId); // Debugging log
-  
+
     fetch("http://127.0.0.1:5000/remove-saved-job", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
       },
       credentials: "include", // Ensure cookies are sent with the request
-      body: JSON.stringify({ job_id: jobId }),
+      body: JSON.stringify({ job_id: jobId }), // Ensure the key matches the backend expectation
     })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.error) {
-          console.error("Error removing job:", data.error);
-        } else {
-          console.log("Job removed successfully:", data.message);
-          setSavedJobs((prevJobs) => prevJobs.filter((job) => job.job_id !== jobId));
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Failed to remove job");
         }
+        return response.json();
       })
-      .catch((error) => console.error("Error:", error));
+      .then((data) => {
+        console.log("Job removed successfully:", data.message);
+        setSavedJobs((prevJobs) => prevJobs.filter((job) => job.job_id !== jobId)); // Update the UI
+      })
+      .catch((error) => {
+        console.error("Error removing job:", error.message);
+        alert("Failed to remove job. Please try again.");
+      });
   };
-  
 
   if (loading) return <p className="text-center text-gray-500">Loading saved jobs...</p>;
   if (error) return <p className="text-center text-red-500">{error}</p>;
@@ -82,13 +85,13 @@ export default function SavedJobs() {
                 </p>
               </div>
 
-              {/* Remove Saved Job (Optional) */}
+              {/* Remove Saved Job */}
               <button
-  className="mt-4 w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition"
-  onClick={() => handleRemoveJob(job.id)}
->
-  Remove Job
-</button>;
+                className="mt-4 w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition"
+                onClick={() => handleRemoveJob(job.job_id)} // Use job.job_id instead of job.id
+              >
+                Remove Job
+              </button>
             </div>
           ))}
         </div>

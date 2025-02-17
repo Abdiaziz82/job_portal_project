@@ -91,7 +91,7 @@ const RelevantCoursesForm = () => {
       // Clear the form after submission
       setCourses([{ year: "", institution: "", courseName: "", details: "", duration: "" }]);
       setProfessionalBodies([{ bodyName: "", membershipNo: "", membershipType: "", renewalDate: "" }]);
-      navigate("/");
+      navigate("/dashboard/profile");
     } catch (error) {
       console.error("Error:", error);
       alert(error.message || "An error occurred while saving data.");

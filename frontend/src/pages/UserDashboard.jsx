@@ -5,7 +5,7 @@ import {
   FaBriefcase,
   FaSave,
   FaUser,
-  FaKey, // Icon for Change Password
+  FaKey, 
   FaSignOutAlt,
   FaBars,
   FaTimes,
