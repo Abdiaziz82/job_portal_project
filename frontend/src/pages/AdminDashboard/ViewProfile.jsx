@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import React, { useEffect, useState } from "react";
 import {
   FaUser,
@@ -9,9 +9,8 @@ import {
   FaUserTie,
   FaBook,
   FaAddressBook,
-  FaEye,
-  FaDownload,
   FaFilePdf,
+  FaArrowLeft, // Back icon
 } from "react-icons/fa";
 
 const ViewProfile = () => {
@@ -19,6 +18,7 @@ const ViewProfile = () => {
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     if (!userId) {
@@ -63,7 +63,18 @@ const ViewProfile = () => {
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-8 bg-white shadow-2xl rounded-lg">
+    <div className="max-w-7xl mx-auto p-8 bg-white shadow-2xl rounded-lg">
+      {/* Back Button - Top Right */}
+      <div className="flex justify-end mb-6">
+        <button
+          onClick={() => navigate(-1)} // Navigate back to the previous page
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-all duration-200"
+        >
+          <FaArrowLeft className="text-lg" /> {/* Larger icon */}
+          <span className="text-sm">Go Back</span>
+        </button>
+      </div>
+
       <h2 className="text-3xl font-bold text-gray-800 mb-8 flex items-center">
         <FaUser className="mr-2" /> User Profile
       </h2>
@@ -134,23 +145,29 @@ const ViewProfile = () => {
               <p><strong>University Grade:</strong> {edu.university_grade}</p>
               <p><strong>Start Date:</strong> {edu.start_date}</p>
               <p><strong>End Date:</strong> {edu.end_date}</p>
-              <p>
-                <strong>Document:</strong>{" "}
-                {edu.file_path ? (
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => window.open(edu.file_path, "_blank")}
-                      className="flex items-center space-x-2 p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-                      title="View or Download Document"
-                    >
-                      <FaFilePdf className="inline-block" />
-                      <span>View/Download</span>
-                    </button>
+
+              {/* ✅ Display Multiple File Links */}
+              {edu.file_paths?.length > 0 ? (
+                <div className="flex flex-col sm:col-span-2">
+                  <strong className="text-sm text-gray-700 w-40">Documents:</strong>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {edu.file_paths.map((file, i) => (
+                      <a
+                        key={i}
+                        href={file}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 bg-blue-600 text-white text-xs px-3 py-1 rounded-md shadow-sm transition-all hover:bg-blue-700 duration-200"
+                      >
+                        <FaFilePdf className="text-white text-sm" />
+                        <span>View {i + 1}</span>
+                      </a>
+                    ))}
                   </div>
-                ) : (
-                  <span className="text-gray-500">No document uploaded</span>
-                )}
-              </p>
+                </div>
+              ) : (
+                <p className="text-gray-500">No document uploaded</p>
+              )}
             </div>
           ))}
         </div>
@@ -191,23 +208,29 @@ const ViewProfile = () => {
               <p><strong>Year:</strong> {cert.year_of_completion}</p>
               <p><strong>Grade:</strong> {cert.grade}</p>
               <p><strong>Additional Awards:</strong> {cert.additional_awards}</p>
-              <p>
-                <strong>Certificate:</strong>{" "}
-                {cert.file_path ? (
-                  <div className="flex items-center space-x-2">
-                    <button
-                      onClick={() => window.open(cert.file_path, "_blank")}
-                      className="flex items-center space-x-2 p-2 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
-                      title="View or Download Certificate"
-                    >
-                      <FaFilePdf className="inline-block" />
-                      <span>View/Download</span>
-                    </button>
+
+              {/* ✅ Display Multiple Certificate Files */}
+              {cert.file_paths?.length > 0 ? (
+                <div className="flex flex-col sm:col-span-2">
+                  <strong className="text-sm text-gray-700 w-40">Certificates:</strong>
+                  <div className="flex flex-wrap gap-2 mt-1">
+                    {cert.file_paths.map((file, i) => (
+                      <a
+                        key={i}
+                        href={file}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 bg-blue-600 text-white text-xs px-3 py-1 rounded-md shadow-sm transition-all hover:bg-blue-700 duration-200"
+                      >
+                        <FaFilePdf className="text-white text-sm" />
+                        <span>View {i + 1}</span>
+                      </a>
+                    ))}
                   </div>
-                ) : (
-                  <span className="text-gray-500">No certificate uploaded</span>
-                )}
-              </p>
+                </div>
+              ) : (
+                <p className="text-gray-500">No certificate uploaded</p>
+              )}
             </div>
           ))}
         </div>

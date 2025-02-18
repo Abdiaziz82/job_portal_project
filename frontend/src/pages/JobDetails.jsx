@@ -81,7 +81,7 @@ const JobDetails = () => {
   const { position, description, requirements, duties, applicationDeadline, numberOfPosts } = job;
 
   return (
-    <div className="container mx-auto mt-12 px-4 md:px-8">
+    <div className="flex-1 overflow-y-auto p-6">
       {/* Toast Notifications */}
       <ToastContainer position="top-center" />
 
@@ -100,7 +100,7 @@ const JobDetails = () => {
       </div>
 
       {/* Job Details Card */}
-      <div className="bg-white rounded-lg shadow-lg p-6 md:p-8 mb-8 relative">
+      <div className="bg-white rounded-lg shadow-lg p-6 md:p-8 mb-8 relative w-full">
         {/* Apply Now Button - Top Right */}
         <button
           className={`absolute top-4 right-4 py-2 px-4 md:py-3 md:px-6 rounded-lg transition flex items-center space-x-2 ${

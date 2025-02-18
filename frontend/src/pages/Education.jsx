@@ -18,8 +18,9 @@ export default function Education() {
     university_grade: "",
     start_date: "",
     end_date: "",
-    file: null, // For file upload
+    files: [], // Now handles multiple files
   });
+  
 
   // Handle input changes
   const handleInputChange = (e) => {
@@ -27,16 +28,16 @@ export default function Education() {
     setFormData({ ...formData, [name]: value });
   };
 
-  // Handle file input changes
+  // Handle multiple file input changes
   const handleFileChange = (e) => {
-    setFormData({ ...formData, file: e.target.files[0] });
-  };
+    setFormData({ ...formData, files: Array.from(e.target.files) });
+};
+  
 
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Create a FormData object to send files and form data
     const data = new FormData();
     data.append("school_name", formData.school_name);
     data.append("year_completed", formData.year_completed);
@@ -48,35 +49,35 @@ export default function Education() {
     data.append("university_grade", formData.university_grade);
     data.append("start_date", formData.start_date);
     data.append("end_date", formData.end_date);
-    if (formData.file) {
-      data.append("file", formData.file);
-    }
+
+    // Append multiple files
+    formData.files.forEach((file) => {
+        data.append("files", file);  // Ensure this matches the backend
+    });
 
     try {
-      // Send POST request to the backend
-      const response = await axios.post(
-        "http://127.0.0.1:5000/upload-educational-background",
-        data,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data", // Required for file uploads
-          },
-          withCredentials: true, // Include cookies for authentication
+        const response = await axios.post(
+            "http://127.0.0.1:5000/upload-educational-background",
+            data,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+                withCredentials: true,
+            }
+        );
+
+        if (response.status === 201) {
+            alert("Educational background saved successfully!");
+            navigate(-1);
         }
-      );
-
-      // Handle success
-      if (response.status === 201) {
-        alert("Educational background saved successfully!");
-        navigate(-1); // Navigate back after successful submission
-      }
     } catch (error) {
-      // Handle errors
-      console.error("Error saving educational background:", error);
-      alert("Failed to save educational background. Please try again.");
+        console.error("Error saving educational background:", error);
+        alert("Failed to save educational background. Please try again.");
     }
-  };
+};
 
+  
   return (
     <div className="flex flex-col min-h-screen p-6 bg-gray-50">
       {/* Back Button */}
@@ -247,20 +248,23 @@ export default function Education() {
         </div>
 
         {/* File Upload */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2">
-            Upload Certificates/Transcripts
-          </label>
-          <input
-            type="file"
-            name="file"
-            onChange={handleFileChange}
-            className="block w-full text-gray-700 border p-2 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
-          />
-          <small className="text-gray-500">
-            Upload files in PDF, JPEG, or PNG format.
-          </small>
-        </div>
+<div>
+  <label className="block text-gray-700 font-medium mb-2">
+    Upload Certificates/Transcripts
+  </label>
+  <input
+    type="file"
+    name="files"  // Ensure this matches the backend
+    multiple  // Allow multiple files
+    onChange={handleFileChange}
+    className="block w-full text-gray-700 border p-2 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
+/>
+
+  <small className="text-gray-500">
+    Upload files in PDF, JPEG, or PNG format.
+  </small>
+</div>
+
 
         {/* Save Button */}
         <div className="flex justify-end">

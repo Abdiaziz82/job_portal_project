@@ -6,7 +6,7 @@ export default function EditEducationalBackground() {
   const location = useLocation();
   const navigate = useNavigate();
   const [formData, setFormData] = useState(location.state?.education || {});
-  const [file, setFile] = useState(null); // State for the uploaded file
+  const [files, setFiles] = useState([]); // State for the uploaded files
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -14,57 +14,36 @@ export default function EditEducationalBackground() {
   };
 
   const handleFileChange = (e) => {
-    setFile(e.target.files[0]); // Store the selected file
+    setFiles([...e.target.files]); // Store the selected files
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
-      // Step 1: Update the educational background details (excluding the file)
-      const response = await fetch(
-        `http://127.0.0.1:5000/education/${formData.id}`,
-        {
-          method: "PUT",
-          credentials: "include", // Include cookies for authentication
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(formData),
-        }
-      );
+      const formDataToSend = new FormData();
+      for (let key in formData) {
+        formDataToSend.append(key, formData[key]);
+      }
+      files.forEach((file) => {
+        formDataToSend.append("files[]", file);
+      });
 
-      if (!response.ok) {
+      const response = await fetch(`http://127.0.0.1:5000/education/${formData.id}`, {
+        method: "PUT",
+        credentials: "include", // Include cookies for authentication
+        body: formDataToSend,
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        console.log(result.message);
+        navigate("/education"); // Navigate back after updating
+      } else {
         const error = await response.json();
         console.error("Failed to update educational background:", error.error);
         alert(`Failed to update educational background: ${error.error}`);
-        return;
       }
-
-      // Step 2: If a new file is uploaded, update the file
-      if (file) {
-        const formDataWithFile = new FormData();
-        formDataWithFile.append("file", file);
-
-        const fileResponse = await fetch(
-          `http://127.0.0.1:5000/education/${formData.id}/upload-file`,
-          {
-            method: "POST",
-            credentials: "include",
-            body: formDataWithFile,
-          }
-        );
-
-        if (!fileResponse.ok) {
-          const error = await fileResponse.json();
-          console.error("Failed to upload file:", error.error);
-          alert(`Failed to upload file: ${error.error}`);
-          return;
-        }
-      }
-
-      // If everything is successful, navigate back
-      navigate("/education");
     } catch (error) {
       console.error("Error updating educational background:", error);
       alert("An error occurred while updating educational background. Please try again.");
@@ -207,10 +186,11 @@ export default function EditEducationalBackground() {
 
         {/* File Upload */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">Upload New Document</label>
+          <label className="block text-sm font-medium text-gray-700">Upload Documents</label>
           <input
             type="file"
-            name="file"
+            name="files[]"
+            multiple
             onChange={handleFileChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
