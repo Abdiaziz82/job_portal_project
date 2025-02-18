@@ -82,7 +82,7 @@ class Certificate(db.Model):
     year_of_completion = db.Column(db.Integer, nullable=False)
     grade = db.Column(db.String(50), nullable=True)
     additional_awards = db.Column(db.String(255), nullable=True)
-    file_path = db.Column(db.String(255), nullable=True)
+    file_path = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -108,7 +108,7 @@ class EducationalBackground(db.Model):
     university_grade = db.Column(db.String(50))
     start_date = db.Column(db.Date)
     end_date = db.Column(db.Date)
-    file_path = db.Column(db.String(500))
+    file_path = db.Column(db.Text, nullable=False)
 
     user = db.relationship('User', backref=db.backref('educational_backgrounds', lazy=True))
 

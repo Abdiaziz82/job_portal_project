@@ -870,7 +870,6 @@ def delete_personal_details(current_user):
 @login_required
 def upload_certificate(current_user):
     """Endpoint for users to upload certificates."""
-    # Extract form data
     certificate_type = request.form.get('certificate_type')
     specialization = request.form.get('specialization')
     institution_name = request.form.get('institution_name')
@@ -878,31 +877,33 @@ def upload_certificate(current_user):
     grade = request.form.get('grade')
     additional_awards = request.form.get('additional_awards')
 
-    # Validate required fields
     if not all([certificate_type, specialization, institution_name, year_of_completion]):
         return jsonify({'error': 'Missing required fields'}), 400
 
-    # Handle file upload (if applicable)
-    file_path = None
-    if 'file' in request.files:
-        file = request.files['file']
+    uploaded_files = request.files.getlist("files[]")  # Handle multiple files
+
+    file_paths = []  # Store paths of saved files
+    upload_folder = current_app.config['UPLOAD_FOLDER']
+
+    for file in uploaded_files:
         if file.filename != '':
             if not allowed_file(file.filename):
                 return jsonify({'error': f'File type not allowed. Allowed types: {", ".join(ALLOWED_EXTENSIONS)}'}), 400
 
-            # Save the file
             filename = secure_filename(file.filename)
-            upload_folder = current_app.config['UPLOAD_FOLDER']
             file_path = os.path.join(upload_folder, filename)
 
             try:
                 if not os.path.exists(upload_folder):
                     os.makedirs(upload_folder)
                 file.save(file_path)
+                file_paths.append(file_path)
             except Exception as e:
                 return jsonify({'error': 'File upload failed', 'details': str(e)}), 500
 
-    # Save the certificate in the database
+    # Convert file paths to a single string (or store them as an array if your DB supports it)
+    file_paths_str = ";".join(file_paths)
+
     try:
         certificate = Certificate(
             user_id=current_user.id,
@@ -912,11 +913,11 @@ def upload_certificate(current_user):
             year_of_completion=int(year_of_completion),
             grade=grade,
             additional_awards=additional_awards,
-            file_path=file_path  # Store full path
+            file_path=file_paths_str  # Store multiple file paths
         )
         db.session.add(certificate)
         db.session.commit()
-        return jsonify({'message': 'Certificate uploaded successfully', 'id': certificate.id}), 201
+        return jsonify({'message': 'Certificates uploaded successfully', 'id': certificate.id}), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Failed to save certificate', 'details': str(e)}), 500
@@ -937,7 +938,10 @@ def get_certificates(current_user):
                 "year_of_completion": certificate.year_of_completion,
                 "grade": certificate.grade,
                 "additional_awards": certificate.additional_awards,
-                "file_path": url_for('routes.uploaded_file', filename=os.path.basename(certificate.file_path), _external=True) if certificate.file_path else None
+                "file_paths": [
+                    url_for('routes.uploaded_file', filename=os.path.basename(file), _external=True)
+                    for file in certificate.file_path.split(";") if file
+                ] if certificate.file_path else []
             }
             for certificate in certificates
         ]
@@ -949,26 +953,37 @@ def get_certificates(current_user):
 @routes.route('/certificates/<int:id>', methods=['PUT'])
 @login_required
 def update_certificate(current_user, id):
-    """Updates certificate details for a user"""
+    """Updates certificate details and files"""
     try:
-        data = request.get_json()
-
-        # Fetch the existing certificate details
         certificate = Certificate.query.filter_by(id=id, user_id=current_user.id).first()
         if not certificate:
             return jsonify({'error': 'Certificate not found'}), 404
 
-        # Update the fields
-        certificate.certificate_type = data.get('certificate_type', certificate.certificate_type)
-        certificate.specialization = data.get('specialization', certificate.specialization)
-        certificate.institution_name = data.get('institution_name', certificate.institution_name)
-        certificate.year_of_completion = data.get('year_of_completion', certificate.year_of_completion)
-        certificate.grade = data.get('grade', certificate.grade)
-        certificate.additional_awards = data.get('additional_awards', certificate.additional_awards)
+        # Parse form data
+        certificate.certificate_type = request.form.get('certificate_type', certificate.certificate_type)
+        certificate.specialization = request.form.get('specialization', certificate.specialization)
+        certificate.institution_name = request.form.get('institution_name', certificate.institution_name)
+        certificate.year_of_completion = request.form.get('year_of_completion', certificate.year_of_completion)
+        certificate.grade = request.form.get('grade', certificate.grade)
+        certificate.additional_awards = request.form.get('additional_awards', certificate.additional_awards)
 
-        # Save to the database
+        # Handle file uploads
+        uploaded_files = request.files.getlist("files[]")
+        if uploaded_files:
+            file_paths = []
+            upload_folder = current_app.config['UPLOAD_FOLDER']
+
+            for file in uploaded_files:
+                if file.filename and allowed_file(file.filename):
+                    filename = secure_filename(file.filename)
+                    file_path = os.path.join(upload_folder, filename)
+                    file.save(file_path)
+                    file_paths.append(file_path)
+
+            # Update stored file paths
+            certificate.file_path = ";".join(file_paths)
+
         db.session.commit()
-
         return jsonify({'message': 'Certificate updated successfully'}), 200
 
     except Exception as e:
@@ -1000,9 +1015,10 @@ def delete_certificate(current_user, certificate_id):
 
     
 @routes.route('/upload-educational-background', methods=['POST'])
-@login_required  # Ensure the user is logged in
+@login_required  
 def upload_educational_background(current_user):
-    """Endpoint for users to upload their educational background."""
+    """Endpoint for users to upload their educational background with multiple files."""
+
     # Extract form data
     school_name = request.form.get('school_name')
     year_completed = request.form.get('year_completed')
@@ -1016,42 +1032,38 @@ def upload_educational_background(current_user):
     end_date = request.form.get('end_date')
 
     # Validate required fields
-    if not all([school_name, year_completed]):
+    if not school_name or not year_completed:
         return jsonify({'error': 'Missing required fields (school_name, year_completed)'}), 400
 
-    # Validate file upload (if applicable)
-    file_path = None
-    if 'file' in request.files:
-        file = request.files['file']
-        if file.filename != '':
-            if not allowed_file(file.filename):
-                return jsonify({'error': f'File type not allowed. Allowed types: {", ".join(ALLOWED_EXTENSIONS)}'}), 400
+    # Handle multiple file uploads
+    uploaded_files = request.files.getlist('files')  # Ensure this matches the frontend
+    file_paths = []
 
-            # Save the file
-            filename = secure_filename(file.filename)
-            upload_folder = current_app.config['UPLOAD_FOLDER']
-            file_path = os.path.join(upload_folder, filename)
+    if uploaded_files:
+        upload_folder = current_app.config['UPLOAD_FOLDER']
+        if not os.path.exists(upload_folder):
+            os.makedirs(upload_folder)
 
-            try:
-                if not os.path.exists(upload_folder):
-                    os.makedirs(upload_folder)
+        for file in uploaded_files:
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(upload_folder, filename)
                 file.save(file_path)
-            except Exception as e:
-                return jsonify({'error': 'File upload failed', 'details': str(e)}), 500
+                file_paths.append(file_path)  
 
-    # Parse date fields (if provided)
+    # Convert dates
     try:
         start_date = datetime.strptime(start_date, '%Y-%m-%d').date() if start_date else None
         end_date = datetime.strptime(end_date, '%Y-%m-%d').date() if end_date else None
     except ValueError as e:
         return jsonify({'error': 'Invalid date format. Use YYYY-MM-DD', 'details': str(e)}), 400
 
-    # Create and save the educational background record
+    # Save record to database
     try:
         educational_background = EducationalBackground(
-            user_id=current_user.id,  # Automatically set user_id to the current user's ID
+            user_id=current_user.id,
             school_name=school_name,
-            year_completed=int(year_completed),
+            year_completed=year_completed,
             high_school_grade=high_school_grade,
             high_school_activities=high_school_activities,
             university_name=university_name,
@@ -1060,14 +1072,16 @@ def upload_educational_background(current_user):
             university_grade=university_grade,
             start_date=start_date,
             end_date=end_date,
-            file_path=file_path
+            file_path=";".join(file_paths) if file_paths else None
         )
+
         db.session.add(educational_background)
         db.session.commit()
-        return jsonify({'message': 'Educational background uploaded successfully', 'id': educational_background.id}), 201
+        return jsonify({'message': 'Educational background saved successfully'}), 201
+
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': 'Failed to save educational background', 'details': str(e)}), 500
+        return jsonify({'error': 'Database error', 'details': str(e)}), 500
 
 @routes.route('/education', methods=['GET'])
 @login_required
@@ -1089,7 +1103,10 @@ def get_education(current_user):
                 "university_grade": edu.university_grade,
                 "start_date": edu.start_date.isoformat() if edu.start_date else None,
                 "end_date": edu.end_date.isoformat() if edu.end_date else None,
-                "file_path": url_for('routes.uploaded_file', filename=os.path.basename(edu.file_path), _external=True) if edu.file_path else None
+                "file_paths": [
+                    url_for('routes.uploaded_file', filename=os.path.basename(file), _external=True)
+                    for file in edu.file_path.split(';') if file
+                ] if edu.file_path else []
             }
             for edu in education
         ]
@@ -1098,29 +1115,63 @@ def get_education(current_user):
     except Exception as e:
         return jsonify({"error": "Failed to fetch educational background", "details": str(e)}), 500
 
+
 @routes.route('/education/<int:id>', methods=['PUT'])
 @login_required
 def update_educational_background(current_user, id):
     """Updates educational background details for a user"""
     try:
-        data = request.get_json()
-
         # Fetch the existing educational background details
         education = EducationalBackground.query.filter_by(id=id, user_id=current_user.id).first()
         if not education:
             return jsonify({'error': 'Educational background not found'}), 404
 
-        # Update the fields
-        education.school_name = data.get('school_name', education.school_name)
-        education.year_completed = data.get('year_completed', education.year_completed)
-        education.high_school_grade = data.get('high_school_grade', education.high_school_grade)
-        education.high_school_activities = data.get('high_school_activities', education.high_school_activities)
-        education.university_name = data.get('university_name', education.university_name)
-        education.degree_program = data.get('degree_program', education.degree_program)
-        education.field_of_study = data.get('field_of_study', education.field_of_study)
-        education.university_grade = data.get('university_grade', education.university_grade)
-        education.start_date = data.get('start_date', education.start_date)
-        education.end_date = data.get('end_date', education.end_date)
+        # Update the fields from form data
+        education.school_name = request.form.get('school_name', education.school_name)
+        education.year_completed = request.form.get('year_completed', education.year_completed)
+        education.high_school_grade = request.form.get('high_school_grade', education.high_school_grade)
+        education.high_school_activities = request.form.get('high_school_activities', education.high_school_activities)
+        education.university_name = request.form.get('university_name', education.university_name)
+        education.degree_program = request.form.get('degree_program', education.degree_program)
+        education.field_of_study = request.form.get('field_of_study', education.field_of_study)
+        education.university_grade = request.form.get('university_grade', education.university_grade)
+        education.start_date = request.form.get('start_date', education.start_date)
+        education.end_date = request.form.get('end_date', education.end_date)
+
+        # Handle file uploads
+        uploaded_files = request.files.getlist("files[]")
+        upload_folder = current_app.config['UPLOAD_FOLDER']
+
+        # Delete existing files
+        if education.file_path:
+            existing_files = education.file_path.split(';')
+            for file_path in existing_files:
+                try:
+                    if os.path.exists(file_path):
+                        os.remove(file_path)  # Delete the file from the server
+                except Exception as e:
+                    print(f"Error deleting file {file_path}: {e}")
+
+        # Save new files
+        new_file_paths = []
+        for file in uploaded_files:
+            if file.filename != '':
+                if not allowed_file(file.filename):
+                    return jsonify({'error': f'File type not allowed. Allowed types: {", ".join(ALLOWED_EXTENSIONS)}'}), 400
+
+                filename = secure_filename(file.filename)
+                file_path = os.path.join(upload_folder, filename)
+
+                try:
+                    if not os.path.exists(upload_folder):
+                        os.makedirs(upload_folder)
+                    file.save(file_path)
+                    new_file_paths.append(file_path)
+                except Exception as e:
+                    return jsonify({'error': 'File upload failed', 'details': str(e)}), 500
+
+        # Update the file paths in the database
+        education.file_path = ";".join(new_file_paths)
 
         # Save to the database
         db.session.commit()
@@ -1927,22 +1978,29 @@ def get_application_details(current_user, user_id):
     response = {
         "personal_details": personal_details.to_dict() if personal_details else None,
         "next_of_kin": [kin.to_dict() for kin in NextOfKin.query.filter_by(user_id=user_id).all()],
+        
         "certificates": [
             {
                 **cert.to_dict(),
-                "file_path": url_for('routes.uploaded_file', filename=os.path.basename(cert.file_path), _external=True) 
-                if cert.file_path else None
+                "file_paths": [
+                    url_for('routes.uploaded_file', filename=os.path.basename(file), _external=True) 
+                    for file in cert.file_path.split(";") if file
+                ] if cert.file_path else []
             }
             for cert in Certificate.query.filter_by(user_id=user_id).all()
         ],
+
         "education": [
             {
                 **edu.to_dict(),
-                "file_path": url_for('routes.uploaded_file', filename=os.path.basename(edu.file_path), _external=True) 
-                if edu.file_path else None
+                "file_paths": [
+                    url_for('routes.uploaded_file', filename=os.path.basename(file), _external=True) 
+                    for file in edu.file_path.split(";") if file
+                ] if edu.file_path else []
             }
             for edu in EducationalBackground.query.filter_by(user_id=user_id).all()
         ],
+
         "professional_qualifications": [qual.to_dict() for qual in ProfessionalQualifications.query.filter_by(user_id=user_id).all()],
         "relevant_courses": [course.to_dict() for course in RelevantCoursesAndProfessionalBody.query.filter_by(user_id=user_id).all()],
         "employment_details": [job.to_dict() for job in EmploymentDetails.query.filter_by(user_id=user_id).all()],
@@ -1950,4 +2008,3 @@ def get_application_details(current_user, user_id):
     }
 
     return jsonify(response), 200
-
