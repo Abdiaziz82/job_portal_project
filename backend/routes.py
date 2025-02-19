@@ -3,7 +3,7 @@ from models import db, User ,Job , PersonalDetails , Certificate ,EducationalBac
 from flask_bcrypt import Bcrypt
 import jwt
 from datetime import datetime, timedelta
-from flask_mail import Message
+from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
 from functools import wraps
 from werkzeug.utils import secure_filename
@@ -13,6 +13,8 @@ from flask import send_from_directory ,url_for
 
 # Initialize bcrypt
 bcrypt = Bcrypt()
+
+mail = Mail()  # Initialize Flask-Mail
 
 routes = Blueprint('routes', __name__)
 
@@ -65,7 +67,7 @@ def signup():
     # Check if user already exists
     existing_user = User.query.filter_by(email_address=data['email_address']).first()
     if existing_user:
-        return jsonify({"error": "User with this email already exists , Please choose a different one"}), 400
+        return jsonify({"error": "This email already exists , Please choose a different one"}), 400
 
     # Hash the password
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
@@ -102,27 +104,21 @@ def login():
         'exp': datetime.utcnow() + timedelta(seconds=current_app.config['JWT_EXPIRATION_DELTA'])
     }, current_app.config['SECRET_KEY'], algorithm='HS256')
 
-    # Ensure token is a string (PyJWT may return bytes in some versions)
     if isinstance(token, bytes):
         token = token.decode('utf-8')
-
-    # Debugging: Print the token (remove this in production)
-    print("Generated Token:", token)
 
     # Create response and set HTTP-only cookie
     response = make_response(jsonify({'message': 'Login successful'}))
     response.set_cookie(
         'jwt', 
         token, 
-        httponly=True,  # Prevents JavaScript access (XSS protection)
-        secure=False,   # For local development, set to True in production (HTTPS)
-        samesite='Lax', # Helps protect against CSRF
+        httponly=True, 
+        secure=False,  
+        samesite='Lax', 
         path='/'        # Make cookie available on all routes
     )
 
     return response, 200
-
-
 
 
 @routes.route('/delete-user/<int:user_id>', methods=['DELETE'])
@@ -146,7 +142,7 @@ def delete_user(current_user, user_id):
         RelevantCoursesAndProfessionalBody.query.filter_by(user_id=user_id).delete()
         EmploymentDetails.query.filter_by(user_id=user_id).delete()
 
-        # Now delete the user
+        #  delete the user
         db.session.delete(user)
         db.session.commit()
         return jsonify({"message": "User and all related records deleted successfully"}), 200
@@ -306,7 +302,7 @@ def forgot_password():
         mail.send(msg)
         return jsonify({"message": "Password reset email sent successfully"}), 200
     except Exception as e:
-        print(f"Error sending email: {e}")  # Log the error for debugging
+        print(f"Error sending email: {e}")  
         return jsonify({"error": str(e)}), 500
 
 
@@ -368,18 +364,11 @@ def user_auth_check():
         return jsonify({"error": "Invalid user token"}), 401
 
 
-
-
-
-
-
 @routes.route('/logout', methods=['POST'])
 def logout():
     response = make_response(jsonify({'message': 'Logged out successfully'}))
     response.set_cookie('jwt', '', expires=0, path='/')  # Clear the JWT cookie
     return response, 200
-
-
 
 
 def admin_required(f):
@@ -411,7 +400,7 @@ def admin_login():
     if data['email_address'] == admin_email and bcrypt.check_password_hash(admin_password_hash, data['password']):
         # Generate Admin JWT Token with correct role field
         admin_token = jwt.encode({
-            'role': 'admin',  # ✅ Correct role format
+            'role': 'admin',  
             'exp': datetime.utcnow() + timedelta(seconds=current_app.config['JWT_EXPIRATION_DELTA'])
         }, current_app.config['SECRET_KEY'], algorithm='HS256')
 
@@ -420,7 +409,7 @@ def admin_login():
             'admin_jwt',
             admin_token,
             httponly=True,
-            secure=False,  # Set to True in production
+            secure=False,  
             samesite='Lax',
             path='/'
         )
@@ -439,7 +428,7 @@ def admin_auth_check():
     try:
         # Decode admin JWT
         data = jwt.decode(admin_token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
-        if data.get('role') == 'admin':  # ✅ Use 'role' instead of 'admin'
+        if data.get('role') == 'admin':  
             return jsonify({"message": "Admin authenticated"}), 200
         else:
             return jsonify({"error": "Invalid admin privileges"}), 403
@@ -465,7 +454,7 @@ def get_users():
         "mobile_number": user.mobile_number
     } for user in users]), 200
 
-# Admin-only route for managing jobs@routes.route('/api/jobs', methods=['POST'])
+
 @routes.route('/api/jobs', methods=['POST'])
 def create_job():
     data = request.get_json()
@@ -495,7 +484,7 @@ def create_job():
         "grade": job.grade,
         "requirements": job.requirements,  
         "duties": job.duties,
-        "createdAt": job.created_at  # Include the created_at field in the response
+        "createdAt": job.created_at 
     }), 201
 
 
@@ -537,7 +526,7 @@ def get_job_by_id(id):
             "grade": job.grade,
             "requirements": job.requirements,  
             "duties": job.duties,
-            "createdAt": job.created_at  # Include the created_at field in the response
+            "createdAt": job.created_at  
         }
         return jsonify(job_details), 200
     return jsonify({"message": "Job not found"}), 404
@@ -1914,10 +1903,9 @@ def get_all_job_applications():
         return jsonify({"error": "Failed to fetch job applications", "details": str(e)}), 500
     
 @routes.route('/admin/job-applications/<int:application_id>', methods=['PUT'])
-@admin_required # Ensure only admins can access
+@admin_required  # Ensure only admins can access
 def update_application_status(application_id):
-    """Allow admin to accept or reject job applications."""
-    from flask import request  # Import inside the function to avoid circular imports
+    """Allow admin to accept or reject job applications and notify user via email."""
     try:
         data = request.get_json()
         new_status = data.get("status")
@@ -1926,14 +1914,94 @@ def update_application_status(application_id):
             return jsonify({"error": "Invalid status. Use 'Accepted' or 'Rejected'."}), 400
 
         application = JobApplication.query.get(application_id)
-
         if not application:
             return jsonify({"error": "Application not found."}), 404
 
+        # Get user details
+        user = User.query.get(application.user_id)
+        if not user:
+            return jsonify({"error": "User not found."}), 404
+
+        # Update status
         application.status = new_status
         db.session.commit()
 
-        return jsonify({"message": f"Application {new_status} successfully."}), 200
+        # Define email subject
+        subject = f"Your Job Application Status: {new_status}"
+
+        # University logo URL (Replace with actual logo URL)
+        university_logo = "https://youruniversity.edu/logo.png"
+
+        # Define email color and button text based on status
+        if new_status == "Accepted":
+            status_color = "#008000"  # Green for acceptance
+            message = f"""
+                <p>Congratulations! We are pleased to inform you that your job application for <strong>{application.job.position}</strong> has been <strong style="color: {status_color};">ACCEPTED</strong>.</p>
+                <p>Please check your portal for further details.</p>
+            """
+            button_text = "View Portal"
+            button_link = "https://youruniversity.edu/job-portal"
+        else:
+            status_color = "#d9534f"  # Red for rejection
+            message = f"""
+                <p>We regret to inform you that your job application for <strong>{application.job.position}</strong> has been <strong style="color: {status_color};">REJECTED</strong>.</p>
+                <p>We encourage you to explore other opportunities on our platform.</p>
+            """
+            button_text = "Browse Jobs"
+            button_link = "https://youruniversity.edu/job-portal"
+
+        # Construct HTML Email Body
+        email_body = f"""
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="UTF-8">
+            <title>Job Application Status</title>
+        </head>
+        <body style="font-family: Arial, sans-serif; margin: 0; padding: 0; background-color: #f4f4f4;">
+            <table align="center" width="600" style="background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
+                <tr>
+                    <td align="center">
+                        <img src="{university_logo}" alt="University Logo" style="width: 120px; margin-bottom: 20px;">
+                    </td>
+                </tr>
+                <tr>
+                    <td style="font-size: 18px; font-weight: bold; color: {status_color}; text-align: center;">
+                        Dear {user.first_name},
+                    </td>
+                </tr>
+                <tr>
+                    <td style="padding: 10px 20px; text-align: center;">
+                        {message}
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center" style="padding: 20px;">
+                        <a href="{button_link}" style="background-color: {status_color}; color: white; padding: 12px 20px; text-decoration: none; font-size: 16px; border-radius: 5px;">
+                            {button_text}
+                        </a>
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; padding-top: 20px; font-size: 14px; color: #555;">
+                        <p>Best Regards,<br>University Job Portal Team</p>
+                        <p><small>If you have any questions, please contact us at <a href="mailto:support@youruniversity.edu">support@youruniversity.edu</a></small></p>
+                    </td>
+                </tr>
+            </table>
+        </body>
+        </html>
+        """
+
+        # Send email
+        msg = Message(subject=subject, recipients=[user.email_address], html=email_body)
+
+        try:
+            mail.send(msg)
+        except Exception as e:
+            return jsonify({"error": f"Application updated but email failed to send: {str(e)}"}), 500
+
+        return jsonify({"message": f"Application {new_status} successfully, and email notification sent."}), 200
 
     except Exception as e:
         return jsonify({"error": "Failed to update application status", "details": str(e)}), 500

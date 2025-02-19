@@ -230,13 +230,14 @@ class Job(db.Model):
     
 class JobApplication(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    job_id = db.Column(db.Integer, db.ForeignKey('jobs.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
+    job_id = db.Column(db.Integer, db.ForeignKey('jobs.id', ondelete="CASCADE"), nullable=False)
     status = db.Column(db.String(20), default='Pending')  # Pending, Accepted, Rejected
     applied_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship('User', backref='applications')
-    job = db.relationship('Job', backref='applications')
+    job = db.relationship('Job', backref=db.backref('applications', cascade="all, delete-orphan"))
+
 
 class SavedJobs(db.Model):
     __tablename__ = 'saved_jobs'
