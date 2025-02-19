@@ -38,7 +38,7 @@ export default function EditEducationalBackground() {
       if (response.ok) {
         const result = await response.json();
         console.log(result.message);
-        navigate("/education"); // Navigate back after updating
+        navigate("/dashboard/profile"); // Navigate back after updating
       } else {
         const error = await response.json();
         console.error("Failed to update educational background:", error.error);

@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function SavedJobs() {
   const [savedJobs, setSavedJobs] = useState([]);
@@ -23,6 +25,7 @@ export default function SavedJobs() {
         console.error("Error fetching saved jobs:", error);
         setError("Failed to load saved jobs");
         setLoading(false);
+        toast.error("Failed to load saved jobs. Please try again.");
       });
   }, []);
 
@@ -46,10 +49,11 @@ export default function SavedJobs() {
       .then((data) => {
         console.log("Job removed successfully:", data.message);
         setSavedJobs((prevJobs) => prevJobs.filter((job) => job.job_id !== jobId)); // Update the UI
+        toast.success("Job removed successfully!");
       })
       .catch((error) => {
         console.error("Error removing job:", error.message);
-        alert("Failed to remove job. Please try again.");
+        toast.error("Failed to remove job. Please try again.");
       });
   };
 
@@ -96,6 +100,19 @@ export default function SavedJobs() {
           ))}
         </div>
       )}
+
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 }

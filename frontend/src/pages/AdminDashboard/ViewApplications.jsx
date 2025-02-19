@@ -59,7 +59,7 @@ const ViewApplications = () => {
   const confirmAction = (id, status) => {
     toast.info(
       <div>
-        <p>Are you sure you want to {status.toLowerCase()} this application?</p>
+        <p>Are you sure you want  this application {status.toLowerCase()}?</p>
         <div className="flex justify-center gap-4 mt-2">
           <button
             className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
@@ -94,61 +94,80 @@ const ViewApplications = () => {
       ) : applications.length === 0 ? (
         <p className="text-gray-500">No job applications found.</p>
       ) : (
-        <table className="w-full bg-white border rounded-lg shadow-md">
-          <thead className="bg-green-700 text-white">
-            <tr>
-              <th className="p-3">#</th>
-              <th className="p-3">Applicant Name</th>
-              <th className="p-3">Job Title</th>
-              <th className="p-3">Status</th>
-              <th className="p-3">Applied At</th>
-              <th className="p-3">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {applications.map((app, index) => (
-              <tr key={app.id} className="border-b hover:bg-gray-100">
-                <td className="p-3 text-center">{index + 1}</td>
-                <td className="p-3">{app.applicant_name}</td>
-                <td className="p-3">{app.job_title}</td>
-                <td className="p-3 font-semibold">{app.status}</td>
-                <td className="p-3">{app.applied_at}</td>
-                <td className="p-3">
-                  <div className="flex items-center gap-2">
-                    {app.status !== "Accepted" && app.status !== "Rejected" ? (
-                      <>
-                        <button
-                          className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700"
-                          onClick={() => confirmAction(app.id, "Accepted")}
-                        >
-                          Accept
-                        </button>
-                        <button
-                          className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700"
-                          onClick={() => confirmAction(app.id, "Rejected")}
-                        >
-                          Reject
-                        </button>
-                      </>
-                    ) : null}
-                    <button
-                      className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700"
-                      onClick={() => {
-                        if (!app.user_id) {
-                          toast.error("User ID not found. Please check the application data.");
-                          return;
-                        }
-                        navigate(`/admin/dashboard/view-profile/${app.user_id}`);
-                      }}
-                    >
-                      View Profile
-                    </button>
-                  </div>
-                </td>
+        <div className="overflow-x-auto">
+          <table className="w-full bg-white border rounded-lg shadow-md">
+            <thead className="bg-green-700 text-white hidden sm:table-header-group">
+              <tr>
+                <th className="p-3">#</th>
+                <th className="p-3">Applicant Name</th>
+                <th className="p-3">Job Title</th>
+                <th className="p-3">Status</th>
+                <th className="p-3">Applied At</th>
+                <th className="p-3">Actions</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {applications.map((app, index) => (
+                <tr
+                  key={app.id}
+                  className="border-b hover:bg-gray-100 block sm:table-row"
+                >
+                  <td className="p-3 text-center block sm:table-cell">
+                    <span className="font-bold sm:hidden">#</span> {index + 1}
+                  </td>
+                  <td className="p-3 block sm:table-cell">
+                    <span className="font-bold sm:hidden">Applicant Name:</span>{" "}
+                    {app.applicant_name}
+                  </td>
+                  <td className="p-3 block sm:table-cell">
+                    <span className="font-bold sm:hidden">Job Title:</span>{" "}
+                    {app.job_title}
+                  </td>
+                  <td className="p-3 font-semibold block sm:table-cell">
+                    <span className="font-bold sm:hidden">Status:</span>{" "}
+                    {app.status}
+                  </td>
+                  <td className="p-3 block sm:table-cell">
+                    <span className="font-bold sm:hidden">Applied At:</span>{" "}
+                    {app.applied_at}
+                  </td>
+                  <td className="p-3 block sm:table-cell">
+                    <div className="flex flex-col sm:flex-row items-center gap-2">
+                      <button
+                        className="bg-blue-600 text-white px-3 py-1 rounded-lg hover:bg-blue-700 w-full sm:w-auto"
+                        onClick={() => {
+                          if (!app.user_id) {
+                            toast.error("User ID not found. Please check the application data.");
+                            return;
+                          }
+                          navigate(`/admin/dashboard/view-profile/${app.user_id}`);
+                        }}
+                      >
+                        View Profile
+                      </button>
+                      {app.status !== "Accepted" && app.status !== "Rejected" ? (
+                        <>
+                          <button
+                            className="bg-green-600 text-white px-3 py-1 rounded-lg hover:bg-green-700 w-full sm:w-auto"
+                            onClick={() => confirmAction(app.id, "Accepted")}
+                          >
+                            Accept
+                          </button>
+                          <button
+                            className="bg-red-600 text-white px-3 py-1 rounded-lg hover:bg-red-700 w-full sm:w-auto"
+                            onClick={() => confirmAction(app.id, "Rejected")}
+                          >
+                            Reject
+                          </button>
+                        </>
+                      ) : null}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </div>
   );

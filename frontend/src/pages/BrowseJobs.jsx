@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Routes, Route, useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import JobDetails from "./JobDetails";
 
 const BrowseJobs = () => {
@@ -25,10 +27,13 @@ const BrowseJobs = () => {
       .then((response) => response.json())
       .then((data) => {
         if (data.message) {
-          alert(data.message);
+          toast.success(data.message); // Display success toast
         }
       })
-      .catch((error) => console.error("Error saving job:", error));
+      .catch((error) => {
+        console.error("Error saving job:", error);
+        toast.error("Failed to save job. Please try again."); // Display error toast
+      });
   };
 
   return (
@@ -132,6 +137,19 @@ const BrowseJobs = () => {
         />
         <Route path=":id" element={<JobDetails />} />
       </Routes>
+
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 };

@@ -16,7 +16,7 @@ export default function Profile() {
   const isProfileMainRoute = location.pathname === "/dashboard/profile";
 
   return (
-    <div className="space-y-6 w-full pb-10 px-4 sm:px-6 lg:px-8">
+    <div className=" font space-y-6 w-full pb-10 px-4 sm:px-6 lg:px-8">
       {isProfileMainRoute && (
         <div className="space-y-6">
           <FetchedPersonalDetails />

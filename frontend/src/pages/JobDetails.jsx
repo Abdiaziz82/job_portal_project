@@ -47,7 +47,7 @@ const JobDetails = () => {
     toast.info(
       <div className="w-full flex flex-col items-center">
         <p className="font-medium text-gray-800 text-center">
-          Before submitting your application, ensure your profile is fully updated.
+          Before submitting your application, ensure your profile is correct and fully updated.
         </p>
         <div className="flex justify-center gap-4 mt-3">
           <button

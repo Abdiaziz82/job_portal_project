@@ -59,7 +59,7 @@ const Header = () => {
   };
 
   return (
-    <header className="bg-green-700 text-white shadow-md sticky top-0 z-50">
+    <header className="bg-green-700 text-white shadow-md sticky top-0 z-50 font">
   <div className="max-w-7xl mx-auto flex justify-between items-center px-6 py-4">
     {/* Logo */}
     <div className="flex-shrink-0">

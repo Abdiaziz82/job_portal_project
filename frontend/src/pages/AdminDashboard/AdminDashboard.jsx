@@ -146,7 +146,7 @@ const AdminDashboard = () => {
 
         {/* Pie Chart */}
         <div>
-          <h3 className="text-lg font-semibold text-gray-700 mb-4">Applications by Status (Pie Chart)</h3>
+          <h3 className="text-lg font-semibold text-gray-700 mb-4">Applications status</h3>
           <div className="flex justify-center">
             <div className="relative w-48 h-48">
               {Object.entries(applicationStatus).map(([status, count], index) => {
