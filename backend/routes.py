@@ -686,7 +686,7 @@ def add_personal_details(current_user):
         # Check if personal details already exist
         existing_details = PersonalDetails.query.filter_by(user_id=current_user.id).first()
         if existing_details:
-            return jsonify({'error': 'Personal details already exist for this user'}), 400
+            return jsonify({'error': 'you already have your personal details'}), 400
 
         # Validate required fields
         required_fields = ['full_names', 'email_address']
@@ -1948,7 +1948,7 @@ def update_application_status(application_id):
                 <p>We encourage you to explore other opportunities on our platform.</p>
             """
             button_text = "Browse Jobs"
-            button_link = "https://youruniversity.edu/job-portal"
+            button_link = "https://gau.ac.ke/job-portal"
 
         # Construct HTML Email Body
         email_body = f"""
@@ -1962,7 +1962,7 @@ def update_application_status(application_id):
             <table align="center" width="600" style="background-color: white; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1);">
                 <tr>
                     <td align="center">
-                        <img src="{university_logo}" alt="University Logo" style="width: 120px; margin-bottom: 20px;">
+                        <img src="https://gau.ac.ke/wp-content/uploads/2023/08/logo-600x131.jpg" alt="University Logo" style="width: 120px; margin-bottom: 20px;">
                     </td>
                 </tr>
                 <tr>
@@ -1984,7 +1984,7 @@ def update_application_status(application_id):
                 </tr>
                 <tr>
                     <td style="text-align: center; padding-top: 20px; font-size: 14px; color: #555;">
-                        <p>Best Regards,<br>University Job Portal Team</p>
+                        <p>Best Regards,<br>Gau job portal</p>
                         <p><small>If you have any questions, please contact us at <a href="mailto:support@youruniversity.edu">support@youruniversity.edu</a></small></p>
                     </td>
                 </tr>
@@ -2035,8 +2035,8 @@ def get_user_job_applications(current_user):
         return jsonify({"error": "Failed to fetch job applications", "details": str(e)}), 500
     
 @routes.route('/applications/<int:user_id>', methods=['GET'])
-@login_required
-def get_application_details(current_user, user_id):
+@admin_required
+def get_application_details( user_id):
     print(f"Fetching details for user ID: {user_id}")
 
     personal_details = PersonalDetails.query.filter_by(user_id=user_id).first()
