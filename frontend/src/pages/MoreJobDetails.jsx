@@ -61,30 +61,30 @@ const MoreJobDetails = () => {
     <div className="container mx-auto mt-12 px-4 md:px-8 w-full max-w-7xl pb-12 font">
       {/* Header Section */}
       <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold text-green-700 mb-2">{job.position}</h1>
-        <p className="text-lg text-gray-600">
+        <h1 className="text-3xl md:text-4xl font-bold text-green-700 mb-2">{job.position}</h1>
+        <p className="text-base md:text-lg text-gray-600">
           <span className="font-semibold text-gray-800">Number of Posts:</span> {job.numberOfPosts}
         </p>
-        <p className="text-lg text-gray-600">
+        <p className="text-base md:text-lg text-gray-600">
           <span className="font-semibold text-gray-800">Grade:</span> {job.grade}
         </p>
-        <p className="text-lg text-gray-600">
+        <p className="text-base md:text-lg text-gray-600">
           <span className="font-semibold text-gray-800">Deadline:</span>{" "}
           {new Date(job.applicationDeadline).toLocaleDateString()}
         </p>
       </div>
 
       {/* Action Buttons at the Top */}
-      <div className="flex justify-end gap-4 mb-8">
+      <div className="flex flex-col md:flex-row justify-end gap-4 mb-8">
         <button
-          className="py-3 px-8 rounded-lg shadow-md bg-gray-600 hover:bg-gray-700 text-white transition-all flex items-center space-x-2"
+          className="py-2 md:py-3 px-6 md:px-8 rounded-lg shadow-md bg-gray-600 hover:bg-gray-700 text-white transition-all flex items-center justify-center space-x-2"
           onClick={() => navigate(-1)}
         >
           <FaArrowLeft className="text-lg" />
           <span>Go Back</span>
         </button>
         <button
-          className={`py-3 px-8 rounded-lg shadow-md transition-all flex items-center space-x-2 ${
+          className={`py-2 md:py-3 px-6 md:px-8 rounded-lg shadow-md transition-all flex items-center justify-center space-x-2 ${
             loading ? "bg-gray-400 cursor-not-allowed" : "bg-green-700 hover:bg-green-800"
           } text-white`}
           onClick={handleApplyNow} // Use the handleApplyNow function
@@ -96,26 +96,32 @@ const MoreJobDetails = () => {
       </div>
 
       {/* Job Details Card */}
-      <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-8 w-full">
+      <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6 md:p-8 w-full">
         {/* Job Description */}
         <div className="mb-8">
           <h2 className="text-2xl font-bold text-green-700 mb-4">Job Description</h2>
-          <p className="text-gray-700 leading-relaxed text-justify">{job.advert}</p>
+          <p className="text-gray-700 leading-relaxed text-justify break-words whitespace-pre-line">
+            {job.description}
+          </p>
         </div>
 
         {/* Requirements Section */}
         {job.requirements && (
           <div className="mb-8">
-            <h2 className="text-2xl font text-green-700 mb-4">Requirements</h2>
-            <p className="text-gray-700 whitespace-pre-line leading-relaxed font">{job.requirements}</p>
+            <h2 className="text-2xl font-bold text-green-700 mb-4">Requirements</h2>
+            <p className="text-gray-700 leading-relaxed text-justify break-words whitespace-pre-line">
+              {job.requirements}
+            </p>
           </div>
         )}
 
         {/* Duties Section */}
         {job.duties && (
-          <div className="mb-8 font">
+          <div className="mb-8">
             <h2 className="text-2xl font-bold text-green-700 mb-4">Duties</h2>
-            <p className="text-gray-700 whitespace-pre-line leading-relaxed">{job.duties}</p>
+            <p className="text-gray-700 leading-relaxed text-justify break-words whitespace-pre-line">
+              {job.duties}
+            </p>
           </div>
         )}
 

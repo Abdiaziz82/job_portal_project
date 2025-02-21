@@ -14,8 +14,6 @@ export default function EmploymentDetailsForm() {
     fromDate: "",
     toDate: "",
     duties: "",
-    publications: "",
-    skillsExperience: "",
   });
 
   const handleChange = (e) => {
@@ -28,7 +26,7 @@ export default function EmploymentDetailsForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     try {
       const response = await fetch("http://127.0.0.1:5000/employment-details", {
         method: "POST",
@@ -45,13 +43,11 @@ export default function EmploymentDetailsForm() {
           from_date: employmentDetails.fromDate,
           to_date: employmentDetails.toDate,
           duties: employmentDetails.duties,
-          publications: employmentDetails.publications,
-          skills_experience: employmentDetails.skillsExperience,
         }),
       });
-  
+
       const data = await response.json();
-  
+
       if (response.ok) {
         alert("Employment details added successfully!");
         navigate("/dashboard/profile"); // Redirect user upon success (optional)
@@ -63,7 +59,6 @@ export default function EmploymentDetailsForm() {
       alert("Something went wrong. Please try again.");
     }
   };
-  ;
 
   return (
     <div className="flex flex-col min-h-screen p-6 bg-gray-50">
@@ -196,37 +191,6 @@ export default function EmploymentDetailsForm() {
             onChange={handleChange}
             rows="4"
             placeholder="Describe your duties and responsibilities..."
-            className="w-full p-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          ></textarea>
-        </div>
-
-        {/* Publications */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2">
-            Publications in refereed journal(s) (for teaching positions
-            applicants)
-          </label>
-          <textarea
-            name="publications"
-            value={employmentDetails.publications}
-            onChange={handleChange}
-            rows="4"
-            placeholder="List your publications..."
-            className="w-full p-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-          ></textarea>
-        </div>
-
-        {/* Skills and Experience */}
-        <div>
-          <label className="block text-gray-700 font-medium mb-2">
-            Please give details of your abilities, skills, and experience
-          </label>
-          <textarea
-            name="skillsExperience"
-            value={employmentDetails.skillsExperience}
-            onChange={handleChange}
-            rows="4"
-            placeholder="Describe your skills and experience..."
             className="w-full p-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
           ></textarea>
         </div>

@@ -7,6 +7,8 @@ const ViewApplications = () => {
   const [applications, setApplications] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedJobTitle, setSelectedJobTitle] = useState("");
+  const [selectedStatus, setSelectedStatus] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -59,7 +61,7 @@ const ViewApplications = () => {
   const confirmAction = (id, status) => {
     toast.info(
       <div>
-        <p>Are you sure you want  this application {status.toLowerCase()}?</p>
+        <p>Are you sure you want to mark this application as {status.toLowerCase()}?</p>
         <div className="flex justify-center gap-4 mt-2">
           <button
             className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
@@ -82,16 +84,51 @@ const ViewApplications = () => {
     );
   };
 
+  const filteredApplications = applications.filter((app) => {
+    const matchesJobTitle = selectedJobTitle ? app.job_title === selectedJobTitle : true;
+    const matchesStatus = selectedStatus ? app.status === selectedStatus : true;
+    return matchesJobTitle && matchesStatus;
+  });
+
+  const jobTitles = [...new Set(applications.map((app) => app.job_title))];
+
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto p-6 font">
       <ToastContainer position="top-right" autoClose={3000} />
       <h2 className="text-2xl font-bold text-green-700 mb-4">Job Applications</h2>
+
+      {/* Search and Filter Section */}
+      <div className="mb-6 flex flex-col sm:flex-row gap-4">
+        <select
+          className="p-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 w-full sm:w-auto"
+          value={selectedJobTitle}
+          onChange={(e) => setSelectedJobTitle(e.target.value)}
+        >
+          <option value="">All Job Titles</option>
+          {jobTitles.map((title, index) => (
+            <option key={index} value={title}>
+              {title}
+            </option>
+          ))}
+        </select>
+
+        <select
+          className="p-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 w-full sm:w-auto"
+          value={selectedStatus}
+          onChange={(e) => setSelectedStatus(e.target.value)}
+        >
+          <option value="">All Statuses</option>
+          <option value="Pending">Pending</option>
+          <option value="Accepted">Accepted</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+      </div>
 
       {loading ? (
         <p className="text-gray-500">Loading applications...</p>
       ) : error ? (
         <p className="text-red-500">{error}</p>
-      ) : applications.length === 0 ? (
+      ) : filteredApplications.length === 0 ? (
         <p className="text-gray-500">No job applications found.</p>
       ) : (
         <div className="overflow-x-auto">
@@ -107,7 +144,7 @@ const ViewApplications = () => {
               </tr>
             </thead>
             <tbody>
-              {applications.map((app, index) => (
+              {filteredApplications.map((app, index) => (
                 <tr
                   key={app.id}
                   className="border-b hover:bg-gray-100 block sm:table-row"

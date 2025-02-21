@@ -7,6 +7,9 @@ import FetchedProfessionalQualifications from "./FetchedProfessionalQualificatio
 import FetchedRelevantCourses from "./FetchedRelevantCourses";
 import FetchedEmploymentDetails from "./FetchedEmploymentDetails";
 import FetchedReferees from "./FetchedReferees";
+import FetchedPublications from "./FetchedPublications";
+import FetchedDuties from "./FetchedDuties";
+import FetchedDeclarations from "./FetchedDeclarations";
 
 export default function Profile() {
   const location = useLocation();
@@ -25,7 +28,11 @@ export default function Profile() {
           <FetchedProfessionalQualifications />
           <FetchedRelevantCourses />
           <FetchedEmploymentDetails />
+          <FetchedPublications />
+          <FetchedDuties />
+          <FetchedDeclarations />
           <FetchedReferees />
+          
         </div>
       )}
 

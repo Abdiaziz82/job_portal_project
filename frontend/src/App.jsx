@@ -50,6 +50,12 @@ import OpenJobs from "./pages/Openjobs";
 import ChangePassword from "./pages/ChangePassword";
 import PortalGuide from "./pages/PortalGuide";
 import HeroSection from "./pages/HeroSection";
+import PublicationsForm from "./pages/PublicationsForm";
+import EditPublications from "./pages/EditPublications";
+import DutiesForm from "./pages/DutiesForm";
+import EditDuties from "./pages/EditDuties";
+import DeclarationForm from "./pages/DeclarationForm";
+import EditDeclaration from "./pages/EditDeclaration";
 
 function App() {
   return (
@@ -100,6 +106,9 @@ function App() {
                     <Route path="RelevantCoursesForm" element={<RelevantCoursesForm />} />
                     <Route path="EmploymentDetailsForm" element={<EmploymentDetailsForm />} />
                     <Route path="referees" element={<Referees />} />
+                    <Route path="publications-form" element={<PublicationsForm />} />
+                    <Route path="duties-form" element={<DutiesForm />} />
+                    <Route path="declaration-form" element={<DeclarationForm />} />
                     <Route path="ProfessionalQualifications" element={<ProfessionalQualificationsForm />} />
                     <Route path="edit-personal-details" element={<EditPersonalDetails />} />
                     <Route path="edit-next-of-kin" element={<EditNextOfKin />} />
@@ -109,6 +118,10 @@ function App() {
                     <Route path="edit-employment-details" element={<EditEmploymentDetails />} />
                     <Route path="edit-relevant-course" element={<EditRelevantCourse />} />
                     <Route path="edit-referee" element={<EditReferee />} />
+                    <Route path="edit-publication" element={<EditPublications />} />
+                    <Route path="edit-duty" element={<EditDuties />} />
+                    <Route path="edit-declaration" element={<EditDeclaration />} />
+                    
                   </Route>
                   
                   <Route path="change-password" element={< ChangePassword />} />

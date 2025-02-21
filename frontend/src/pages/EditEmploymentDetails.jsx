@@ -31,7 +31,7 @@ export default function EditEmploymentDetails() {
       if (response.ok) {
         const result = await response.json();
         console.log(result.message);
-        navigate("edit-employment-details"); // Navigate back after updating
+        navigate("/dashboard/profile"); // Navigate back after updating
       } else {
         const error = await response.json();
         console.error("Failed to update employment details:", error.error);
@@ -147,28 +147,6 @@ export default function EditEmploymentDetails() {
           <textarea
             name="duties"
             value={formData.duties || ""}
-            onChange={handleChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-
-        {/* Publications */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Publications</label>
-          <textarea
-            name="publications"
-            value={formData.publications || ""}
-            onChange={handleChange}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-          />
-        </div>
-
-        {/* Skills & Experience */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700">Skills & Experience</label>
-          <textarea
-            name="skills_experience"
-            value={formData.skills_experience || ""}
             onChange={handleChange}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />

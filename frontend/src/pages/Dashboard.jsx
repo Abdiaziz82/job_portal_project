@@ -201,31 +201,33 @@ const Dashboard = () => {
       </div>
 
       {/* Job Alerts Section */}
-      <div className="bg-white p-6 rounded-xl shadow-sm">
-        <h2 className="text-2xl font-bold text-gray-800 mb-6">Recent Job Alerts</h2>
-        <div className="space-y-4">
-          {jobs.length > 0 ? (
-            jobs.map((job) => (
-              <div
-                key={job.id}
-                className="flex justify-between items-center p-4 rounded-lg hover:bg-gray-50 transition-all duration-200"
-              >
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-700">
-                    {job.position} - GaU GRADE {job.grade}
-                  </h3>
-                  <p className="text-sm text-gray-500">ADVERT NO: {job.advert}</p>
-                </div>
-                <span className="text-sm text-gray-500">
-                  Posted {timeSincePosted(job.createdAt)}
-                </span>
-              </div>
-            ))
-          ) : (
-            <p className="text-gray-500">No jobs available at the moment.</p>
-          )}
+      <div className="bg-white p-4 md:p-6 rounded-xl shadow-sm">
+  <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 md:mb-6">Recent Job Alerts</h2>
+  <div className="space-y-4">
+    {jobs.length > 0 ? (
+      jobs.map((job) => (
+        <div
+          key={job.id}
+          className="flex flex-col md:flex-row justify-between items-start md:items-center p-4 rounded-lg hover:bg-gray-50 transition-all duration-200 border border-gray-100"
+        >
+          <div className="flex-1">
+            <h3 className="text-base md:text-lg font-semibold text-gray-700 break-words whitespace-normal">
+              {job.position} - GaU GRADE {job.grade}
+            </h3>
+            <p className="text-sm text-gray-500 break-words whitespace-normal">
+              ADVERT NO: {job.advert}
+            </p>
+          </div>
+          <span className="text-sm text-gray-500 mt-2 md:mt-0 md:ml-4 break-words whitespace-normal">
+            Posted {timeSincePosted(job.createdAt)}
+          </span>
         </div>
-      </div>
+      ))
+    ) : (
+      <p className="text-gray-500">No jobs available at the moment.</p>
+    )}
+  </div>
+</div>
     </div>
   );
 };

@@ -70,12 +70,12 @@ const Header = () => {
             <div className="text-sm flex items-center space-x-4">
               <div className="flex items-center space-x-2">
                 <FaPhone className="text-white" />
-                <span>Call us: (+254) 721966418</span>
+                <span className="hidden sm:inline">Call us: (+254) 721966418</span>
               </div>
               <span className="text-white hidden sm:inline">|</span>
               <div className="flex items-center space-x-2">
                 <FaEnvelope className="text-white" />
-                <span>recruitment.gau.ac.ke</span>
+                <span className="hidden sm:inline">recruitment.gau.ac.ke</span>
               </div>
             </div>
 
@@ -85,13 +85,13 @@ const Header = () => {
                 <>
                   <Link
                     to="/login"
-                    className="px-4 py-2 border border-white text-white rounded hover:bg-white hover:text-green-800 transition duration-300"
+                    className="px-4 py-2 border border-white text-white rounded hover:bg-white hover:text-green-800 transition duration-300 text-sm sm:text-base"
                   >
                     Login
                   </Link>
                   <Link
                     to="/signup"
-                    className="px-4 py-2 bg-white text-green-800 border border-green-800 rounded hover:bg-green-800 hover:text-white transition duration-300"
+                    className="px-4 py-2 bg-white text-green-800 border border-green-800 rounded hover:bg-green-800 hover:text-white transition duration-300 text-sm sm:text-base"
                   >
                     Sign Up
                   </Link>

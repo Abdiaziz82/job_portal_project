@@ -30,6 +30,7 @@ const ManageJobs = () => {
     try {
       const response = await fetch("http://127.0.0.1:5000/api/jobs", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -63,7 +64,7 @@ const ManageJobs = () => {
   };
 
   return (
-    <div className="container mx-auto p-6">
+    <div className="container mx-auto p-6 font">
       <h2 className="text-2xl font-bold text-center mb-6">Post a New Job</h2>
 
       <form

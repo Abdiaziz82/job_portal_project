@@ -10,10 +10,19 @@ const AdminSidebar = () => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative font">
       {/* Toggle Button for Small Screens */}
       <button
         className="sm:hidden fixed top-11 left-4 z-50 bg-green-700 text-white p-2 rounded-full shadow-lg"
+        onClick={toggleSidebar}
+        aria-label="Toggle Sidebar"
+      >
+        {isSidebarOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+      </button>
+
+      {/* Toggle Button for Large Screens */}
+      <button
+        className="hidden sm:block fixed top-11 left-4 z-50 bg-green-700 text-white p-2 rounded-full shadow-lg"
         onClick={toggleSidebar}
         aria-label="Toggle Sidebar"
       >
@@ -24,7 +33,9 @@ const AdminSidebar = () => {
       <aside
         className={`fixed top-0 left-0 h-full bg-green-900 text-white shadow-lg transform transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } sm:translate-x-0 sm:relative sm:w-64 z-40`}
+        } sm:translate-x-0 sm:relative sm:w-64 z-40 ${
+          !isSidebarOpen && "sm:hidden"
+        }`}
       >
         <div className="flex flex-col h-full">
           {/* Sidebar Header */}

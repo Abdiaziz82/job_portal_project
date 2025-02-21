@@ -98,10 +98,10 @@ const AdminDashboard = () => {
   const totalApplicationsData = Object.values(applicationStatus).reduce((acc, value) => acc + value, 0);
 
   return (
-    <div className="p-6 sm:p-8 bg-gray-50 min-h-screen">
+    <div className="p-6 sm:p-8 bg-gray-50 min-h-screen font">
       {/* Dashboard Header */}
       <h1 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6 sm:mb-8">
-        Admin Dashboard
+        Adminstrator Dashboard
       </h1>
 
       {/* Summary Cards */}
@@ -109,7 +109,7 @@ const AdminDashboard = () => {
         {/* Total Jobs */}
         <div className="flex items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
           <div className="p-4 bg-green-100 rounded-full">
-            <FaBriefcase className="text-3xl text-green-600" />
+            <FaBriefcase className="text-3xl text-red-600" />
           </div>
           <div className="ml-4">
             <h2 className="text-lg font-semibold text-gray-700">Total Jobs</h2>
@@ -120,10 +120,10 @@ const AdminDashboard = () => {
         {/* Total Applications */}
         <div className="flex items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
           <div className="p-4 bg-blue-100 rounded-full">
-            <FaFileAlt className="text-3xl text-blue-600" />
+            <FaFileAlt className="text-3xl text-red-600" />
           </div>
           <div className="ml-4">
-            <h2 className="text-lg font-semibold text-gray-700">Applications</h2>
+            <h2 className="text-lg font-semibold text-red-700">Applications</h2>
             <p className="text-2xl font-bold text-gray-900">{totalApplications}</p>
           </div>
         </div>
@@ -131,7 +131,7 @@ const AdminDashboard = () => {
         {/* Registered Users */}
         <div className="flex items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
           <div className="p-4 bg-yellow-100 rounded-full">
-            <FaUsers className="text-3xl text-yellow-600" />
+            <FaUsers className="text-3xl text-red-600" />
           </div>
           <div className="ml-4">
             <h2 className="text-lg font-semibold text-gray-700">Registered Users</h2>

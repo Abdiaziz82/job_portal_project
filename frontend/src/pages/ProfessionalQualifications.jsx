@@ -18,7 +18,7 @@ const ProfessionalQualificationsForm = () => {
     setQualifications(newQualifications);
   };
 
-  // Add new qualification row
+  
   const addQualification = () => {
     setQualifications([...qualifications, { yearFrom: "", yearTo: "", institution: "", award: "", specialization: "", grade: "" }]);
   };
@@ -41,7 +41,7 @@ const ProfessionalQualificationsForm = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ qualifications }), // Send the qualifications array
+        body: JSON.stringify({ qualifications }), 
       });
 
       // Check if the response is successful
@@ -52,14 +52,12 @@ const ProfessionalQualificationsForm = () => {
 
       // Handle successful response
       const result = await response.json();
-      setSuccessMessage(result.message); // Show success message
-      alert(result.message); // Alert the user
+      setSuccessMessage(result.message); 
+      alert(result.message); 
 
       // Clear the form after successful submission
       setQualifications([{ yearFrom: "", yearTo: "", institution: "", award: "", specialization: "", grade: "" }]);
-
-      // Navigate to another page (e.g., home page)
-      navigate("/"); // Replace "/" with the desired route
+      navigate("/dashboard/profile"); 
     } catch (error) {
       console.error("Error:", error);
       alert(error.message || "An error occurred while saving qualifications.");

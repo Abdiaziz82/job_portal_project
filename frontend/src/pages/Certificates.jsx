@@ -91,10 +91,12 @@ export default function Certificate() {
               className="w-full p-3 border rounded-md shadow-sm focus:ring-green-600 focus:border-green-500"
             >
               <option value="">Select certificate type</option>
+              <option value="kcpe">KCPE</option>
               <option value="kcse">KCSE</option>
+              <option value="certificate">Certificate</option>
               <option value="diploma">Diploma</option>
               <option value="degree">Degree</option>
-              <option value="masters">Master's (MSc/MA)</option>
+              <option value="masters">Masters</option>
               <option value="phd">PhD</option>
             </select>
           </div>

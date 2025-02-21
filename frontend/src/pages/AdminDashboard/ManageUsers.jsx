@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { FaTrash } from 'react-icons/fa'; // Using React Icons for the delete icon
 
 const ManageUser = () => {
     const [users, setUsers] = useState([]);
@@ -27,38 +26,6 @@ const ManageUser = () => {
         }
     };
 
-    const handleDelete = (userId) => {
-        console.log("Deleting user with ID:", userId); // Debugging
-
-        if (!userId) {
-            alert("Invalid user ID. Try refreshing the page.");
-            return;
-        }
-
-        if (!window.confirm("Are you sure you want to delete this user?")) return;
-
-        fetch(`http://127.0.0.1:5000/delete-user/${userId}`, {
-            method: "DELETE",
-            credentials: "include",
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    return response.json().then((data) => {
-                        throw new Error(data.error || "Failed to delete user");
-                    });
-                }
-                return response.json();
-            })
-            .then((data) => {
-                alert(data.message);
-                setUsers(users.filter((user) => user.id !== userId));
-            })
-            .catch((error) => {
-                console.error("Error deleting user:", error);
-                alert("Error: " + error.message);
-            });
-    };
-
     return (
         <div className="container mx-auto px-4 sm:px-8 py-8">
             <div className="py-8">
@@ -75,9 +42,6 @@ const ManageUser = () => {
                                 </th>
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
                                     Mobile Number
-                                </th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
-                                    Actions
                                 </th>
                             </tr>
                         </thead>
@@ -109,14 +73,6 @@ const ManageUser = () => {
                                         <div className="text-sm text-gray-900">
                                             {user.mobile_number}
                                         </div>
-                                    </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                        <button
-                                            onClick={() => handleDelete(user.id)}
-                                            className="text-red-600 hover:text-red-900 transition-colors"
-                                        >
-                                            <FaTrash className="w-5 h-5" />
-                                        </button>
                                     </td>
                                 </tr>
                             ))}

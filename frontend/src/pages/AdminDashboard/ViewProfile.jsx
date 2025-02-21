@@ -11,6 +11,9 @@ import {
   FaAddressBook,
   FaFilePdf,
   FaArrowLeft, // Back icon
+  FaNewspaper, // Publication icon
+  FaTasks, // Duties icon
+  FaSignature, // Declaration icon
 } from "react-icons/fa";
 
 const ViewProfile = () => {
@@ -85,7 +88,7 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaUser className="mr-2" /> Personal Details
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
             <p><strong>Name:</strong> {profileData.personal_details.full_names}</p>
             <p><strong>Title:</strong> {profileData.personal_details.title}</p>
             <p><strong>Date of Birth:</strong> {profileData.personal_details.date_of_birth}</p>
@@ -117,14 +120,16 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaUsers className="mr-2" /> Next of Kin
           </h3>
-          {profileData.next_of_kin.map((kin, index) => (
-            <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <p><strong>Name:</strong> {kin.kin_name}</p>
-              <p><strong>Relationship:</strong> {kin.kin_relationship}</p>
-              <p><strong>Phone:</strong> {kin.kin_tel}</p>
-              <p><strong>Address:</strong> {kin.kin_address}</p>
-            </div>
-          ))}
+          <div className="max-h-96 overflow-y-auto">
+            {profileData.next_of_kin.map((kin, index) => (
+              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p><strong>Name:</strong> {kin.kin_name}</p>
+                <p><strong>Relationship:</strong> {kin.kin_relationship}</p>
+                <p><strong>Phone:</strong> {kin.kin_tel}</p>
+                <p><strong>Address:</strong> {kin.kin_address}</p>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -134,42 +139,44 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaGraduationCap className="mr-2" /> Educational Background
           </h3>
-          {profileData.education.map((edu, index) => (
-            <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <p><strong>Institution:</strong> {edu.university_name || edu.school_name}</p>
-              <p><strong>Degree:</strong> {edu.degree_program}</p>
-              <p><strong>Field:</strong> {edu.field_of_study}</p>
-              <p><strong>Year:</strong> {edu.year_completed}</p>
-              <p><strong>High School Grade:</strong> {edu.high_school_grade}</p>
-              <p><strong>High School Activities:</strong> {edu.high_school_activities}</p>
-              <p><strong>University Grade:</strong> {edu.university_grade}</p>
-              <p><strong>Start Date:</strong> {edu.start_date}</p>
-              <p><strong>End Date:</strong> {edu.end_date}</p>
+          <div className="max-h-96 overflow-y-auto">
+            {profileData.education.map((edu, index) => (
+              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p><strong>Institution:</strong> {edu.university_name || edu.school_name}</p>
+                <p><strong>Degree:</strong> {edu.degree_program}</p>
+                <p><strong>Field:</strong> {edu.field_of_study}</p>
+                <p><strong>Year:</strong> {edu.year_completed}</p>
+                <p><strong>High School Grade:</strong> {edu.high_school_grade}</p>
+                <p><strong>High School Activities:</strong> {edu.high_school_activities}</p>
+                <p><strong>University Grade:</strong> {edu.university_grade}</p>
+                <p><strong>Start Date:</strong> {edu.start_date}</p>
+                <p><strong>End Date:</strong> {edu.end_date}</p>
 
-              {/* ✅ Display Multiple File Links */}
-              {edu.file_paths?.length > 0 ? (
-                <div className="flex flex-col sm:col-span-2">
-                  <strong className="text-sm text-gray-700 w-40">Documents:</strong>
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    {edu.file_paths.map((file, i) => (
-                      <a
-                        key={i}
-                        href={file}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 bg-blue-600 text-white text-xs px-3 py-1 rounded-md shadow-sm transition-all hover:bg-blue-700 duration-200"
-                      >
-                        <FaFilePdf className="text-white text-sm" />
-                        <span>View {i + 1}</span>
-                      </a>
-                    ))}
+                {/* ✅ Display Multiple File Links */}
+                {edu.file_paths?.length > 0 ? (
+                  <div className="flex flex-col sm:col-span-2">
+                    <strong className="text-sm text-gray-700 w-40">Documents:</strong>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {edu.file_paths.map((file, i) => (
+                        <a
+                          key={i}
+                          href={file}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 bg-blue-600 text-white text-xs px-3 py-1 rounded-md shadow-sm transition-all hover:bg-blue-700 duration-200"
+                        >
+                          <FaFilePdf className="text-white text-sm" />
+                          <span>View {i + 1}</span>
+                        </a>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <p className="text-gray-500">No document uploaded</p>
-              )}
-            </div>
-          ))}
+                ) : (
+                  <p className="text-gray-500">No document uploaded</p>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -179,18 +186,20 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaBriefcase className="mr-2" /> Employment Details
           </h3>
-          {profileData.employment_details.map((job, index) => (
-            <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <p><strong>Designation:</strong> {job.designation}</p>
-              <p><strong>Ministry:</strong> {job.ministry}</p>
-              <p><strong>From:</strong> {job.from_date} - <strong>To:</strong> {job.to_date}</p>
-              <p><strong>Gross Salary:</strong> ${job.gross_salary}</p>
-              <p><strong>Job Group:</strong> {job.job_group}</p>
-              <p><strong>Duties:</strong> {job.duties}</p>
-              <p><strong>Publications:</strong> {job.publications}</p>
-              <p><strong>Skills and Experience:</strong> {job.skills_experience}</p>
-            </div>
-          ))}
+          <div className="max-h-96 overflow-y-auto">
+            {profileData.employment_details.map((job, index) => (
+              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p><strong>Designation:</strong> {job.designation}</p>
+                <p><strong>Ministry:</strong> {job.ministry}</p>
+                <p><strong>From:</strong> {job.from_date} - <strong>To:</strong> {job.to_date}</p>
+                <p><strong>Gross Salary:</strong> ${job.gross_salary}</p>
+                <p><strong>Job Group:</strong> {job.job_group}</p>
+                <p><strong>Duties:</strong> {job.duties}</p>
+                <p><strong>Publications:</strong> {job.publications}</p>
+                <p><strong>Skills and Experience:</strong> {job.skills_experience}</p>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -200,39 +209,41 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaCertificate className="mr-2" /> Certificates
           </h3>
-          {profileData.certificates.map((cert, index) => (
-            <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <p><strong>Type:</strong> {cert.certificate_type}</p>
-              <p><strong>Specialization:</strong> {cert.specialization}</p>
-              <p><strong>Institution:</strong> {cert.institution_name}</p>
-              <p><strong>Year:</strong> {cert.year_of_completion}</p>
-              <p><strong>Grade:</strong> {cert.grade}</p>
-              <p><strong>Additional Awards:</strong> {cert.additional_awards}</p>
+          <div className="max-h-96 overflow-y-auto">
+            {profileData.certificates.map((cert, index) => (
+              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p><strong>Type:</strong> {cert.certificate_type}</p>
+                <p><strong>Specialization:</strong> {cert.specialization}</p>
+                <p><strong>Institution:</strong> {cert.institution_name}</p>
+                <p><strong>Year:</strong> {cert.year_of_completion}</p>
+                <p><strong>Grade:</strong> {cert.grade}</p>
+                <p><strong>Additional Awards:</strong> {cert.additional_awards}</p>
 
-              {/* ✅ Display Multiple Certificate Files */}
-              {cert.file_paths?.length > 0 ? (
-                <div className="flex flex-col sm:col-span-2">
-                  <strong className="text-sm text-gray-700 w-40">Certificates:</strong>
-                  <div className="flex flex-wrap gap-2 mt-1">
-                    {cert.file_paths.map((file, i) => (
-                      <a
-                        key={i}
-                        href={file}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 bg-blue-600 text-white text-xs px-3 py-1 rounded-md shadow-sm transition-all hover:bg-blue-700 duration-200"
-                      >
-                        <FaFilePdf className="text-white text-sm" />
-                        <span>View {i + 1}</span>
-                      </a>
-                    ))}
+                {/* ✅ Display Multiple Certificate Files */}
+                {cert.file_paths?.length > 0 ? (
+                  <div className="flex flex-col sm:col-span-2">
+                    <strong className="text-sm text-gray-700 w-40">Certificates:</strong>
+                    <div className="flex flex-wrap gap-2 mt-1">
+                      {cert.file_paths.map((file, i) => (
+                        <a
+                          key={i}
+                          href={file}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 bg-blue-600 text-white text-xs px-3 py-1 rounded-md shadow-sm transition-all hover:bg-blue-700 duration-200"
+                        >
+                          <FaFilePdf className="text-white text-sm" />
+                          <span>View {i + 1}</span>
+                        </a>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <p className="text-gray-500">No certificate uploaded</p>
-              )}
-            </div>
-          ))}
+                ) : (
+                  <p className="text-gray-500">No certificate uploaded</p>
+                )}
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -242,15 +253,17 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaUserTie className="mr-2" /> Professional Qualifications
           </h3>
-          {profileData.professional_qualifications.map((qual, index) => (
-            <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <p><strong>Institution:</strong> {qual.institution}</p>
-              <p><strong>Award:</strong> {qual.award}</p>
-              <p><strong>Specialization:</strong> {qual.specialization}</p>
-              <p><strong>Year:</strong> {qual.year_from} - {qual.year_to}</p>
-              <p><strong>Grade:</strong> {qual.grade}</p>
-            </div>
-          ))}
+          <div className="max-h-96 overflow-y-auto">
+            {profileData.professional_qualifications.map((qual, index) => (
+              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p><strong>Institution:</strong> {qual.institution}</p>
+                <p><strong>Award:</strong> {qual.award}</p>
+                <p><strong>Specialization:</strong> {qual.specialization}</p>
+                <p><strong>Year:</strong> {qual.year_from} - {qual.year_to}</p>
+                <p><strong>Grade:</strong> {qual.grade}</p>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -260,19 +273,21 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaBook className="mr-2" /> Relevant Courses and Professional Bodies
           </h3>
-          {profileData.relevant_courses.map((course, index) => (
-            <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <p><strong>Year:</strong> {course.year}</p>
-              <p><strong>Institution:</strong> {course.institution}</p>
-              <p><strong>Course Name:</strong> {course.course_name}</p>
-              <p><strong>Details:</strong> {course.details}</p>
-              <p><strong>Duration:</strong> {course.duration}</p>
-              <p><strong>Body Name:</strong> {course.body_name}</p>
-              <p><strong>Membership No:</strong> {course.membership_no}</p>
-              <p><strong>Membership Type:</strong> {course.membership_type}</p>
-              <p><strong>Renewal Date:</strong> {course.renewal_date}</p>
-            </div>
-          ))}
+          <div className="max-h-96 overflow-y-auto">
+            {profileData.relevant_courses.map((course, index) => (
+              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p><strong>Year:</strong> {course.year}</p>
+                <p><strong>Institution:</strong> {course.institution}</p>
+                <p><strong>Course Name:</strong> {course.course_name}</p>
+                <p><strong>Details:</strong> {course.details}</p>
+                <p><strong>Duration:</strong> {course.duration}</p>
+                <p><strong>Body Name:</strong> {course.body_name}</p>
+                <p><strong>Membership No:</strong> {course.membership_no}</p>
+                <p><strong>Membership Type:</strong> {course.membership_type}</p>
+                <p><strong>Renewal Date:</strong> {course.renewal_date}</p>
+              </div>
+            ))}
+          </div>
         </div>
       )}
 
@@ -282,18 +297,69 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaAddressBook className="mr-2" /> Referees
           </h3>
-          {profileData.referees.map((ref, index) => (
-            <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-              <p><strong>Name:</strong> {ref.full_name}</p>
-              <p><strong>Occupation:</strong> {ref.occupation}</p>
-              <p><strong>Email:</strong> {ref.email}</p>
-              <p><strong>Phone:</strong> {ref.mobile_no}</p>
-              <p><strong>Address:</strong> {ref.address}</p>
-              <p><strong>Post Code:</strong> {ref.post_code}</p>
-              <p><strong>City/Town:</strong> {ref.city_town}</p>
-              <p><strong>Known Period:</strong> {ref.known_period}</p>
-            </div>
-          ))}
+          <div className="max-h-96 overflow-y-auto">
+            {profileData.referees.map((ref, index) => (
+              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p><strong>Name:</strong> {ref.full_name}</p>
+                <p><strong>Occupation:</strong> {ref.occupation}</p>
+                <p><strong>Email:</strong> {ref.email}</p>
+                <p><strong>Phone:</strong> {ref.mobile_no}</p>
+                <p><strong>Address:</strong> {ref.address}</p>
+                <p><strong>Post Code:</strong> {ref.post_code}</p>
+                <p><strong>City/Town:</strong> {ref.city_town}</p>
+                <p><strong>Known Period:</strong> {ref.known_period}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ✅ New Section: Publications */}
+      {profileData.publications?.length > 0 && (
+        <div className="mb-8 p-6 bg-gray-50 rounded-lg shadow-sm">
+          <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
+            <FaNewspaper className="mr-2" /> Publications
+          </h3>
+          <div className="max-h-96 overflow-y-auto">
+            {profileData.publications.map((pub, index) => (
+              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p><strong>Publication:</strong> {pub.publications}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ✅ New Section: Duties */}
+      {profileData.duties?.length > 0 && (
+        <div className="mb-8 p-6 bg-gray-50 rounded-lg shadow-sm">
+          <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
+            <FaTasks className="mr-2" /> Duties
+          </h3>
+          <div className="max-h-96 overflow-y-auto">
+            {profileData.duties.map((duty, index) => (
+              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p><strong>Duties:</strong> {duty.duties}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ✅ New Section: Declarations */}
+      {profileData.declarations?.length > 0 && (
+        <div className="mb-8 p-6 bg-gray-50 rounded-lg shadow-sm">
+          <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
+            <FaSignature className="mr-2" /> Declarations
+          </h3>
+          <div className="max-h-96 overflow-y-auto">
+            {profileData.declarations.map((decl, index) => (
+              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <p><strong>Date:</strong> {decl.date}</p>
+                <p><strong>Name:</strong> {decl.name}</p>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
