@@ -99,7 +99,7 @@ export default function FetchedEmploymentDetails() {
         </div>
       ))
     ) : (
-      <p className="text-center text-gray-600 text-sm">No employment details added yet.</p>
+      <p className=" text-red-600 ">No employment details added yet. click on Add employment details to add your employment details</p>
     )}
   </div>
   

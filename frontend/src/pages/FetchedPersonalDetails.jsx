@@ -53,7 +53,7 @@ export default function FetchedPersonalDetails() {
   };
 
   return (
-    <div className="p-8 bg-white rounded-xl border border-gray-100 shadow-lg w-full max-w-7xl mx-auto">
+    <div className="p-8 bg-white rounded-xl border border-gray-100 shadow-lg w-full  mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
           Personal Details
@@ -169,7 +169,7 @@ export default function FetchedPersonalDetails() {
           </div>
         </div>
       ) : (
-        <p className="text-sm text-gray-600">No personal details added yet.</p>
+        <p className=" text-red-600">No personal details added yet.Click on Add Personal details to add your personal details</p>
       )}
     </div>
   );

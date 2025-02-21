@@ -136,7 +136,7 @@ export default function FetchedRelevantCourses() {
           </div>
         ))
       ) : (
-        <p className="text-sm text-gray-600">No relevant courses added yet.</p>
+        <p className=" text-red-600">No relevant courses added yet. Click on Add courses and professional bodies to add your courses and professional bodies</p>
       )}
     </div>
   );

@@ -48,6 +48,8 @@ import ViewProfile from "./pages/AdminDashboard/ViewProfile";
 import MoreJobDetails from "./pages/MoreJobDetails";
 import OpenJobs from "./pages/Openjobs";
 import ChangePassword from "./pages/ChangePassword";
+import PortalGuide from "./pages/PortalGuide";
+import HeroSection from "./pages/HeroSection";
 
 function App() {
   return (
@@ -61,14 +63,15 @@ function App() {
           element={
             <UserLayout>
               <Routes>
-              <Route path="/" element={<Login />} />
+              <Route path="/" element={<HeroSection />} />
+              
               
                 <Route path="/signup" element={<SignUp />} />
                 {/* <Route path="/open-jobs" element={<Openjobs />} /> */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/forgot-password" element={<ForgotPassword />} />
                 <Route path="/reset-password/:token" element={<ResetPassword />} />
-               
+                <Route path="/portal-guide" element={<PortalGuide />} />
                 <Route path="/open-jobs" element={<OpenJobs />} />
                 <Route path="/open-jobs/:id" element={<MoreJobDetails />} />
 

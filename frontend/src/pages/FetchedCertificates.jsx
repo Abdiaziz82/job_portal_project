@@ -62,7 +62,7 @@ export default function FetchedCertificates() {
           className="flex items-center bg-green-700 text-white px-5 py-2.5 rounded-lg hover:bg-green-700 transition-all text-sm sm:text-base whitespace-nowrap shadow-sm"
         >
           <FaPlus className="mr-2" />
-          Add Certificate
+          Add Certificates
         </Link>
       </div>
   
@@ -145,7 +145,7 @@ export default function FetchedCertificates() {
           </div>
         ))
       ) : (
-        <p className="text-sm text-gray-600">No certificates added yet.</p>
+        <p className=" text-red-600">No certificates added yet. Click on Add Certificates to add your Certificates</p>
       )}
     </div>
   );

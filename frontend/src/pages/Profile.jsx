@@ -1,7 +1,6 @@
 import { Outlet, useLocation } from "react-router-dom";
 import FetchedPersonalDetails from "./FetchedPersonalDetails";
 import FetchedNextOfKin from "./FetchedNextOfKin";
-// import FetchedWorkExperience from "./FetchedWorkExperience";
 import FetchedCertificates from "./FetchedCertificates";
 import FetchedEducationalBackground from "./FetchedEducationalBackground";
 import FetchedProfessionalQualifications from "./FetchedProfessionalQualifications";
@@ -21,7 +20,6 @@ export default function Profile() {
         <div className="space-y-6">
           <FetchedPersonalDetails />
           <FetchedNextOfKin />
-          {/* <FetchedWorkExperience /> */}
           <FetchedCertificates />
           <FetchedEducationalBackground />
           <FetchedProfessionalQualifications />

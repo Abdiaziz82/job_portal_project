@@ -50,7 +50,7 @@ export default function FetchedNextOfKin() {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md w-full max-w-7xl mx-auto">
+    <div className="p-6 bg-white rounded-lg shadow-md w-full mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-800 mb-2 sm:mb-0">
           Next of Kin
@@ -64,7 +64,10 @@ export default function FetchedNextOfKin() {
         </Link>
       </div>
 
-      <div className="border-t-2 border-gray-300 my-6"></div>
+      {/* Conditionally render the horizontal line only if nextOfKin has data */}
+      {nextOfKin.length > 0 && (
+        <div className="border-t-2 border-gray-300 my-6"></div>
+      )}
 
       {nextOfKin.length > 0 ? (
         <div className="flex flex-wrap -mx-2">
@@ -118,10 +121,13 @@ export default function FetchedNextOfKin() {
           ))}
         </div>
       ) : (
-        <p className="text-sm text-gray-600">No next of kin added yet.</p>
+        <p className=" text-red-600">No next of kin added yet.  Click on Add Next of kin button to add your next of kin</p>
       )}
 
-      <div className="border-t-2 border-gray-300 my-6"></div>
+      {/* Conditionally render the horizontal line only if nextOfKin has data */}
+      {nextOfKin.length > 0 && (
+        <div className="border-t-2 border-gray-300 my-6"></div>
+      )}
     </div>
   );
 }

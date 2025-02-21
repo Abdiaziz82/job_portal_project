@@ -101,7 +101,7 @@ export default function FetchedReferees() {
           </div>
         ))
       ) : (
-        <p className="text-sm text-gray-600">No referees added yet.</p>
+        <p className=" text-red-600">No referees added yet. Click on Add referees to add your referees </p>
       )}
     </div>
   );

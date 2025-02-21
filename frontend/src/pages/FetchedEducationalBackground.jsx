@@ -165,7 +165,7 @@ export default function FetchedEducationalBackground() {
           );
         })
       ) : (
-        <p className="text-sm text-gray-600">No educational background added yet.</p>
+        <p className=" text-red-600">No educational background added yet. click on Add Education to add your Educational Background </p>
       )}
     </div>
   );

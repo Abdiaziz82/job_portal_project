@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-import { FaArrowLeft } from "react-icons/fa"; // Import the back icon
+import { FaArrowLeft } from "react-icons/fa"; 
 
 export default function EditReferee() {
   const location = useLocation();

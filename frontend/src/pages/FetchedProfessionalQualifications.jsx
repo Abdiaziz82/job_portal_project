@@ -123,7 +123,7 @@ export default function FetchedProfessionalQualifications() {
           </div>
         ))
       ) : (
-        <p className="text-sm text-gray-600">No professional qualifications added yet.</p>
+        <p className=" text-red-600">No professional qualifications added yet. Click on Add Professional Qualification to add your qualifications</p>
       )}
     </div>
   );

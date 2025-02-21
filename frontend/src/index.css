@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Acme&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,11 +14,6 @@
   animation: spin 2s linear infinite;
 }
 
-.font {
-  font-family: "Acme", serif;
-  font-weight: 500;
-  font-style: normal;
-}
 
 @keyframes spin {
   0% { transform: rotate(0deg); }
