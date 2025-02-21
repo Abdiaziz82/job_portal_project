@@ -8,12 +8,13 @@ from itsdangerous import URLSafeTimedSerializer
 from functools import wraps
 from werkzeug.utils import secure_filename
 import os
+import logging
 from flask import send_from_directory ,url_for
 
 
 # Initialize bcrypt
 bcrypt = Bcrypt()
-
+logging.basicConfig(level=logging.DEBUG)
 mail = Mail()  # Initialize Flask-Mail
 
 routes = Blueprint('routes', __name__)
@@ -644,11 +645,11 @@ def update_job(job_id):
         "duties": job.duties  
     }), 200
 
-
 @routes.route('/api/jobs/<int:job_id>', methods=['DELETE'])
+@admin_required
 def delete_job(job_id):
     """
-    Delete a job by its ID.
+    Delete a job by its ID after removing related job applications and saved jobs.
     """
     job = Job.query.get(job_id)
 
@@ -656,12 +657,22 @@ def delete_job(job_id):
         return jsonify({"error": "Job not found"}), 404
 
     try:
+        # Delete related job applications first
+        JobApplication.query.filter_by(job_id=job_id).delete()
+
+        # Delete related saved jobs
+        SavedJobs.query.filter_by(job_id=job_id).delete()
+
+        # Now delete the job
         db.session.delete(job)
         db.session.commit()
+
         return jsonify({"message": f"Job with ID {job_id} has been deleted."}), 200
+
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": "An error occurred while deleting the job.", "details": str(e)}), 500
+
 
 @routes.route('/save-job', methods=['POST'])
 @login_required  # Ensure the user is logged in
@@ -2020,7 +2031,7 @@ def update_application_status(application_id):
                 <p>Please check your portal for further details.</p>
             """
             button_text = "View Portal"
-            button_link = "https://youruniversity.edu/job-portal"
+            button_link = "http://127.0.0.1:5173"
         else:
             status_color = "#d9534f"  # Red for rejection
             message = f"""
@@ -2028,7 +2039,7 @@ def update_application_status(application_id):
                 <p>We encourage you to explore other opportunities on our platform.</p>
             """
             button_text = "Browse Jobs"
-            button_link = "https://gau.ac.ke/job-portal"
+            button_link = "http://127.0.0.1:5173/open-jobs"
 
         # Construct HTML Email Body
         email_body = f"""
@@ -2065,7 +2076,7 @@ def update_application_status(application_id):
                 <tr>
                     <td style="text-align: center; padding-top: 20px; font-size: 14px; color: #555;">
                         <p>Best Regards,<br>Gau job portal</p>
-                        <p><small>If you have any questions, please contact us at <a href="mailto:support@youruniversity.edu">support@youruniversity.edu</a></small></p>
+                        <p><small>If you have any questions, please contact us at <a href="mailto:recruitment.gau.ac.ke">recruitment.gau.ac.ke</a></small></p>
                     </td>
                 </tr>
             </table>

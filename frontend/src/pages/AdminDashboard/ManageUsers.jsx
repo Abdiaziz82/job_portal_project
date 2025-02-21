@@ -65,7 +65,7 @@ const ManageUser = () => {
                 <h2 className="text-3xl font-bold text-gray-800 mb-6">Manage Users</h2>
                 <div className="overflow-x-auto bg-white rounded-lg shadow-xl border border-gray-100">
                     <table className="min-w-full">
-                        <thead className="bg-gradient-to-r from-blue-500 to-blue-600">
+                        <thead className="bg-green-600">
                             <tr>
                                 <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
                                     Name

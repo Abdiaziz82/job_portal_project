@@ -225,6 +225,9 @@ class Job(db.Model):
     duties = db.Column(db.Text, nullable=False) 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+    # Relationship with SavedJobs
+   
+
     def __repr__(self):
         return f'<Job {self.position}>'
     
@@ -243,13 +246,13 @@ class SavedJobs(db.Model):
     __tablename__ = 'saved_jobs'
 
     id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    job_id = db.Column(db.Integer, db.ForeignKey('jobs.id'), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
+    job_id = db.Column(db.Integer, db.ForeignKey('jobs.id', ondelete="CASCADE"), nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    user = db.relationship('User', backref=db.backref('saved_jobs', lazy=True))
-    job = db.relationship('Job', backref=db.backref('saved_by_users', lazy=True))
+    user = db.relationship('User', backref=db.backref('saved_jobs', lazy=True, cascade="all, delete-orphan"))
+    job = db.relationship('Job', backref=db.backref('saved_by_users', lazy=True, cascade="all, delete-orphan"))
 
     def to_dict(self):
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}

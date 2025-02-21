@@ -37,6 +37,7 @@ const CreatedJobs = () => {
     try {
       const response = await fetch(`http://127.0.0.1:5000/api/jobs/${jobId}`, {
         method: "DELETE",
+        credentials: "include",
       });
 
       if (!response.ok) throw new Error("Failed to delete job");

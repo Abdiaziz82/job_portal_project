@@ -21,7 +21,7 @@ export default function MyApplications() {
 
       {applications.length === 0 ? (
         <p className="text-center text-gray-500 mt-6">
-          No job applications found.
+          you don't have job applications yet
         </p>
       ) : (
         <div className="mt-6 bg-white p-4 md:p-6 rounded-lg shadow-lg overflow-x-auto">
