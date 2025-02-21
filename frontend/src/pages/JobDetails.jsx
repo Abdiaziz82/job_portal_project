@@ -86,7 +86,7 @@ const JobDetails = () => {
   const { position, description, requirements, duties, applicationDeadline, numberOfPosts } = job;
 
   return (
-    <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8">
+    <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 font">
       {/* Toast Notifications */}
       <ToastContainer position="top-center" />
 
@@ -122,7 +122,7 @@ const JobDetails = () => {
 
         {/* Job Description */}
         <div className="mb-6">
-          <h3 className="text-lg font-semibold text-green-700">Job Description</h3>
+         
           <p className="text-gray-700 text-sm md:text-base whitespace-pre-line leading-relaxed">{description}</p>
         </div>
 

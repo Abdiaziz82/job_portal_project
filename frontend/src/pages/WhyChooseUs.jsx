@@ -34,7 +34,7 @@ const WhyChooseUs = () => {
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mt-5">Exclusive Jobs</h3>
             <p className="text-gray-600 mt-3 text-base leading-relaxed">
-              Get access to jobs posted directly by the university, tailored for experts.
+              Get access to jobs posted directly by the university, tailored for professionals.
             </p>
           </div>
 

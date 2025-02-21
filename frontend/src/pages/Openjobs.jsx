@@ -42,7 +42,7 @@ const OpenJobs = () => {
     );
 
   return (
-    <div className="container mx-auto px-4 pt-12 pb-20">
+    <div className="container mx-auto px-4 pt-12 pb-20 font">
       {/* Page Title with Icon */}
       <div className="flex items-center justify-center mb-12">
         <FaBriefcase className="text-4xl text-green-600 mr-3" />

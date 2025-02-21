@@ -3,7 +3,7 @@ import WhyChooseUs from "./WhyChooseUs"; // Import the new component
 
 const HeroSection = () => {
   return (
-    <div className="bg-white">
+    <div className="bg-white font">
       {/* Hero Section */}
       <section className="w-full flex items-center py-16 md:py-20">
         <div className="max-w-7xl mx-auto px-6 md:px-12 lg:px-24 flex flex-col-reverse md:flex-row items-center justify-between">

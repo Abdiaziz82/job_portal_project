@@ -52,6 +52,73 @@ def login_required(f):
         return f(current_user, *args, **kwargs)
     return decorated_function
 
+def send_welcome_email(email, first_name , last_name ):
+    """Send a welcome email to the newly registered user with a logo and footer."""
+    try:
+        subject = "Welcome to Our Recruitment Portal!"
+        
+        # HTML email template
+        html_body = f"""
+        <html>
+            <head>
+                <style>
+                    body {{
+                        font-family: Arial, sans-serif;
+                        line-height: 1.6;
+                        color: #333;
+                    }}
+                    .header {{
+                        text-align: center;
+                        background-color: #FFFFFFF;
+                        padding: 20px;
+                        color: white;
+                    }}
+                    .content {{
+                        padding: 20px;
+                    }}
+                    .footer {{
+                        text-align: center;
+                        margin-top: 20px;
+                        padding: 10px;
+                        background-color: #f4f4f4;
+                        color: #777;
+                        font-size: 0.9em;
+                    }}
+                    .logo {{
+                        width: 150px;
+                        height: auto;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="header">
+                    <img src="https://gau.ac.ke/wp-content/uploads/2023/08/logo-600x131.jpg" alt="Recruitment Portal Logo" class="logo">
+                    <h1 style="color: green;">Welcome to Our Recruitment Portal!</h1>
+
+                </div>
+                <div class="content">
+                    <p>Dear {first_name}{last_name},</p>
+                    <p>Thank you for signing up with our recruitment portal. We are excited to have you on board!</p>
+                    <p>You can now start applying for the open jobs and take the next step in your career.</p>
+                    <p>If you have any questions or need assistance, feel free to contact us at <a href="mailto:recruitment@gau.ac.ke">support@recruitmentportal.com</a>.</p>
+                    <p>Best regards,</p>
+                    <p><strong>The Recruitment Team</strong></p>
+                </div>
+                <div class="footer">
+                    <p>&copy; 2025 Recruitment Portal. All rights reserved.</p>
+                    
+                </div>
+            </body>
+        </html>
+        """
+
+        # Create the email message
+        msg = Message(subject, sender=current_app.config['MAIL_DEFAULT_SENDER'], recipients=[email])
+        msg.html = html_body  # Use HTML for the email body
+        mail.send(msg)
+    except Exception as e:
+        print(f"Failed to send email: {e}")
+
 @routes.route('/signup', methods=['POST'])
 def signup():
     data = request.get_json()
@@ -67,7 +134,7 @@ def signup():
     # Check if user already exists
     existing_user = User.query.filter_by(email_address=data['email_address']).first()
     if existing_user:
-        return jsonify({"error": "This email already exists , Please choose a different one"}), 400
+        return jsonify({"error": "This email already exists, please choose a different one"}), 400
 
     # Hash the password
     hashed_password = bcrypt.generate_password_hash(data['password']).decode('utf-8')
@@ -84,10 +151,19 @@ def signup():
     try:
         db.session.add(new_user)
         db.session.commit()
-        return jsonify({"message": "User successfully created"}), 201
+
+        # Send welcome email
+        send_welcome_email(new_user.email_address, new_user.first_name , new_user.last_name)
+
+        return jsonify({
+            "message": "User successfully created",
+     
+        }), 201
     except Exception as e:
         db.session.rollback()
         return jsonify({"error": str(e)}), 500
+
+
 
 @routes.route('/login', methods=['POST'])
 def login():
@@ -120,12 +196,29 @@ def login():
 
     return response, 200
 
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = request.cookies.get('admin_jwt')
+        if not token:
+            return jsonify({"error": "Admin authentication required!"}), 403
+        try:
+            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
+            if data.get('role') != 'admin':
+                return jsonify({"error": "Unauthorized access!"}), 403
+        except jwt.ExpiredSignatureError:
+            return jsonify({"error": "Token expired!"}), 403
+        except jwt.InvalidTokenError:
+            return jsonify({"error": "Invalid token!"}), 403
+
+        return f(*args, **kwargs)
+    return decorated_function
 
 @routes.route('/delete-user/<int:user_id>', methods=['DELETE'])
-@login_required
-def delete_user(current_user, user_id):
+@admin_required
+def delete_user(user_id):
     """Delete a user by ID."""
-    print("Received delete request for user ID:", user_id)  # Debugging
+    print("Received delete request for user ID:", user_id)  
 
     user = User.query.get(user_id)
     if not user:
@@ -141,8 +234,11 @@ def delete_user(current_user, user_id):
         ProfessionalQualifications.query.filter_by(user_id=user_id).delete()
         RelevantCoursesAndProfessionalBody.query.filter_by(user_id=user_id).delete()
         EmploymentDetails.query.filter_by(user_id=user_id).delete()
+        
+        # Delete related job applications
+        JobApplication.query.filter_by(user_id=user_id).delete()
 
-        #  delete the user
+        # Delete the user
         db.session.delete(user)
         db.session.commit()
         return jsonify({"message": "User and all related records deleted successfully"}), 200
@@ -285,7 +381,7 @@ def forgot_password():
             <p>If you did not request this change, you can safely ignore this email.</p>
         </div>
         <div class="footer">
-            <p>&copy; {datetime.datetime.now().year} University Name. All rights reserved.</p>
+            <p>&copy; 2025 Recruitment Portal. All rights reserved.</p>
         </div>
     </div>
 </body>
@@ -371,23 +467,7 @@ def logout():
     return response, 200
 
 
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        token = request.cookies.get('admin_jwt')
-        if not token:
-            return jsonify({"error": "Admin authentication required!"}), 403
-        try:
-            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
-            if data.get('role') != 'admin':
-                return jsonify({"error": "Unauthorized access!"}), 403
-        except jwt.ExpiredSignatureError:
-            return jsonify({"error": "Token expired!"}), 403
-        except jwt.InvalidTokenError:
-            return jsonify({"error": "Invalid token!"}), 403
 
-        return f(*args, **kwargs)
-    return decorated_function
 
 # Admin login route
 @routes.route('/admin/login', methods=['POST'])
@@ -499,7 +579,7 @@ def get_jobs():
             "advert": job.advert,
             "termsOfService": job.terms_of_service,
             "numberOfPosts": job.number_of_posts,
-            "applicationDeadline": job.application_deadline,  # ✅ FIXED TYPO
+            "applicationDeadline": job.application_deadline,  
             "grade": job.grade,
             "requirements": job.requirements, 
             "duties": job.duties,
@@ -1247,9 +1327,9 @@ def add_referees(current_user):
             return jsonify({'error': 'Both referees are required'}), 400
 
         # Check if referees already exist for the user
-        existing_referees = Referee.query.filter_by(user_id=current_user.id).first()
-        if existing_referees:
-            return jsonify({'error': 'Referees already exist for this user'}), 409
+        # existing_referees = Referee.query.filter_by(user_id=current_user.id).first()
+        # if existing_referees:
+        #     return jsonify({'error': 'Referees already exist for this user'}), 409
 
         # Save Referee 1
         ref1 = Referee(
@@ -1368,7 +1448,7 @@ def delete_referee(current_user, id):
         return jsonify({'error': 'Failed to delete referee', 'details': str(e)}), 500
     
 @routes.route('/next-of-kin', methods=['POST'])
-@login_required  # Ensure the user is logged in
+@login_required 
 def add_next_of_kin(current_user):
     # Get JSON data from the request
     data = request.get_json()
@@ -1380,7 +1460,7 @@ def add_next_of_kin(current_user):
     try:
         # Create a new NextOfKin object
         new_kin = NextOfKin(
-            user_id=current_user.id,  # Automatically set user_id to the current user's ID
+            user_id=current_user.id,  
             kin_name=data['kin_name'],
             kin_address=data['kin_address'],
             kin_tel=data['kin_tel'],

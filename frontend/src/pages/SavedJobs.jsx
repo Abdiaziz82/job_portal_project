@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -6,6 +7,7 @@ export default function SavedJobs() {
   const [savedJobs, setSavedJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     fetch("http://127.0.0.1:5000/saved-jobs", {
@@ -89,13 +91,38 @@ export default function SavedJobs() {
                 </p>
               </div>
 
-              {/* Remove Saved Job */}
-              <button
-                className="mt-4 w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition"
-                onClick={() => handleRemoveJob(job.job_id)} // Use job.job_id instead of job.id
-              >
-                Remove Job
-              </button>
+              {/* Buttons */}
+              <div className="mt-4 space-y-3">
+                {/* View More Details Button */}
+                <button
+                  className="w-full bg-gradient-to-r from-green-600 to-green-700 text-white py-2 px-4 rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300 flex items-center justify-center"
+                  onClick={() => navigate(`/dashboard/browse-jobs/${job.job_id}`)} // Navigate to job details
+                >
+                  <span>View More Details</span>
+                  <svg
+                    className="w-4 h-4 ml-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M17 8l4 4m0 0l-4 4m4-4H3"
+                    />
+                  </svg>
+                </button>
+
+                {/* Remove Job Button */}
+                <button
+                  className="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition"
+                  onClick={() => handleRemoveJob(job.job_id)} // Use job.job_id instead of job.id
+                >
+                  Remove Job
+                </button>
+              </div>
             </div>
           ))}
         </div>

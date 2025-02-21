@@ -34,7 +34,7 @@ const MoreJobDetails = () => {
 
   if (loading)
     return (
-      <div className="flex justify-center items-center h-screen">
+      <div className="flex justify-center items-center h-screen font">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-700"></div>
       </div>
     );
@@ -58,7 +58,7 @@ const MoreJobDetails = () => {
   };
 
   return (
-    <div className="container mx-auto mt-12 px-4 md:px-8 w-full max-w-7xl pb-12">
+    <div className="container mx-auto mt-12 px-4 md:px-8 w-full max-w-7xl pb-12 font">
       {/* Header Section */}
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-green-700 mb-2">{job.position}</h1>
@@ -106,14 +106,14 @@ const MoreJobDetails = () => {
         {/* Requirements Section */}
         {job.requirements && (
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-green-700 mb-4">Requirements</h2>
-            <p className="text-gray-700 whitespace-pre-line leading-relaxed">{job.requirements}</p>
+            <h2 className="text-2xl font text-green-700 mb-4">Requirements</h2>
+            <p className="text-gray-700 whitespace-pre-line leading-relaxed font">{job.requirements}</p>
           </div>
         )}
 
         {/* Duties Section */}
         {job.duties && (
-          <div className="mb-8">
+          <div className="mb-8 font">
             <h2 className="text-2xl font-bold text-green-700 mb-4">Duties</h2>
             <p className="text-gray-700 whitespace-pre-line leading-relaxed">{job.duties}</p>
           </div>

@@ -139,7 +139,7 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen font-sans">
+    <div className="p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen font">
       {/* Dashboard Title */}
       <h1 className="text-3xl font-bold text-gray-800 mb-8">Job Portal Dashboard</h1>
 

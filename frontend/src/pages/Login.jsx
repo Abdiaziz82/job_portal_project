@@ -50,14 +50,9 @@ export default function Login() {
   };
   
   
-  
-  
-  
-  
-  
 
   return (
-    <div className="font-[sans-serif] bg-white flex items-center justify-center py-8 px-4">
+    <div className="font-[sans-serif] bg-white flex items-center justify-center py-8 px-4 font">
       <div className="w-full max-w-4xl rounded-md p-6">
         
         {/* Toast Container */}
@@ -81,6 +76,11 @@ export default function Login() {
           </div>
 
           <form onSubmit={handleLogin} className="md:max-w-md w-full mx-auto">
+            {/* New Heading - Aligned with "Sign in" */}
+            <h1 className="text-4xl font-bold text-green-800 mb-4">
+              Welcome to GAU Recruitment Portal
+            </h1>
+
             <div className="mb-6">
               <h3 className="text-3xl font-bold text-green-800">Sign in</h3>
             </div>

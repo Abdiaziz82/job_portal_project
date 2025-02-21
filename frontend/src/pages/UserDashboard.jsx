@@ -75,7 +75,7 @@ const UserDashboard = ({ setIsAuthenticated }) => {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-screen bg-gray-100 font">
       {/* Sidebar */}
       <div
         className={`fixed inset-y-0 left-0 z-40 w-64 bg-white text-gray-700 transform ${
