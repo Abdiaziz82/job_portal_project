@@ -1,7 +1,9 @@
 from flask import Blueprint, jsonify, request, make_response, current_app
-from models import db, User ,Job , PersonalDetails , Certificate ,EducationalBackground ,Referee ,NextOfKin , ProfessionalQualifications ,RelevantCoursesAndProfessionalBody, EmploymentDetails ,JobApplication ,SavedJobs
+from models import db, User ,Job , PersonalDetails , Certificate ,EducationalBackground ,Referee ,NextOfKin , ProfessionalQualifications ,RelevantCoursesAndProfessionalBody, EmploymentDetails ,JobApplication ,SavedJobs ,Publication ,Duties ,Declaration ,AdminRefreshToken
 from flask_bcrypt import Bcrypt
 import jwt
+import uuid
+import requests
 from datetime import datetime, timedelta
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
@@ -19,6 +21,9 @@ mail = Mail()  # Initialize Flask-Mail
 
 routes = Blueprint('routes', __name__)
 
+ACCESS_TOKEN_EXPIRY = timedelta(minutes=15)   # Short-lived access token
+REFRESH_TOKEN_EXPIRY = timedelta(days=7)
+
 # Configuration for file uploads
 ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg'}
 
@@ -34,31 +39,56 @@ def uploaded_file(filename):
 def login_required(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        # Access the JWT token from cookies
         token = request.cookies.get('jwt')
+        refresh_token = request.cookies.get('refresh_jwt')
+
         if not token:
             return jsonify({"error": "Authentication required!"}), 401
 
         try:
-            # Decode the JWT
+            # Decode Access Token
             data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
             current_user = User.query.get(data['user_id'])
             if not current_user:
                 return jsonify({"error": "User not found!"}), 401
+
+            return f(current_user, *args, **kwargs)
+
         except jwt.ExpiredSignatureError:
-            return jsonify({"error": "Token expired!"}), 401
+            if not refresh_token:
+                return jsonify({"error": "Token expired. Please log in again."}), 401
+
+            try:
+                # Decode Refresh Token
+                refresh_data = jwt.decode(refresh_token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
+                new_access_token = jwt.encode({
+                    'user_id': refresh_data['user_id'],
+                    'exp': datetime.utcnow() + timedelta(minutes=15)
+                }, current_app.config['SECRET_KEY'], algorithm='HS256')
+
+                if isinstance(new_access_token, bytes):
+                    new_access_token = new_access_token.decode('utf-8')
+
+                # Set new Access Token in response
+                response = make_response(f(User.query.get(refresh_data['user_id']), *args, **kwargs))
+                response.set_cookie('jwt', new_access_token, httponly=True, secure=False, samesite='Lax', path='/')
+                return response
+
+            except jwt.ExpiredSignatureError:
+                return jsonify({"error": "Session expired. Please log in again."}), 401
+            except jwt.InvalidTokenError:
+                return jsonify({"error": "Invalid refresh token!"}), 401
+
         except jwt.InvalidTokenError:
             return jsonify({"error": "Invalid token!"}), 401
 
-        return f(current_user, *args, **kwargs)
     return decorated_function
+
 
 def send_welcome_email(email, first_name , last_name ):
     """Send a welcome email to the newly registered user with a logo and footer."""
     try:
         subject = "Welcome to Our Recruitment Portal!"
-        
-        # HTML email template
         html_body = f"""
         <html>
             <head>
@@ -101,7 +131,7 @@ def send_welcome_email(email, first_name , last_name ):
                     <p>Dear {first_name}{last_name},</p>
                     <p>Thank you for signing up with our recruitment portal. We are excited to have you on board!</p>
                     <p>You can now start applying for the open jobs and take the next step in your career.</p>
-                    <p>If you have any questions or need assistance, feel free to contact us at <a href="mailto:recruitment@gau.ac.ke">support@recruitmentportal.com</a>.</p>
+                    <p>If you have any questions or need assistance, feel free to contact us at <a href="mailto:recruitment@gau.ac.ke">gau@recruitmentportal.com</a>.</p>
                     <p>Best regards,</p>
                     <p><strong>The Recruitment Team</strong></p>
                 </div>
@@ -115,7 +145,7 @@ def send_welcome_email(email, first_name , last_name ):
 
         # Create the email message
         msg = Message(subject, sender=current_app.config['MAIL_DEFAULT_SENDER'], recipients=[email])
-        msg.html = html_body  # Use HTML for the email body
+        msg.html = html_body  
         mail.send(msg)
     except Exception as e:
         print(f"Failed to send email: {e}")
@@ -169,83 +199,94 @@ def signup():
 @routes.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
-
     user = User.query.filter_by(email_address=data['email_address']).first()
 
     if not user or not bcrypt.check_password_hash(user.password, data['password']):
         return jsonify({"error": "Invalid email or password"}), 401
 
-    # Create JWT Token
-    token = jwt.encode({
+    # Create JWT Access Token (Short Expiry)
+    access_token = jwt.encode({
         'user_id': user.id,
-        'exp': datetime.utcnow() + timedelta(seconds=current_app.config['JWT_EXPIRATION_DELTA'])
+        'exp': datetime.utcnow() + timedelta(minutes=15)  # Expires in 15 minutes
     }, current_app.config['SECRET_KEY'], algorithm='HS256')
 
-    if isinstance(token, bytes):
-        token = token.decode('utf-8')
+    # Create Refresh Token (Long Expiry)
+    refresh_token = jwt.encode({
+        'user_id': user.id,
+        'exp': datetime.utcnow() + timedelta(days=7)  # Expires in 7 days
+    }, current_app.config['SECRET_KEY'], algorithm='HS256')
 
-    # Create response and set HTTP-only cookie
+    # Ensure tokens are strings (not bytes)
+    if isinstance(access_token, bytes):
+        access_token = access_token.decode('utf-8')
+    if isinstance(refresh_token, bytes):
+        refresh_token = refresh_token.decode('utf-8')
+
+    # Create response and set HTTP-only cookies
     response = make_response(jsonify({'message': 'Login successful'}))
-    response.set_cookie(
-        'jwt', 
-        token, 
-        httponly=True, 
-        secure=False,  
-        samesite='Lax', 
-        path='/'        # Make cookie available on all routes
-    )
+    response.set_cookie('jwt', access_token, httponly=True, secure=False, samesite='Lax', path='/')
+    response.set_cookie('refresh_jwt', refresh_token, httponly=True, secure=False, samesite='Lax', path='/')
 
     return response, 200
 
-def admin_required(f):
-    @wraps(f)
-    def decorated_function(*args, **kwargs):
-        token = request.cookies.get('admin_jwt')
-        if not token:
-            return jsonify({"error": "Admin authentication required!"}), 403
-        try:
-            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
-            if data.get('role') != 'admin':
-                return jsonify({"error": "Unauthorized access!"}), 403
-        except jwt.ExpiredSignatureError:
-            return jsonify({"error": "Token expired!"}), 403
-        except jwt.InvalidTokenError:
-            return jsonify({"error": "Invalid token!"}), 403
+@routes.route('/refresh-token', methods=['POST'])
+def refresh_token():
+    refresh_token = request.cookies.get('refresh_jwt')
 
-        return f(*args, **kwargs)
-    return decorated_function
-
-@routes.route('/delete-user/<int:user_id>', methods=['DELETE'])
-@admin_required
-def delete_user(user_id):
-    """Delete a user by ID."""
-    print("Received delete request for user ID:", user_id)  
-
-    user = User.query.get(user_id)
-    if not user:
-        return jsonify({"error": "User not found"}), 404
+    if not refresh_token:
+        return jsonify({"error": "Refresh token required!"}), 401
 
     try:
-        # Delete all related records
-        PersonalDetails.query.filter_by(user_id=user_id).delete()
-        Certificate.query.filter_by(user_id=user_id).delete()
-        EducationalBackground.query.filter_by(user_id=user_id).delete()
-        Referee.query.filter_by(user_id=user_id).delete()
-        NextOfKin.query.filter_by(user_id=user_id).delete()
-        ProfessionalQualifications.query.filter_by(user_id=user_id).delete()
-        RelevantCoursesAndProfessionalBody.query.filter_by(user_id=user_id).delete()
-        EmploymentDetails.query.filter_by(user_id=user_id).delete()
-        
-        # Delete related job applications
-        JobApplication.query.filter_by(user_id=user_id).delete()
+        # Decode refresh token
+        refresh_data = jwt.decode(refresh_token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
+        user = User.query.get(refresh_data['user_id'])
 
-        # Delete the user
-        db.session.delete(user)
-        db.session.commit()
-        return jsonify({"message": "User and all related records deleted successfully"}), 200
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": str(e)}), 500
+        if not user:
+            return jsonify({"error": "User not found!"}), 401
+
+        # Generate new tokens
+        new_access_token = jwt.encode({
+            'user_id': user.id,
+            'exp': datetime.utcnow() + timedelta(minutes=10)
+        }, current_app.config['SECRET_KEY'], algorithm='HS256')
+
+        new_refresh_token = jwt.encode({
+            'user_id': user.id,
+            'exp': datetime.utcnow() + timedelta(days=2)
+        }, current_app.config['SECRET_KEY'], algorithm='HS256')
+
+        response = make_response(jsonify({"message": "Token refreshed"}))
+        response.set_cookie('jwt', new_access_token, httponly=True, secure=True, samesite='Strict', path='/')
+        response.set_cookie('refresh_jwt', new_refresh_token, httponly=True, secure=True, samesite='Strict', path='/')
+
+        return response, 200
+
+    except jwt.ExpiredSignatureError:
+        return jsonify({"error": "Refresh token expired, please log in again!"}), 401
+    except jwt.InvalidTokenError:
+        return jsonify({"error": "Invalid refresh token!"}), 401
+
+
+
+# def admin_required(f):
+#     @wraps(f)
+#     def decorated_function(*args, **kwargs):
+#         token = request.cookies.get('admin_jwt')
+#         if not token:
+#             return jsonify({"error": "Admin authentication required!"}), 403
+#         try:
+#             data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
+#             if data.get('role') != 'admin':
+#                 return jsonify({"error": "Unauthorized access!"}), 403
+#         except jwt.ExpiredSignatureError:
+#             return jsonify({"error": "Token expired!"}), 403
+#         except jwt.InvalidTokenError:
+#             return jsonify({"error": "Invalid token!"}), 403
+
+#         return f(*args, **kwargs)
+#     return decorated_function
+
+
     
 @routes.route('/change-password', methods=['POST'])
 @login_required
@@ -462,15 +503,55 @@ def user_auth_check():
 
 
 @routes.route('/logout', methods=['POST'])
-def logout():
-    response = make_response(jsonify({'message': 'Logged out successfully'}))
-    response.set_cookie('jwt', '', expires=0, path='/')  # Clear the JWT cookie
+@login_required
+def logout(current_user):
+    response = make_response(jsonify({"message": "Logged out successfully"}))
+    response.set_cookie('jwt', '', expires=0, path='/')
+    response.set_cookie('refresh_jwt', '', expires=0, path='/')
     return response, 200
 
 
 
+def generate_access_token(email):
+    return jwt.encode(
+        {'role': 'admin', 'email': email, 'exp': datetime.utcnow() + ACCESS_TOKEN_EXPIRY},
+        current_app.config['SECRET_KEY'], 
+        algorithm='HS256'
+    )
 
-# Admin login route
+
+def generate_refresh_token():
+    return str(uuid.uuid4())  # Generate a unique, random string
+
+
+# Middleware to protect admin routes
+
+def admin_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        token = request.cookies.get('admin_jwt')
+        if not token:
+            return jsonify({"error": "Admin authentication required!"}), 403
+
+        try:
+            data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
+            if data.get('role') != 'admin':
+                return jsonify({"error": "Unauthorized access!"}), 403
+        except jwt.ExpiredSignatureError:
+            # Try to refresh the token automatically
+            refresh_response = requests.post(f"{request.host_url}admin/refresh")
+            if refresh_response.status_code == 200:
+                return decorated_function(*args, **kwargs)  # Retry request
+            else:
+                return jsonify({"error": "Session expired. Please log in again"}), 401
+        except jwt.InvalidTokenError:
+            return jsonify({"error": "Invalid token!"}), 403
+
+        return f(*args, **kwargs)
+    return decorated_function
+
+
+# Admin Login with Access & Refresh Token
 @routes.route('/admin/login', methods=['POST'])
 def admin_login():
     data = request.get_json()
@@ -479,27 +560,85 @@ def admin_login():
     admin_password_hash = current_app.config['ADMIN_PASSWORD']  # Hashed password
 
     if data['email_address'] == admin_email and bcrypt.check_password_hash(admin_password_hash, data['password']):
-        # Generate Admin JWT Token with correct role field
+        # Generate Admin JWT Token
         admin_token = jwt.encode({
             'role': 'admin',  
             'exp': datetime.utcnow() + timedelta(seconds=current_app.config['JWT_EXPIRATION_DELTA'])
         }, current_app.config['SECRET_KEY'], algorithm='HS256')
 
+        # Generate Refresh Token
+        refresh_token = str(uuid.uuid4())  # Generate a secure random UUID as refresh token
+        expires_at = datetime.utcnow() + timedelta(days=7)  # Refresh token expires in 7 days
+
+        # Check if a refresh token already exists
+        existing_token = AdminRefreshToken.query.filter_by(admin_email=admin_email).first()
+
+        if existing_token:
+            # Update existing token
+            existing_token.token = refresh_token
+            existing_token.expires_at = expires_at
+        else:
+            # Create new refresh token entry
+            new_refresh_token = AdminRefreshToken(
+                admin_email=admin_email,
+                token=refresh_token,
+                created_at=datetime.utcnow(),
+                expires_at=expires_at
+            )
+            db.session.add(new_refresh_token)
+
+        db.session.commit()  # Commit changes
+
+        # Set cookies for authentication and refresh tokens
         response = make_response(jsonify({'message': 'Admin Login successful'}))
-        response.set_cookie(
-            'admin_jwt',
-            admin_token,
-            httponly=True,
-            secure=False,  
-            samesite='Lax',
-            path='/'
-        )
+        response.set_cookie('admin_jwt', admin_token, httponly=True, secure=False, samesite='Lax', path='/')
+        response.set_cookie('admin_refresh', refresh_token, httponly=True, secure=False, samesite='Lax', path='/')
 
         return response, 200
 
     return jsonify({'error': 'Invalid email or password'}), 401
 
-   
+
+
+# Refresh Token Endpoint
+@routes.route('/admin/refresh', methods=['POST'])
+def refresh_admin_token():
+    refresh_token = request.cookies.get('admin_refresh')
+    if not refresh_token:
+        return jsonify({"error": "Refresh token missing"}), 403
+
+    stored_refresh = AdminRefreshToken.query.filter_by(token=refresh_token).first()
+
+    if not stored_refresh or stored_refresh.expires_at < datetime.utcnow():
+        return jsonify({"error": "Invalid or expired refresh token"}), 403
+
+    # Generate a new access token
+    new_access_token = generate_access_token(stored_refresh.admin_email)
+
+    response = make_response(jsonify({'message': 'Token refreshed'}))
+    response.set_cookie('admin_jwt', new_access_token, httponly=True, secure=True, samesite='Lax', path='/')
+
+    return response, 200
+
+
+# Admin Logout - Invalidates refresh token
+@routes.route('/admin/logout', methods=['POST'])
+def admin_logout():
+    refresh_token = request.cookies.get('admin_refresh')
+    if refresh_token:
+        stored_refresh = AdminRefreshToken.query.filter_by(token=refresh_token).first()
+        if stored_refresh:
+            db.session.delete(stored_refresh)
+            db.session.commit()
+
+    response = make_response(jsonify({'message': 'Admin logged out successfully'}))
+    response.set_cookie('admin_jwt', '', expires=0, path='/')
+    response.set_cookie('admin_refresh', '', expires=0, path='/')
+
+    return response, 200
+
+
+# Admin Authentication Check
 @routes.route('/admin/authcheck', methods=['GET'])
 def admin_auth_check():
     admin_token = request.cookies.get('admin_jwt')
@@ -507,17 +646,16 @@ def admin_auth_check():
         return jsonify({"error": "Unauthorized"}), 401
 
     try:
-        # Decode admin JWT
         data = jwt.decode(admin_token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
-        if data.get('role') == 'admin':  
+        if data.get('role') == 'admin':
             return jsonify({"message": "Admin authenticated"}), 200
         else:
             return jsonify({"error": "Invalid admin privileges"}), 403
     except jwt.ExpiredSignatureError:
-        return jsonify({"error": "Admin token expired"}), 401
+        return jsonify({"error": "Admin token expired", "refresh": True}), 401
     except jwt.InvalidTokenError:
         return jsonify({"error": "Invalid admin token"}), 401
-
+    
 @routes.route('/users', methods=['GET'])
 @admin_required  # Ensure only the admin can access
 def get_users():
@@ -537,6 +675,7 @@ def get_users():
 
 
 @routes.route('/api/jobs', methods=['POST'])
+@admin_required
 def create_job():
     data = request.get_json()
 
@@ -758,12 +897,6 @@ def remove_saved_job(current_user):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
 
-# Admin logout
-@routes.route('/admin/logout', methods=['POST'])
-def admin_logout():
-    response = make_response(jsonify({"message": "Admin logged out successfully"}))
-    response.set_cookie('admin_jwt', '', expires=0, path='/')  # Clear admin JWT cookie
-    return response, 200
 
 
 @routes.route('/personal-details', methods=['POST'])
@@ -1337,10 +1470,7 @@ def add_referees(current_user):
         if not referee1 or not referee2:
             return jsonify({'error': 'Both referees are required'}), 400
 
-        # Check if referees already exist for the user
-        # existing_referees = Referee.query.filter_by(user_id=current_user.id).first()
-        # if existing_referees:
-        #     return jsonify({'error': 'Referees already exist for this user'}), 409
+      
 
         # Save Referee 1
         ref1 = Referee(
@@ -1569,10 +1699,7 @@ def add_professional_qualifications(current_user):
         return jsonify({'error': 'Missing required fields'}), 400
 
     try:
-        # Check if the user already has professional qualifications
-        existing_qualifications = ProfessionalQualifications.query.filter_by(user_id=current_user.id).first()
-        if existing_qualifications:
-            return jsonify({'error': 'Professional qualifications already exist for this user'}), 400
+       
 
         # Loop through the qualifications and save each one
         for qualification in data['qualifications']:
@@ -1818,9 +1945,7 @@ def add_employment_details(current_user):
             ministry=data['ministry'],
             from_date=parse_date(data.get('from_date')),
             to_date=parse_date(data.get('to_date')),
-            duties=data.get('duties', ''),
-            publications=data.get('publications', ''),
-            skills_experience=data.get('skills_experience', '')
+            duties=data.get('duties', '')
         )
 
         # Save to the database
@@ -1853,8 +1978,6 @@ def get_employment_details(current_user):
                 "from_date": emp.from_date.isoformat() if emp.from_date else None,
                 "to_date": emp.to_date.isoformat() if emp.to_date else None,
                 "duties": emp.duties,
-                "publications": emp.publications,
-                "skills_experience": emp.skills_experience,
                 "created_at": emp.created_at.isoformat() if emp.created_at else None,
             }
             for emp in employment_details
@@ -1885,8 +2008,6 @@ def update_employment_details(current_user, id):
         employment.from_date = data.get('from_date', employment.from_date)
         employment.to_date = data.get('to_date', employment.to_date)
         employment.duties = data.get('duties', employment.duties)
-        employment.publications = data.get('publications', employment.publications)
-        employment.skills_experience = data.get('skills_experience', employment.skills_experience)
 
         # Save to the database
         db.session.commit()
@@ -1915,7 +2036,305 @@ def delete_employment_detail(current_user, id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': 'Failed to delete employment detail', 'details': str(e)}), 500
-        
+
+@routes.route('/publications', methods=['POST'])
+@login_required
+def add_publication(current_user):
+    # Get JSON data from the request
+    data = request.get_json()
+
+    # Validate required fields
+    if not data or 'publications' not in data:
+        return jsonify({'error': 'Missing required field: publications'}), 400
+
+    try:
+        # Create a new Publication object
+        new_publication = Publication(
+            user_id=current_user.id,  # Link to the current logged-in user
+            publications=data['publications']  # Store the publications data
+        )
+
+        # Add to the database session and commit
+        db.session.add(new_publication)
+        db.session.commit()
+
+        # Return success response
+        return jsonify({
+            'message': 'Publication added successfully',
+            'id': new_publication.id
+        }), 201
+
+    except Exception as e:
+        # Handle errors
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@routes.route('/publications', methods=['GET'])
+@login_required
+def get_publications(current_user):
+    """Fetches publications for the logged-in user"""
+    try:
+        # Query all publications for the current user
+        publications = Publication.query.filter_by(user_id=current_user.id).all()
+
+        if not publications:
+            return jsonify({'error': 'No publications found'}), 404
+
+        # Convert publications to a list of dictionaries
+        publications_data = [{
+            'id': pub.id,
+            'publications': pub.publications,
+           
+        } for pub in publications]
+
+        return jsonify(publications_data), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@routes.route('/publications/<int:id>', methods=['PUT'])
+@login_required
+def update_publication(current_user, id):
+    """Updates a specific publication for the logged-in user"""
+    try:
+        data = request.get_json()
+
+        # Fetch the existing publication
+        publication = Publication.query.filter_by(id=id, user_id=current_user.id).first()
+        if not publication:
+            return jsonify({'error': 'Publication not found'}), 404
+
+        # Update the publications field
+        publication.publications = data.get('publications', publication.publications)
+
+        # Save to the database
+        db.session.commit()
+
+        return jsonify({'message': 'Publication updated successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@routes.route('/publications/<int:id>', methods=['DELETE'])
+@login_required
+def delete_publication(current_user, id):
+    """Deletes a specific publication for the logged-in user"""
+    try:
+        # Fetch the publication
+        publication = Publication.query.filter_by(id=id, user_id=current_user.id).first()
+        if not publication:
+            return jsonify({'error': 'Publication not found'}), 404
+
+        # Delete the publication
+        db.session.delete(publication)
+        db.session.commit()
+
+        return jsonify({'message': 'Publication deleted successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@routes.route('/duties', methods=['POST'])
+@login_required
+def add_duties(current_user):
+    # Get JSON data from the request
+    data = request.get_json()
+
+    # Validate required fields
+    if not data or 'duties' not in data:
+        return jsonify({'error': 'Missing required field: duties'}), 400
+
+    try:
+        # Create a new Duties object
+        new_duties = Duties(
+            user_id=current_user.id,  # Link to the current logged-in user
+            duties=data['duties']  # Store the duties data
+        )
+
+        # Add to the database session and commit
+        db.session.add(new_duties)
+        db.session.commit()
+
+        # Return success response
+        return jsonify({
+            'message': 'Duties added successfully',
+            'id': new_duties.id
+        }), 201
+
+    except Exception as e:
+        # Handle errors
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
+@routes.route('/duties', methods=['GET'])
+@login_required
+def get_duties(current_user):
+    """Fetches duties for the logged-in user"""
+    try:
+        # Query all duties for the current user
+        duties = Duties.query.filter_by(user_id=current_user.id).all()
+
+        if not duties:
+            return jsonify({'error': 'No duties found'}), 404
+
+        # Convert duties to a list of dictionaries
+        duties_data = [{
+            'id': duty.id,
+            'duties': duty.duties
+        } for duty in duties]
+
+        return jsonify(duties_data), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+    
+@routes.route('/duties/<int:id>', methods=['PUT'])
+@login_required
+def update_duties(current_user, id):
+    """Updates a specific duty for the logged-in user"""
+    try:
+        data = request.get_json()
+
+        # Fetch the existing duty
+        duty = Duties.query.filter_by(id=id, user_id=current_user.id).first()
+        if not duty:
+            return jsonify({'error': 'Duty not found'}), 404
+
+        # Update the duties field
+        duty.duties = data.get('duties', duty.duties)
+
+        # Save to the database
+        db.session.commit()
+
+        return jsonify({'message': 'Duty updated successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
+@routes.route('/duties/<int:id>', methods=['DELETE'])
+@login_required
+def delete_duties(current_user, id):
+    """Deletes a specific duty for the logged-in user"""
+    try:
+        # Fetch the duty
+        duty = Duties.query.filter_by(id=id, user_id=current_user.id).first()
+        if not duty:
+            return jsonify({'error': 'Duty not found'}), 404
+
+        # Delete the duty
+        db.session.delete(duty)
+        db.session.commit()
+
+        return jsonify({'message': 'Duty deleted successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
+@routes.route('/declarations', methods=['POST'])
+@login_required
+def add_declaration(current_user):
+    # Get JSON data from the request
+    data = request.get_json()
+
+    # Validate required fields
+    if not data or 'date' not in data or 'name' not in data:
+        return jsonify({'error': 'Missing required fields: date and name'}), 400
+
+    try:
+        # Create a new Declaration object
+        new_declaration = Declaration(
+            user_id=current_user.id,  # Link to the current logged-in user
+            date=data['date'],  # Store the date
+            name=data['name']  # Store the name
+        )
+
+        # Add to the database session and commit
+        db.session.add(new_declaration)
+        db.session.commit()
+
+        # Return success response
+        return jsonify({
+            'message': 'Declaration added successfully',
+            'id': new_declaration.id
+        }), 201
+
+    except Exception as e:
+        # Handle errors
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+
+@routes.route('/declarations', methods=['GET'])
+@login_required
+def get_declarations(current_user):
+    """Fetches declarations for the logged-in user"""
+    try:
+        # Query all declarations for the current user
+        declarations = Declaration.query.filter_by(user_id=current_user.id).all()
+
+        if not declarations:
+            return jsonify({'error': 'No declarations found'}), 404
+
+        # Convert declarations to a list of dictionaries
+        declarations_data = [{
+            'id': declaration.id,
+            'date': declaration.date.isoformat() if declaration.date else None,
+            'name': declaration.name
+        } for declaration in declarations]
+
+        return jsonify(declarations_data), 200
+
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@routes.route('/declarations/<int:id>', methods=['PUT'])
+@login_required
+def update_declaration(current_user, id):
+    """Updates a specific declaration for the logged-in user"""
+    try:
+        data = request.get_json()
+
+        # Fetch the existing declaration
+        declaration = Declaration.query.filter_by(id=id, user_id=current_user.id).first()
+        if not declaration:
+            return jsonify({'error': 'Declaration not found'}), 404
+
+        # Update the fields
+        declaration.date = data.get('date', declaration.date)
+        declaration.name = data.get('name', declaration.name)
+
+        # Save to the database
+        db.session.commit()
+
+        return jsonify({'message': 'Declaration updated successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
+@routes.route('/declarations/<int:id>', methods=['DELETE'])
+@login_required
+def delete_declaration(current_user, id):
+    """Deletes a specific declaration for the logged-in user"""
+    try:
+        # Fetch the declaration
+        declaration = Declaration.query.filter_by(id=id, user_id=current_user.id).first()
+        if not declaration:
+            return jsonify({'error': 'Declaration not found'}), 404
+
+        # Delete the declaration
+        db.session.delete(declaration)
+        db.session.commit()
+
+        return jsonify({'message': 'Declaration deleted successfully'}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({'error': str(e)}), 500
+    
 @routes.route('/apply-job/<int:job_id>', methods=['POST'])
 @login_required
 def apply_for_job(current_user, job_id):
@@ -1926,7 +2345,9 @@ def apply_for_job(current_user, job_id):
         """Check if the user has completed all required profile sections."""
         required_models = [
             PersonalDetails, Certificate, EducationalBackground,
-            Referee, NextOfKin, ProfessionalQualifications, RelevantCoursesAndProfessionalBody, EmploymentDetails
+            Referee, NextOfKin, ProfessionalQualifications, 
+            RelevantCoursesAndProfessionalBody, EmploymentDetails,
+            Publication, Duties, Declaration  
         ]
 
         for model in required_models:
@@ -1958,7 +2379,7 @@ def apply_for_job(current_user, job_id):
     except Exception as e:
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
-
+    
 @routes.route('/admin/job-applications', methods=['GET'])
 @admin_required
 def get_all_job_applications():
@@ -2025,15 +2446,15 @@ def update_application_status(application_id):
 
         # Define email color and button text based on status
         if new_status == "Accepted":
-            status_color = "#008000"  # Green for acceptance
+            status_color = "#008000"  
             message = f"""
                 <p>Congratulations! We are pleased to inform you that your job application for <strong>{application.job.position}</strong> has been <strong style="color: {status_color};">ACCEPTED</strong>.</p>
-                <p>Please check your portal for further details.</p>
+                <p>Please come with all the relevant documents on the scheduled date for your interview</p>
             """
             button_text = "View Portal"
             button_link = "http://127.0.0.1:5173"
         else:
-            status_color = "#d9534f"  # Red for rejection
+            status_color = "#d9534f"  
             message = f"""
                 <p>We regret to inform you that your job application for <strong>{application.job.position}</strong> has been <strong style="color: {status_color};">REJECTED</strong>.</p>
                 <p>We encourage you to explore other opportunities on our platform.</p>
@@ -2058,7 +2479,7 @@ def update_application_status(application_id):
                 </tr>
                 <tr>
                     <td style="font-size: 18px; font-weight: bold; color: {status_color}; text-align: center;">
-                        Dear {user.first_name},
+                        Dear {user.first_name} {user.last_name}
                     </td>
                 </tr>
                 <tr>
@@ -2127,13 +2548,15 @@ def get_user_job_applications(current_user):
     
 @routes.route('/applications/<int:user_id>', methods=['GET'])
 @admin_required
-def get_application_details( user_id):
+def get_application_details(user_id):
     print(f"Fetching details for user ID: {user_id}")
 
+    # Fetch personal details
     personal_details = PersonalDetails.query.filter_by(user_id=user_id).first()
     if not personal_details:
         return jsonify({"error": "User profile not found"}), 404
 
+    # Build the response
     response = {
         "personal_details": personal_details.to_dict() if personal_details else None,
         "next_of_kin": [kin.to_dict() for kin in NextOfKin.query.filter_by(user_id=user_id).all()],
@@ -2164,6 +2587,11 @@ def get_application_details( user_id):
         "relevant_courses": [course.to_dict() for course in RelevantCoursesAndProfessionalBody.query.filter_by(user_id=user_id).all()],
         "employment_details": [job.to_dict() for job in EmploymentDetails.query.filter_by(user_id=user_id).all()],
         "referees": [ref.to_dict() for ref in Referee.query.filter_by(user_id=user_id).all()],
+
+        # Newly added models
+        "publications": [pub.to_dict() for pub in Publication.query.filter_by(user_id=user_id).all()],
+        "duties": [duty.to_dict() for duty in Duties.query.filter_by(user_id=user_id).all()],
+        "declarations": [decl.to_dict() for decl in Declaration.query.filter_by(user_id=user_id).all()],
     }
 
     return jsonify(response), 200

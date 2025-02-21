@@ -165,8 +165,6 @@ class EmploymentDetails(db.Model):
     from_date = db.Column(db.Date, nullable=True)
     to_date = db.Column(db.Date, nullable=True)
     duties = db.Column(db.Text, nullable=True)
-    publications = db.Column(db.Text, nullable=True)
-    skills_experience = db.Column(db.Text, nullable=True)
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
@@ -198,6 +196,52 @@ class Referee(db.Model):
 
     def __repr__(self):
         return f"<Referee {self.full_name} - {self.occupation}>"
+    
+class Publication(db.Model):
+    __tablename__ = 'publications'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  
+    publications = db.Column(db.Text, nullable=False)  # Field to store publications
+
+    # Relationship to the User model
+    user = db.relationship('User', backref=db.backref('publications', lazy=True))
+
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+
+    def __repr__(self):
+        return f"<Publication {self.id} - User {self.user_id}>"
+
+class Duties(db.Model):
+    __tablename__ = 'duties'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Link to the user
+    duties = db.Column(db.Text, nullable=False)  # Field to store duties
+
+    # Relationship to the User model
+    user = db.relationship('User', backref=db.backref('duties', lazy=True))
+
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+
+    def __repr__(self):
+        return f"<Duties {self.id} - User {self.user_id}>"
+    
+class Declaration(db.Model):
+    __tablename__ = 'declarations'
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Link to the user
+    date = db.Column(db.Date, nullable=False)  # Field to store the date
+    name = db.Column(db.String(255), nullable=False)  # Field to store the name
+
+    # Relationship to the User model
+    user = db.relationship('User', backref=db.backref('declarations', lazy=True))
+
+    def to_dict(self):
+        return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+
+    def __repr__(self):
+        return f"<Declaration {self.id} - User {self.user_id}>"
 
 class Admin(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -210,6 +254,14 @@ class Admin(db.Model):
         admin = Admin(email=email, password=hashed_password)
         db.session.add(admin)
         db.session.commit()
+        
+class AdminRefreshToken(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    admin_email = db.Column(db.String(255), nullable=False, unique=True)
+    token = db.Column(db.String(512), nullable=False, unique=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    expires_at = db.Column(db.DateTime, nullable=False)
+
 
 class Job(db.Model):
     __tablename__ = 'jobs'
