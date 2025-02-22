@@ -20,7 +20,7 @@ mail = Mail()  # Initialize Flask-Mail
 
 routes = Blueprint('routes', __name__)
 
-ACCESS_TOKEN_EXPIRY = timedelta(minutes=15)   # Short-lived access token
+ACCESS_TOKEN_EXPIRY = timedelta(minutes=30)   # Short-lived access token
 REFRESH_TOKEN_EXPIRY = timedelta(days=7)
 
 # Configuration for file uploads
@@ -62,7 +62,7 @@ def login_required(f):
                 refresh_data = jwt.decode(refresh_token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
                 new_access_token = jwt.encode({
                     'user_id': refresh_data['user_id'],
-                    'exp': datetime.utcnow() + timedelta(minutes=15)
+                    'exp': datetime.utcnow() + timedelta(minutes=30)
                 }, current_app.config['SECRET_KEY'], algorithm='HS256')
 
                 if isinstance(new_access_token, bytes):
@@ -206,7 +206,7 @@ def login():
     # Create JWT Access Token (Short Expiry)
     access_token = jwt.encode({
         'user_id': user.id,
-        'exp': datetime.utcnow() + timedelta(minutes=15)  # Expires in 15 minutes
+        'exp': datetime.utcnow() + timedelta(minutes=30)  # Expires in 15 minutes
     }, current_app.config['SECRET_KEY'], algorithm='HS256')
 
     # Create Refresh Token (Long Expiry)
@@ -246,7 +246,7 @@ def refresh_token():
         # Generate new tokens
         new_access_token = jwt.encode({
             'user_id': user.id,
-            'exp': datetime.utcnow() + timedelta(minutes=10)
+            'exp': datetime.utcnow() + timedelta(minutes=30)
         }, current_app.config['SECRET_KEY'], algorithm='HS256')
 
         new_refresh_token = jwt.encode({
@@ -1772,7 +1772,8 @@ def delete_professional_qualification(current_user, id):
         db.session.rollback()
         return jsonify({'error': 'Failed to delete qualification', 'details': str(e)}), 500
 
-    
+
+
 @routes.route('/relevant-courses-professional-body', methods=['POST'])
 @login_required
 def add_relevant_courses_and_professional_body(current_user):
@@ -1782,26 +1783,35 @@ def add_relevant_courses_and_professional_body(current_user):
         return jsonify({'error': 'Missing required fields'}), 400
 
     try:
-        # Loop through each record (course + professional body)
         for record in data:
-            # Check if renewal_date is provided and not an empty string
+            # Validate year field
+            year = record.get('year')
+            if year and year.strip().lower() != 'n/a':
+                try:
+                    year = int(year)  # Try converting to integer
+                    if year < 1900 or year > datetime.now().year:  # Validate year range
+                        return jsonify({'error': 'Invalid year'}), 400
+                except ValueError:
+                    return jsonify({'error': 'Year must be a number or "N/A"'}), 400
+
+            # Handle renewal_date
             renewal_date = record.get('renewal_date')
-            if renewal_date:
-                renewal_date = datetime.strptime(renewal_date, '%Y-%m-%d')  # Convert the date
+            if renewal_date and renewal_date.strip().lower() != 'n/a':
+                renewal_date = datetime.strptime(renewal_date, '%Y-%m-%d')
             else:
-                renewal_date = None  # Set to None if not provided or empty
+                renewal_date = None
 
             new_record = RelevantCoursesAndProfessionalBody(
                 user_id=current_user.id,
-                year=record['year'],
-                institution=record['institution'],
-                course_name=record['course_name'],
-                details=record['details'],
-                duration=record['duration'],
-                body_name=record['body_name'],
-                membership_no=record['membership_no'],
-                membership_type=record['membership_type'],
-                renewal_date=renewal_date,  # Use the parsed date or None
+                year=year,  # Use validated year
+                institution=record.get('institution', ''),
+                course_name=record.get('course_name', ''),
+                details=record.get('details', ''),
+                duration=record.get('duration', ''),
+                body_name=record.get('body_name', ''),
+                membership_no=record.get('membership_no', ''),
+                membership_type=record.get('membership_type', ''),
+                renewal_date=renewal_date,
                 created_at=datetime.utcnow()
             )
 
@@ -1812,9 +1822,9 @@ def add_relevant_courses_and_professional_body(current_user):
         return jsonify({'message': 'Relevant courses and professional body records saved successfully'}), 201
 
     except Exception as e:
-        db.session.rollback()  # Rollback any changes if an error occurs
+        db.session.rollback()
         return jsonify({'error': str(e)}), 500
-
+    
 @routes.route('/relevant-courses', methods=['GET'])
 @login_required  # Ensure the user is logged in
 def get_relevant_courses(current_user):

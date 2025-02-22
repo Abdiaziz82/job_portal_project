@@ -137,7 +137,7 @@ class RelevantCoursesAndProfessionalBody(db.Model):
     __tablename__ = 'relevant_courses_and_professional_bodies'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
-    year = db.Column(db.Integer)
+    year = db.Column(db.String(255))  # Ensure this matches your database schema
     institution = db.Column(db.String(255))
     course_name = db.Column(db.String(255))
     details = db.Column(db.Text)
@@ -151,7 +151,11 @@ class RelevantCoursesAndProfessionalBody(db.Model):
     user = db.relationship('User', backref=db.backref('relevant_courses_and_professional_bodies', lazy=True))
 
     def to_dict(self):
+        """Convert the model instance to a dictionary dynamically."""
         return {column.name: getattr(self, column.name) for column in self.__table__.columns}
+
+    def __repr__(self):
+        return f"<RelevantCoursesAndProfessionalBody {self.course_name} - {self.institution}>"
 
 class EmploymentDetails(db.Model):
     __tablename__ = 'employment_details'

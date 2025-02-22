@@ -1,18 +1,16 @@
 import os
 from dotenv import load_dotenv
 from flask_bcrypt import Bcrypt
-bcrypt = Bcrypt()
 
 # Load environment variables from the .env file
 load_dotenv()
 
+bcrypt = Bcrypt()
+
 class Config:
     # Database configuration
-    SQLALCHEMY_DATABASE_URI = os.getenv(
-        'SQLALCHEMY_DATABASE_URI', 
-        'mysql+pymysql://flask_user:password@localhost/university_jobs'
-    )
-    
+    SQLALCHEMY_DATABASE_URI = os.getenv('SQLALCHEMY_DATABASE_URI')
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # Flask-Mail configuration
@@ -20,20 +18,17 @@ class Config:
     MAIL_PORT = 587
     MAIL_USE_TLS = True
     MAIL_USE_SSL = False
-    MAIL_USERNAME = os.getenv('MAIL_USERNAME', 'abdiazizhared64@gmail.com')
-    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD', 'zgdj edcr dtnz zugp')
-    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER', 'abdiazizhared64@gmail.com')
+    MAIL_USERNAME = os.getenv('MAIL_USERNAME')
+    MAIL_PASSWORD = os.getenv('MAIL_PASSWORD')
+    MAIL_DEFAULT_SENDER = os.getenv('MAIL_DEFAULT_SENDER')
 
-    # Frontend URL
-    # FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:5176')
+    # Admin Credentials (Loaded Securely)
+    ADMIN_EMAIL = os.getenv('ADMIN_EMAIL')
+    ADMIN_PASSWORD = bcrypt.generate_password_hash(os.getenv('ADMIN_PASSWORD')).decode('utf-8')
 
-    # Admin Credentials (Securely loaded from environment variables)
-    ADMIN_EMAIL = os.getenv('ADMIN_EMAIL', 'abdiazizhared64@gmail.com')
-    ADMIN_PASSWORD = bcrypt.generate_password_hash(os.getenv('ADMIN_PASSWORD', 'admin123')).decode('utf-8')
-
-    
-    SECRET_KEY = 'supersecretkey'  
-    JWT_EXPIRATION_DELTA = 7200  
+    # Security Keys
+    SECRET_KEY = os.getenv('SECRET_KEY')
+    JWT_EXPIRATION_DELTA = int(os.getenv('JWT_EXPIRATION_DELTA', 7200))  # Default to 7200 if missing
 
     # File Upload Configuration
     UPLOAD_FOLDER = os.path.join(os.getcwd(), 'uploads')  # Setting up uploads folder in the current working directory
