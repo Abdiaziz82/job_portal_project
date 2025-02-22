@@ -37,7 +37,7 @@ const BrowseJobs = () => {
   };
 
   return (
-    <div className="container mx-auto mt-12 px-4">
+    <div className="container mx-auto mt-12 px-4 pb-20"> {/* Added pb-20 for bottom padding */}
       <Routes>
         <Route
           index
@@ -47,22 +47,26 @@ const BrowseJobs = () => {
                 Available Jobs
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-6"> {/* Added pb-6 for bottom padding */}
                 {jobs.length > 0 ? (
                   jobs.map((job) => (
                     <div
                       key={job.id}
                       className="bg-white shadow-lg rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 flex flex-col"
+                      style={{
+                        overflow: "hidden", // Prevent content from overflowing
+                        wordWrap: "break-word", // Break long words to prevent overflow
+                      }}
                     >
                       <div className="p-5 flex-1">
-                        <h3 className="text-xl font-bold text-green-700 mb-3">
+                        <h3 className="text-xl font-bold text-green-700 mb-3 break-words">
                           {job.position}
                         </h3>
 
                         <div className="text-sm text-gray-600 space-y-2">
                           <p>
                             <strong className="text-gray-700">Advert:</strong>{" "}
-                            {job.advert}
+                            <span className="break-words">{job.advert}</span>
                           </p>
                           <p>
                             <strong className="text-gray-700">Posts Available:</strong>{" "}

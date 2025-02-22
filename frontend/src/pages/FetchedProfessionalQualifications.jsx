@@ -94,10 +94,7 @@ export default function FetchedProfessionalQualifications() {
                 <strong className="text-sm text-gray-700 w-40">Year To:</strong>
                 <span className="text-sm text-gray-600 flex-1">{qualification.year_to}</span>
               </div>
-              <div className="flex items-start sm:col-span-2">
-                <strong className="text-sm text-gray-700 w-40">Created At:</strong>
-                <span className="text-sm text-gray-600 flex-1">{qualification.created_at}</span>
-              </div>
+              
             </div>
 
             <div className="flex space-x-4 mt-4">

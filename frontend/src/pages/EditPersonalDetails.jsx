@@ -225,11 +225,11 @@ export default function EditPersonalDetails() {
         {/* Disability Details */}
         <div>
           <label className="block text-sm font-medium text-gray-700">Disability Details</label>
-          <input
-            type="text"
+          <textarea
             name="disability_details"
             value={formData.disability_details || ""}
             onChange={handleChange}
+            rows={3} // Adjust the number of rows as needed
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
@@ -261,11 +261,11 @@ export default function EditPersonalDetails() {
         {/* Criminal Offence Details */}
         <div>
           <label className="block text-sm font-medium text-gray-700">Criminal Offence Details</label>
-          <input
-            type="text"
+          <textarea
             name="criminal_offence_details"
             value={formData.criminal_offence_details || ""}
             onChange={handleChange}
+            rows={3} // Adjust the number of rows as needed
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
@@ -285,11 +285,11 @@ export default function EditPersonalDetails() {
         {/* Dismissal Reason */}
         <div>
           <label className="block text-sm font-medium text-gray-700">Dismissal Reason</label>
-          <input
-            type="text"
+          <textarea
             name="dismissal_reason"
             value={formData.dismissal_reason || ""}
             onChange={handleChange}
+            rows={3} // Adjust the number of rows as needed
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
           />
         </div>

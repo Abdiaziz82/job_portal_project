@@ -50,7 +50,7 @@ export default function FetchedRelevantCourses() {
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md w-full">
+    <div className="p-6 bg-white rounded-lg shadow-md w-full overflow-hidden">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-800 mb-2 sm:mb-0">
           Relevant Courses
@@ -68,50 +68,47 @@ export default function FetchedRelevantCourses() {
 
       {courses.length > 0 ? (
         courses.map((course, index) => (
-          <div key={course.id} className="mt-4 space-y-2 border-b pb-4">
-            <h3 className="text-md font-semibold">{course.course_name}</h3>
+          <div key={course.id} className="mt-4 space-y-2 border-b pb-4 overflow-hidden">
+            <h3 className="text-md font-semibold break-words">{course.course_name}</h3>
             <div className="mt-2 grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-3">
               {/* Left Group */}
               <div className="space-y-3">
                 <div className="flex items-start">
                   <strong className="text-sm text-gray-700 w-40">Institution:</strong>
-                  <span className="text-sm text-gray-600 flex-1">{course.institution}</span>
+                  <span className="text-sm text-gray-600 flex-1 break-words">{course.institution}</span>
                 </div>
                 <div className="flex items-start">
                   <strong className="text-sm text-gray-700 w-40">Year:</strong>
-                  <span className="text-sm text-gray-600 flex-1">{course.year}</span>
+                  <span className="text-sm text-gray-600 flex-1 break-words">{course.year}</span>
                 </div>
                 <div className="flex items-start">
                   <strong className="text-sm text-gray-700 w-40">Details:</strong>
-                  <span className="text-sm text-gray-600 flex-1">{course.details}</span>
+                  <span className="text-sm text-gray-600 flex-1 break-words">{course.details}</span>
                 </div>
                 <div className="flex items-start">
                   <strong className="text-sm text-gray-700 w-40">Duration:</strong>
-                  <span className="text-sm text-gray-600 flex-1">{course.duration}</span>
+                  <span className="text-sm text-gray-600 flex-1 break-words">{course.duration}</span>
                 </div>
               </div>
               {/* Right Group */}
               <div className="space-y-3">
                 <div className="flex items-start">
                   <strong className="text-sm text-gray-700 w-40">Professional Body:</strong>
-                  <span className="text-sm text-gray-600 flex-1">{course.body_name}</span>
+                  <span className="text-sm text-gray-600 flex-1 break-words">{course.body_name}</span>
                 </div>
                 <div className="flex items-start">
                   <strong className="text-sm text-gray-700 w-40">Membership No:</strong>
-                  <span className="text-sm text-gray-600 flex-1">{course.membership_no}</span>
+                  <span className="text-sm text-gray-600 flex-1 break-words">{course.membership_no}</span>
                 </div>
                 <div className="flex items-start">
                   <strong className="text-sm text-gray-700 w-40">Membership Type:</strong>
-                  <span className="text-sm text-gray-600 flex-1">{course.membership_type}</span>
+                  <span className="text-sm text-gray-600 flex-1 break-words">{course.membership_type}</span>
                 </div>
                 <div className="flex items-start">
                   <strong className="text-sm text-gray-700 w-40">Renewal Date:</strong>
-                  <span className="text-sm text-gray-600 flex-1">{course.renewal_date}</span>
+                  <span className="text-sm text-gray-600 flex-1 break-words">{course.renewal_date}</span>
                 </div>
-                <div className="flex items-start">
-                  <strong className="text-sm text-gray-700 w-40">Created At:</strong>
-                  <span className="text-sm text-gray-600 flex-1">{course.created_at}</span>
-                </div>
+              
               </div>
             </div>
             <div className="flex space-x-4 mt-4">
@@ -136,7 +133,7 @@ export default function FetchedRelevantCourses() {
           </div>
         ))
       ) : (
-        <p className=" text-red-600">No relevant courses added yet. Click on Add courses and professional bodies to add your courses and professional bodies</p>
+        <p className="text-red-600">No relevant courses added yet. Click on Add courses and professional bodies to add your courses and professional bodies</p>
       )}
     </div>
   );

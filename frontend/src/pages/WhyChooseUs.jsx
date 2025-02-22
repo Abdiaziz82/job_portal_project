@@ -29,7 +29,7 @@ const WhyChooseUs = () => {
 
           {/* Exclusive University Jobs */}
           <div className="group p-6 bg-white rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 flex flex-col items-center text-center">
-            <div className="p-3 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full shadow-sm">
+            <div className="p-3 bg-yellow-600 rounded-full shadow-sm">
               <FaBriefcase className="text-white text-3xl" />
             </div>
             <h3 className="text-xl font-semibold text-gray-900 mt-5">Exclusive Jobs</h3>

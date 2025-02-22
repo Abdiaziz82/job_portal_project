@@ -117,24 +117,29 @@ const Header = () => {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex space-x-8 text-lg font-medium ml-auto">
-              <Link
-                to="/"
-                className="hover:text-green-700 transition duration-300"
-              >
-                Home
-              </Link>
-              <Link
-                to="open-jobs"
-                className="hover:text-green-700 transition duration-300"
-              >
-                Open Jobs
-              </Link>
-              <Link
-                to="portal-guide"
-                className="hover:text-green-700 transition duration-300"
-              >
-                Portal Guide
-              </Link>
+              {/* Conditionally render navigation links based on authentication status */}
+              {!isAuthenticated && (
+                <>
+                  <Link
+                    to="/"
+                    className="hover:text-green-700 transition duration-300"
+                  >
+                    Home
+                  </Link>
+                  <Link
+                    to="open-jobs"
+                    className="hover:text-green-700 transition duration-300"
+                  >
+                    Open Jobs
+                  </Link>
+                  <Link
+                    to="portal-guide"
+                    className="hover:text-green-700 transition duration-300"
+                  >
+                    Portal Guide
+                  </Link>
+                </>
+              )}
             </nav>
 
             {/* Right Section: Avatar + Dropdown */}
@@ -261,27 +266,32 @@ const Header = () => {
           {isOpen && (
             <div className="md:hidden bg-white text-gray-700">
               <nav className="flex flex-col items-center space-y-4 py-4">
-                <Link
-                  to="/"
-                  className="hover:text-green-700 transition duration-300"
-                  onClick={toggleMenu}
-                >
-                  Home
-                </Link>
-                <Link
-                  to="open-jobs"
-                  className="hover:text-green-700 transition duration-300"
-                  onClick={toggleMenu}
-                >
-                  Open Jobs
-                </Link>
-                <Link
-                  to="portal-guide"
-                  className="hover:text-green-700 transition duration-300"
-                  onClick={toggleMenu}
-                >
-                  Portal Guide
-                </Link>
+                {/* Conditionally render navigation links based on authentication status */}
+                {!isAuthenticated && (
+                  <>
+                    <Link
+                      to="/"
+                      className="hover:text-green-700 transition duration-300"
+                      onClick={toggleMenu}
+                    >
+                      Home
+                    </Link>
+                    <Link
+                      to="open-jobs"
+                      className="hover:text-green-700 transition duration-300"
+                      onClick={toggleMenu}
+                    >
+                      Open Jobs
+                    </Link>
+                    <Link
+                      to="portal-guide"
+                      className="hover:text-green-700 transition duration-300"
+                      onClick={toggleMenu}
+                    >
+                      Portal Guide
+                    </Link>
+                  </>
+                )}
                 {isAuthenticated && (
                   <>
                     {/* User Email on Mobile */}

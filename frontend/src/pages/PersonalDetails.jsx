@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify"; // Import react-toastify
+import "react-toastify/dist/ReactToastify.css"; // Import react-toastify styles
 
 export default function PersonalDetails() {
   const navigate = useNavigate();
@@ -72,16 +74,29 @@ export default function PersonalDetails() {
       }
 
       const result = await response.json();
-      alert(result.message); // Show success message
+      toast.success(result.message); // Show success message using toast
       navigate("/dashboard/profile"); // Redirect to profile page
     } catch (error) {
       console.error("Error:", error);
-      alert(error.message || "An error occurred while saving personal details.");
+      toast.error(error.message || "An error occurred while saving personal details."); // Show error message using toast
     }
   };
 
   return (
     <div className="flex flex-col min-h-screen p-6 bg-gray-50">
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}

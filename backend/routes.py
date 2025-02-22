@@ -70,7 +70,7 @@ def login_required(f):
 
                 # Set new Access Token in response
                 response = make_response(f(User.query.get(refresh_data['user_id']), *args, **kwargs))
-                response.set_cookie('jwt', new_access_token, httponly=True, secure=False, samesite='Lax', path='/')
+                response.set_cookie('jwt', new_access_token, httponly=True, secure=True, samesite='Lax', path='/')
                 return response
 
             except jwt.ExpiredSignatureError:
@@ -223,8 +223,8 @@ def login():
 
     # Create response and set HTTP-only cookies
     response = make_response(jsonify({'message': 'Login successful'}))
-    response.set_cookie('jwt', access_token, httponly=True, secure=False, samesite='Lax', path='/')
-    response.set_cookie('refresh_jwt', refresh_token, httponly=True, secure=False, samesite='Lax', path='/')
+    response.set_cookie('jwt', access_token, httponly=True, secure=True, samesite='Lax', path='/')
+    response.set_cookie('refresh_jwt', refresh_token, httponly=True, secure=True, samesite='Lax', path='/')
 
     return response, 200
 
@@ -569,8 +569,8 @@ def admin_login():
 
         # Set cookies for authentication and refresh tokens
         response = make_response(jsonify({'message': 'Admin Login successful'}))
-        response.set_cookie('admin_jwt', admin_token, httponly=True, secure=False, samesite='Lax', path='/')
-        response.set_cookie('admin_refresh', refresh_token, httponly=True, secure=False, samesite='Lax', path='/')
+        response.set_cookie('admin_jwt', admin_token, httponly=True, secure=True, samesite='Lax', path='/')
+        response.set_cookie('admin_refresh', refresh_token, httponly=True, secure=True, samesite='Lax', path='/')
 
         return response, 200
 
@@ -687,6 +687,7 @@ def create_job():
 
 
 @routes.route('/api/jobs', methods=['GET'])
+@admin_required
 def get_jobs():
     jobs = Job.query.all()
     jobs_list = [
@@ -732,6 +733,7 @@ def get_job_by_id(id):
 
 
 @routes.route('/api/jobs/<int:job_id>', methods=['PUT'])
+@admin_required
 def update_job(job_id):
     job = Job.query.get(job_id)
     if not job:
@@ -2425,13 +2427,16 @@ def get_all_job_applications():
             if app.status in status_counts:
                 status_counts[app.status] += 1
 
+            # Convert applied_at from UTC to EAT (UTC+3)
+            applied_at_eat = app.applied_at + timedelta(hours=3) if app.applied_at else None
+
             applications_data.append({
                 "id": app.id,
                 "user_id": app.user.id,
                 "applicant_name": f"{app.user.first_name} {app.user.last_name}",
                 "job_title": app.job.position,
                 "status": app.status,
-                "applied_at": app.applied_at.strftime("%Y-%m-%d %H:%M:%S") if app.applied_at else None
+                "applied_at": applied_at_eat.strftime("%Y-%m-%d %H:%M:%S") if applied_at_eat else None
             })
 
         return jsonify({
@@ -2440,6 +2445,7 @@ def get_all_job_applications():
         }), 200
     except Exception as e:
         return jsonify({"error": "Failed to fetch job applications", "details": str(e)}), 500
+
     
 @routes.route('/admin/job-applications/<int:application_id>', methods=['PUT'])
 @admin_required  # Ensure only admins can access
@@ -2545,6 +2551,7 @@ def update_application_status(application_id):
     except Exception as e:
         return jsonify({"error": "Failed to update application status", "details": str(e)}), 500
 
+
 @routes.route('/user/job-applications', methods=['GET'])
 @login_required
 def get_user_job_applications(current_user):
@@ -2558,11 +2565,12 @@ def get_user_job_applications(current_user):
 
         applications = query.all()
 
+        # Convert applied_at to East African Time (EAT)
         applications_data = [
             {
                 "id": app.id,
                 "job_title": app.job.position, 
-                "applied_at": app.applied_at.strftime("%Y-%m-%d %H:%M"),
+                "applied_at": (app.applied_at + timedelta(hours=3)).strftime("%Y-%m-%d %H:%M"),  # Convert to EAT
                 "status": app.status
             }
             for app in applications

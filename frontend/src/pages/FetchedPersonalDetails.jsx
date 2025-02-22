@@ -53,7 +53,7 @@ export default function FetchedPersonalDetails() {
   };
 
   return (
-    <div className="p-8 bg-white rounded-xl border border-gray-100 shadow-lg w-full  mx-auto">
+    <div className="p-8 bg-white rounded-xl border border-gray-100 shadow-lg w-full mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
         <h2 className="text-2xl font-bold text-gray-900 mb-4 sm:mb-0">
           Personal Details
@@ -169,7 +169,9 @@ export default function FetchedPersonalDetails() {
           </div>
         </div>
       ) : (
-        <p className=" text-red-600">No personal details added yet.Click on Add Personal details to add your personal details</p>
+        <p className="text-red-600">
+          No personal details added yet. Click on Add Personal Details to add your personal details.
+        </p>
       )}
     </div>
   );
@@ -180,7 +182,9 @@ function DetailItem({ label, value }) {
   return (
     <div className="flex flex-col sm:flex-row sm:items-start">
       <strong className="text-sm text-gray-700 sm:w-48">{label}:</strong>
-      <span className="text-sm text-gray-600 sm:flex-1">{value || "N/A"}</span>
+      <span className="text-sm text-gray-600 sm:flex-1 break-words">
+        {value || "N/A"}
+      </span>
     </div>
   );
 }

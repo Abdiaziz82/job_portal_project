@@ -1,6 +1,6 @@
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash
-from datetime import datetime
+from datetime import datetime ,timedelta ,timezone
 
 db = SQLAlchemy()
 
@@ -292,7 +292,7 @@ class JobApplication(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
     job_id = db.Column(db.Integer, db.ForeignKey('jobs.id', ondelete="CASCADE"), nullable=False)
     status = db.Column(db.String(20), default='Pending')  # Pending, Accepted, Rejected
-    applied_at = db.Column(db.DateTime, default=datetime.utcnow)
+    applied_at = db.Column(db.DateTime, default=lambda: datetime.utcnow() + timedelta(hours=3))  # Convert UTC to EAT
 
     user = db.relationship('User', backref='applications')
     job = db.relationship('Job', backref=db.backref('applications', cascade="all, delete-orphan"))

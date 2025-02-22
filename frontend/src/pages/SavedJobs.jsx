@@ -74,14 +74,21 @@ export default function SavedJobs() {
             <div
               key={job.id}
               className="bg-white shadow-lg rounded-lg p-6 border border-gray-200 hover:shadow-xl transition-all duration-300"
+              style={{
+                overflow: "hidden", // Prevent content from overflowing
+                wordWrap: "break-word", // Break long words to prevent overflow
+              }}
             >
               {/* Job Title */}
-              <h3 className="text-xl font-semibold text-green-700 mb-3">{job.position}</h3>
+              <h3 className="text-xl font-semibold text-green-700 mb-3 break-words">
+                {job.position}
+              </h3>
 
               {/* Job Details */}
               <div className="text-sm text-gray-600 space-y-2">
                 <p>
-                  <strong className="text-gray-700">Advert:</strong> {job.advert}
+                  <strong className="text-gray-700">Advert:</strong>{" "}
+                  <span className="break-words">{job.advert}</span>
                 </p>
                 <p>
                   <strong className="text-gray-700">Grade:</strong> {job.grade}

@@ -67,7 +67,7 @@ const AdminSidebar = () => {
                       : "block py-3 px-4 rounded-lg hover:bg-green-700 hover:font-medium text-lg transition-all"
                   }
                 >
-                  Manage Jobs
+                  Post jobs
                 </NavLink>
               </li>
               <li>
@@ -79,7 +79,7 @@ const AdminSidebar = () => {
                       : "block py-3 px-4 rounded-lg hover:bg-green-700 hover:font-medium text-lg transition-all"
                   }
                 >
-                  Created Jobs
+                  posted Jobs
                 </NavLink>
               </li>
               <li>
