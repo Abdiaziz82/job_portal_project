@@ -269,7 +269,7 @@ const RelevantCoursesForm = () => {
                 value={body.renewalDate}
                 onChange={(event) => handleProfessionalBodyChange(index, event)}
                 className="w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                required
+                
               />
             </div>
 
