@@ -10,13 +10,12 @@ from itsdangerous import URLSafeTimedSerializer
 from functools import wraps
 from werkzeug.utils import secure_filename
 import os
-import logging
+
 from flask import send_from_directory ,url_for
 
 
 # Initialize bcrypt
 bcrypt = Bcrypt()
-logging.basicConfig(level=logging.DEBUG)
 mail = Mail()  # Initialize Flask-Mail
 
 routes = Blueprint('routes', __name__)
@@ -265,27 +264,6 @@ def refresh_token():
         return jsonify({"error": "Refresh token expired, please log in again!"}), 401
     except jwt.InvalidTokenError:
         return jsonify({"error": "Invalid refresh token!"}), 401
-
-
-
-# def admin_required(f):
-#     @wraps(f)
-#     def decorated_function(*args, **kwargs):
-#         token = request.cookies.get('admin_jwt')
-#         if not token:
-#             return jsonify({"error": "Admin authentication required!"}), 403
-#         try:
-#             data = jwt.decode(token, current_app.config['SECRET_KEY'], algorithms=['HS256'])
-#             if data.get('role') != 'admin':
-#                 return jsonify({"error": "Unauthorized access!"}), 403
-#         except jwt.ExpiredSignatureError:
-#             return jsonify({"error": "Token expired!"}), 403
-#         except jwt.InvalidTokenError:
-#             return jsonify({"error": "Invalid token!"}), 403
-
-#         return f(*args, **kwargs)
-#     return decorated_function
-
 
     
 @routes.route('/change-password', methods=['POST'])
@@ -1806,6 +1784,13 @@ def add_relevant_courses_and_professional_body(current_user):
     try:
         # Loop through each record (course + professional body)
         for record in data:
+            # Check if renewal_date is provided and not an empty string
+            renewal_date = record.get('renewal_date')
+            if renewal_date:
+                renewal_date = datetime.strptime(renewal_date, '%Y-%m-%d')  # Convert the date
+            else:
+                renewal_date = None  # Set to None if not provided or empty
+
             new_record = RelevantCoursesAndProfessionalBody(
                 user_id=current_user.id,
                 year=record['year'],
@@ -1816,7 +1801,7 @@ def add_relevant_courses_and_professional_body(current_user):
                 body_name=record['body_name'],
                 membership_no=record['membership_no'],
                 membership_type=record['membership_type'],
-                renewal_date=datetime.strptime(record['renewal_date'], '%Y-%m-%d'),  # Convert the date
+                renewal_date=renewal_date,  # Use the parsed date or None
                 created_at=datetime.utcnow()
             )
 
@@ -1917,16 +1902,19 @@ def add_employment_details(current_user):
     try:
         data = request.get_json()
 
-        # Check if employment details already exist for the user (optional, if you want to restrict to one record per user)
-        existing_details = EmploymentDetails.query.filter_by(user_id=current_user.id).first()
-        if existing_details:
-            return jsonify({'error': 'Employment details already exist for this user'}), 400
-
         # Validate required fields
         required_fields = ['year', 'designation', 'job_group', 'gross_salary', 'ministry']
         missing_fields = [field for field in required_fields if field not in data]
         if missing_fields:
             return jsonify({'error': f"Missing required fields: {', '.join(missing_fields)}"}), 400
+
+        # Validate gross_salary is a number
+        try:
+            gross_salary = float(data['gross_salary'])  # Convert to float
+            if gross_salary < 0:
+                return jsonify({'error': 'Gross salary must be a positive number'}), 400
+        except (ValueError, TypeError):
+            return jsonify({'error': 'Gross salary must be a valid number'}), 400
 
         # Convert date fields safely
         def parse_date(date_str):
@@ -1941,7 +1929,7 @@ def add_employment_details(current_user):
             year=data['year'],
             designation=data['designation'],
             job_group=data['job_group'],
-            gross_salary=data['gross_salary'],
+            gross_salary=gross_salary,  # Use the validated gross_salary
             ministry=data['ministry'],
             from_date=parse_date(data.get('from_date')),
             to_date=parse_date(data.get('to_date')),
@@ -1956,7 +1944,8 @@ def add_employment_details(current_user):
 
     except Exception as e:
         db.session.rollback()
-        return jsonify({'error': str(e)}), 500
+        # Return a generic error message for unexpected errors
+        return jsonify({'error': 'An error occurred while saving your details. Please try again.'}), 500
     
 @routes.route('/employment-details', methods=['GET'])
 @login_required  # Ensure the user is logged in
@@ -2373,6 +2362,34 @@ def apply_for_job(current_user, job_id):
         )
         db.session.add(application)
         db.session.commit()
+
+        # Send email notification to the user
+        msg = Message(
+            subject='Job Application Received - [Garissa university]',
+            recipients=[current_user.email_address],  # Assuming the user model has an email field
+            html=f'''
+            <div style="font-family: Arial, sans-serif; color: #333;">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="https://gau.ac.ke/wp-content/uploads/2023/08/logo-600x131.jpg" alt="University Logo" style="width: 150px;">
+                </div>
+                <h2 style="color: #004080;">Job Application Received</h2>
+                <p>Dear {current_user.first_name}{current_user.last_name},</p>
+                <p>Thank you for submitting your application for the <strong>{application.job.position}</strong> position . We have successfully received your application and it is now under review.</p>
+                <p>Our recruitment team will carefully evaluate your qualifications and experience. If your profile aligns with our requirements, we will contact you for further steps in the selection process.</p>
+                <p>We appreciate your interest in joining [University Name] and contributing to our mission of excellence in education and research.</p>
+                <p>Should you have any questions or need further assistance, please feel free to contact us at <a href="mailto:careers@university.edu">careers@university.edu</a>.</p>
+                <p>Thank you once again for your application. We wish you the best of luck in the selection process.</p>
+                <p>Best regards,</p>
+                <p><strong>Recruitment Team</strong><br>
+                [University Name]<br>
+                <a href="https://www.university.edu">www.university.edu</a></p>
+                <div style="margin-top: 20px; font-size: 12px; color: #777;">
+                    <p>This is an automated message. Please do not reply to this email.</p>
+                </div>
+            </div>
+            '''
+        )
+        mail.send(msg)
 
         return jsonify({'message': 'Application submitted successfully!'}), 201
 
