@@ -1,6 +1,8 @@
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify"; // Import react-toastify
+import "react-toastify/dist/ReactToastify.css"; // Import react-toastify styles
 
 export default function NextOfKinForm() {
   const navigate = useNavigate();
@@ -31,7 +33,7 @@ export default function NextOfKinForm() {
     e.preventDefault();
 
     // API URL
-    const API_URL = "http://127.0.0.1:5000/next-of-kin"; // Adjust as needed
+    const API_URL = "http://127.0.0.1:5000/next-of-kin"; 
 
     // Prepare the data for submission (only send non-empty kin)
     const kinData = [
@@ -48,6 +50,18 @@ export default function NextOfKinForm() {
         kin_relationship: formData.kin2_relationship,
       },
     ].filter((kin) => kin.kin_name && kin.kin_address && kin.kin_tel && kin.kin_relationship);
+
+    if (kinData.length === 0) {
+      toast.error("Please fill in at least one Next of Kin details.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      return;
+    }
 
     try {
       for (const kin of kinData) {
@@ -67,16 +81,50 @@ export default function NextOfKinForm() {
         }
       }
 
-      alert("Next of Kin details saved successfully!");
-      navigate("/dashboard/profile"); // Redirect to profile page
+      // Show success toast
+      toast.success("Next of Kin details saved successfully!", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+
+      // Redirect to profile page after a short delay
+      setTimeout(() => {
+        navigate("/dashboard/profile");
+      }, 2000); // Redirect after 2 seconds
     } catch (error) {
       console.error("Error:", error.message);
-      alert("Failed to save Next of Kin details.");
+
+      // Show error toast
+      toast.error(error.message || "Failed to save Next of Kin details.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
   };
 
   return (
     <div className="flex flex-col min-h-screen p-6 bg-gray-50">
+      {/* Toast Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}

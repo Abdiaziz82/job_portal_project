@@ -20,7 +20,11 @@ const CreatedJobs = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/api/jobs");
+        const response = await fetch("http://127.0.0.1:5000/api/jobs", {
+          method: "GET",
+          credentials: "include", // Ensures cookies and authentication headers are sent
+        });
+  
         if (!response.ok) throw new Error("Failed to fetch jobs");
         const data = await response.json();
         setJobs(data);
@@ -28,8 +32,10 @@ const CreatedJobs = () => {
         console.error("Error fetching jobs:", error);
       }
     };
+  
     fetchJobs();
   }, []);
+  
 
   const handleDelete = async (jobId) => {
     if (!window.confirm("Are you sure you want to delete this job?")) return;
@@ -65,7 +71,7 @@ const CreatedJobs = () => {
     try {
       const response = await fetch(`http://127.0.0.1:5000/api/jobs/${editingJob.id}`, {
         method: "PUT",
-        withCredentials: 'true',
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formData),
       });

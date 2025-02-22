@@ -687,7 +687,6 @@ def create_job():
 
 
 @routes.route('/api/jobs', methods=['GET'])
-@admin_required
 def get_jobs():
     jobs = Job.query.all()
     jobs_list = [
