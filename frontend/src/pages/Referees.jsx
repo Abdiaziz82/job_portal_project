@@ -129,7 +129,7 @@ export default function Referees() {
                   Post Code
                 </label>
                 <input
-                  type="text"
+                  type="number"
                   value={formData[referee].post_code}
                   onChange={(e) => handleChange(e, referee, "post_code")}
                   className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"
@@ -155,7 +155,7 @@ export default function Referees() {
                   Mobile No
                 </label>
                 <input
-                  type="text"
+                  type="number"
                   value={formData[referee].mobile_no}
                   onChange={(e) => handleChange(e, referee, "mobile_no")}
                   className="w-full p-3 border rounded-md shadow-sm focus:ring-green-500 focus:border-green-500"

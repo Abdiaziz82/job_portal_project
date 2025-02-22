@@ -146,7 +146,7 @@ export default function PersonalDetails() {
           <div>
             <label className="block text-gray-700 font-medium mb-2">ID Number</label>
             <input
-              type="text"
+              type="number"
               name="id_number"
               placeholder="Enter your ID number"
               value={formData.id_number}
@@ -237,7 +237,7 @@ export default function PersonalDetails() {
           <div>
             <label className="block text-gray-700 font-medium mb-2">Mobile Number</label>
             <input
-              type="tel"
+              type="number"
               name="mobile_number"
               placeholder="Enter your mobile number"
               value={formData.mobile_number}
@@ -279,7 +279,7 @@ export default function PersonalDetails() {
           <div>
             <label className="block text-gray-700 font-medium mb-2">Telephone No</label>
             <input
-              type="text"
+              type="number"
               name="alternative_contact_phone"
               placeholder="Enter alternative contact's phone number"
               value={formData.alternative_contact_phone}

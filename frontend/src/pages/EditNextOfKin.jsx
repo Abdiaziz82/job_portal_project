@@ -82,7 +82,7 @@ export default function EditNextOfKin() {
         <div>
           <label className="block text-sm font-medium text-gray-700">Kin Telephone</label>
           <input
-            type="text"
+            type="number"
             name="kin_tel"
             value={formData.kin_tel || ""}
             onChange={handleChange}

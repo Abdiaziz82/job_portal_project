@@ -124,7 +124,7 @@ export default function NextOfKinForm() {
             <div>
               <label className="block text-gray-700 font-medium mb-2">Tel. No</label>
               <input
-                type="tel"
+                type="number"
                 name="kin1_tel"
                 value={formData.kin1_tel}
                 onChange={handleChange}
@@ -179,7 +179,7 @@ export default function NextOfKinForm() {
             <div>
               <label className="block text-gray-700 font-medium mb-2">Tel. No</label>
               <input
-                type="tel"
+                type="number"
                 name="kin2_tel"
                 value={formData.kin2_tel}
                 onChange={handleChange}

@@ -94,7 +94,7 @@ export default function EditPersonalDetails() {
         <div>
           <label className="block text-sm font-medium text-gray-700">ID Number</label>
           <input
-            type="text"
+            type="number"
             name="id_number"
             value={formData.id_number || ""}
             onChange={handleChange}
@@ -166,7 +166,7 @@ export default function EditPersonalDetails() {
         <div>
           <label className="block text-sm font-medium text-gray-700">Mobile Number</label>
           <input
-            type="text"
+            type="number"
             name="mobile_number"
             value={formData.mobile_number || ""}
             onChange={handleChange}
@@ -202,7 +202,7 @@ export default function EditPersonalDetails() {
         <div>
           <label className="block text-sm font-medium text-gray-700">Alternative Contact Phone</label>
           <input
-            type="text"
+            type="number"
             name="alternative_contact_phone"
             value={formData.alternative_contact_phone || ""}
             onChange={handleChange}

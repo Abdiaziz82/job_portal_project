@@ -97,7 +97,7 @@ export default function EditReferee() {
         <div>
           <label className="block text-sm font-medium text-gray-700">Post Code</label>
           <input
-            type="text"
+            type="number"
             name="post_code"
             value={formData.post_code || ""}
             onChange={handleChange}
@@ -121,7 +121,7 @@ export default function EditReferee() {
         <div>
           <label className="block text-sm font-medium text-gray-700">Mobile No</label>
           <input
-            type="text"
+            type="number"
             name="mobile_no"
             value={formData.mobile_no || ""}
             onChange={handleChange}
