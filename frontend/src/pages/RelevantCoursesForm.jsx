@@ -59,20 +59,20 @@ const RelevantCoursesForm = () => {
     try {
       // Loop through each course and professional body record and send them
       const records = courses.map((course, index) => ({
-        year: course.year,
-        institution: course.institution,
-        course_name: course.courseName,
-        details: course.details,
-        duration: course.duration,
-        body_name: professionalBodies[index]?.bodyName || "", // Handle cases when there's no professional body
-        membership_no: professionalBodies[index]?.membershipNo || "",
-        membership_type: professionalBodies[index]?.membershipType || "",
-        renewal_date: professionalBodies[index]?.renewalDate || "",
+        year: course.year || "N/A", // Default to "N/A" if empty
+        institution: course.institution || "N/A", // Default to "N/A" if empty
+        course_name: course.courseName || "N/A", // Default to "N/A" if empty
+        details: course.details || "N/A", // Default to "N/A" if empty
+        duration: course.duration || "N/A", // Default to "N/A" if empty
+        body_name: professionalBodies[index]?.bodyName || "N/A", // Default to "N/A" if empty
+        membership_no: professionalBodies[index]?.membershipNo || "N/A", // Default to "N/A" if empty
+        membership_type: professionalBodies[index]?.membershipType || "N/A", // Default to "N/A" if empty
+        renewal_date: professionalBodies[index]?.renewalDate || "N/A", // Default to "N/A" if empty
       }));
   
       const response = await fetch("http://127.0.0.1:5000/relevant-courses-professional-body", {
         method: "POST",
-        credentials: "include", 
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -121,17 +121,16 @@ const RelevantCoursesForm = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Year */}
               <div>
-                <label className="block text-gray-700 font-medium mb-2">Year</label>
-                <input
-                  type="number"
-                  name="year"
-                  value={course.year}
-                  onChange={(event) => handleCourseInputChange(index, event)}
-                  className="w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
-                  placeholder="Year"
-                  required
-                />
-              </div>
+  <label className="block text-gray-700 font-medium mb-2">Year</label>
+  <input
+    type="text" // Changed from "number" to "text"
+    name="year"
+    value={course.year}
+    onChange={(event) => handleCourseInputChange(index, event)}
+    className="w-full p-2 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+    placeholder="Year or N/A"
+  />
+</div>
 
               {/* Institution */}
               <div>
