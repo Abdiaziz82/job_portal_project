@@ -1,6 +1,8 @@
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import React, { useState } from "react";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function EmploymentDetailsForm() {
   const navigate = useNavigate();
@@ -26,42 +28,100 @@ export default function EmploymentDetailsForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
+    // Validate grossSalary is a number
+    const grossSalary = parseFloat(employmentDetails.grossSalary);
+    if (isNaN(grossSalary)) { // Corrected line
+      toast.error("Gross salary must be a valid number.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
+      return;
+    }
+  
     try {
       const response = await fetch("http://127.0.0.1:5000/employment-details", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        credentials: "include", // ✅ Ensures cookies (JWT) are sent
+        credentials: "include", // Ensures cookies (JWT) are sent
         body: JSON.stringify({
           year: employmentDetails.year,
           designation: employmentDetails.designation,
           job_group: employmentDetails.jobGroup,
-          gross_salary: employmentDetails.grossSalary,
+          gross_salary: grossSalary, // Use the validated grossSalary
           ministry: employmentDetails.ministry,
           from_date: employmentDetails.fromDate,
           to_date: employmentDetails.toDate,
           duties: employmentDetails.duties,
         }),
       });
-
+  
       const data = await response.json();
-
+  
       if (response.ok) {
-        alert("Employment details added successfully!");
-        navigate("/dashboard/profile"); // Redirect user upon success (optional)
+        // Show success toast
+        toast.success("Employment details added successfully!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
+  
+        // Clear the form after successful submission
+        setEmploymentDetails({
+          year: "",
+          designation: "",
+          jobGroup: "",
+          grossSalary: "",
+          ministry: "",
+          fromDate: "",
+          toDate: "",
+          duties: "",
+        });
+  
+        // Navigate to the profile page after a delay
+        setTimeout(() => {
+          navigate("/dashboard/profile");
+        }, 3000); // Wait for 3 seconds before navigating
       } else {
-        alert(`Error: ${data.error}`);
+        // Handle backend errors (e.g., validation errors)
+        toast.error(data.error || "An error occurred. Please try again.", {
+          position: "top-right",
+          autoClose: 5000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+        });
       }
     } catch (error) {
       console.error("Error submitting form:", error);
-      alert("Something went wrong. Please try again.");
+  
+      // Show a generic error toast for unexpected errors
+      toast.error("Something went wrong. Please try again.", {
+        position: "top-right",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      });
     }
   };
 
   return (
     <div className="flex flex-col min-h-screen p-6 bg-gray-50">
+      {/* Toast Container */}
+      <ToastContainer />
+
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
@@ -90,6 +150,7 @@ export default function EmploymentDetailsForm() {
               onChange={handleChange}
               placeholder="Enter year"
               className="w-full p-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              required
             />
           </div>
           <div>
@@ -103,6 +164,7 @@ export default function EmploymentDetailsForm() {
               onChange={handleChange}
               placeholder="Enter designation/position"
               className="w-full p-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              required
             />
           </div>
         </div>
@@ -120,6 +182,7 @@ export default function EmploymentDetailsForm() {
               onChange={handleChange}
               placeholder="Enter job group/grade/scale"
               className="w-full p-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              required
             />
           </div>
           <div>
@@ -133,6 +196,7 @@ export default function EmploymentDetailsForm() {
               onChange={handleChange}
               placeholder="Enter gross monthly salary"
               className="w-full p-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              required
             />
           </div>
         </div>
@@ -150,6 +214,7 @@ export default function EmploymentDetailsForm() {
               onChange={handleChange}
               placeholder="Enter ministry/institution"
               className="w-full p-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+              required
             />
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -163,6 +228,7 @@ export default function EmploymentDetailsForm() {
                 value={employmentDetails.fromDate}
                 onChange={handleChange}
                 className="w-full p-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                required
               />
             </div>
             <div>
@@ -175,6 +241,7 @@ export default function EmploymentDetailsForm() {
                 value={employmentDetails.toDate}
                 onChange={handleChange}
                 className="w-full p-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+                required
               />
             </div>
           </div>
@@ -192,6 +259,7 @@ export default function EmploymentDetailsForm() {
             rows="4"
             placeholder="Describe your duties and responsibilities..."
             className="w-full p-3 border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"
+            required
           ></textarea>
         </div>
 
