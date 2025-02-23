@@ -280,24 +280,26 @@ class Job(db.Model):
     requirements = db.Column(db.Text, nullable=False)
     duties = db.Column(db.Text, nullable=False) 
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
-
-    # Relationship with SavedJobs
-   
+    is_deleted = db.Column(db.Boolean, default=False)  # Soft delete flag
+    interview_date = db.Column(db.DateTime, nullable=True)  # Nullable to avoid issues with old records
 
     def __repr__(self):
         return f'<Job {self.position}>'
-    
+
 class JobApplication(db.Model):
+    __tablename__ = 'job_applications'
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id', ondelete="CASCADE"), nullable=False)
-    job_id = db.Column(db.Integer, db.ForeignKey('jobs.id', ondelete="CASCADE"), nullable=False)
+    job_id = db.Column(db.Integer, db.ForeignKey('jobs.id', ondelete="SET NULL"), nullable=True)
     status = db.Column(db.String(20), default='Pending')  # Pending, Accepted, Rejected
-    applied_at = db.Column(db.DateTime, default=lambda: datetime.utcnow() + timedelta(hours=3))  # Convert UTC to EAT
+    applied_at = db.Column(db.DateTime, default=lambda: datetime.utcnow() + timedelta(hours=3))
 
     user = db.relationship('User', backref='applications')
-    job = db.relationship('Job', backref=db.backref('applications', cascade="all, delete-orphan"))
+    job = db.relationship('Job', backref=db.backref('applications', lazy=True))
 
-
+    def __repr__(self):
+        return f'<JobApplication User {self.user_id} - Job {self.job_id}>'
+    
 class SavedJobs(db.Model):
     __tablename__ = 'saved_jobs'
 

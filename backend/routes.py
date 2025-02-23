@@ -4,6 +4,7 @@ from flask_bcrypt import Bcrypt
 import jwt
 import uuid
 import requests
+import pytz
 from datetime import datetime, timedelta
 from flask_mail import Mail, Message
 from itsdangerous import URLSafeTimedSerializer
@@ -17,6 +18,9 @@ from flask import send_from_directory ,url_for
 # Initialize bcrypt
 bcrypt = Bcrypt()
 mail = Mail()  # Initialize Flask-Mail
+
+# Define the Kenya timezone
+KENYA_TIMEZONE = pytz.timezone('Africa/Nairobi')
 
 routes = Blueprint('routes', __name__)
 
@@ -502,7 +506,6 @@ def generate_refresh_token():
     return str(uuid.uuid4())  # Generate a unique, random string
 
 
-# Middleware to protect admin routes
 
 def admin_required(f):
     @wraps(f)
@@ -657,16 +660,28 @@ def get_users():
 def create_job():
     data = request.get_json()
 
+    # Parse the application deadline
+    application_deadline = datetime.strptime(data['applicationDeadline'], "%Y-%m-%d").date()
+
+    # Parse interview_date if provided
+    interview_date = None
+    if 'interviewDate' in data and data['interviewDate']:
+        # Parse the date and assume it is in the Kenya timezone
+        interview_date = datetime.strptime(data['interviewDate'], "%Y-%m-%d %H:%M:%S")
+        interview_date = KENYA_TIMEZONE.localize(interview_date)  # Make it timezone-aware
+
     job = Job(
         position=data['position'],
         description=data['description'],
         advert=data['advert'],
         terms_of_service=data['termsOfService'],
         number_of_posts=int(data['numberOfPosts']),
-        application_deadline=data['applicationDeadline'],
+        application_deadline=application_deadline,
         grade=int(data['grade']),
-        requirements=data['requirements'],  
-        duties=data['duties']  
+        requirements=data['requirements'],
+        duties=data['duties'],
+        is_deleted=False,
+        interview_date=interview_date  # Save as timezone-aware datetime
     )
     db.session.add(job)
     db.session.commit()
@@ -678,37 +693,178 @@ def create_job():
         "advert": job.advert,
         "termsOfService": job.terms_of_service,
         "numberOfPosts": job.number_of_posts,
-        "applicationDeadline": job.application_deadline,
+        "applicationDeadline": job.application_deadline.strftime("%Y-%m-%d"),
         "grade": job.grade,
-        "requirements": job.requirements,  
+        "requirements": job.requirements,
         "duties": job.duties,
-        "createdAt": job.created_at 
+        "createdAt": job.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+        "interviewDate": job.interview_date.astimezone(KENYA_TIMEZONE).strftime("%Y-%m-%d %H:%M:%S") if job.interview_date else None
     }), 201
-
-
+      
 @routes.route('/api/jobs', methods=['GET'])
 def get_jobs():
-    jobs = Job.query.all()
-    jobs_list = [
-        {
+    """
+    Fetch all jobs that are not soft-deleted.
+    """
+    try:
+        jobs = Job.query.filter_by(is_deleted=False).all()
+        jobs_data = [{
             "id": job.id,
             "position": job.position,
             "description": job.description,
             "advert": job.advert,
-            "termsOfService": job.terms_of_service,
-            "numberOfPosts": job.number_of_posts,
-            "applicationDeadline": job.application_deadline,  
+            "terms_of_service": job.terms_of_service,
+            "application_deadline": job.application_deadline.strftime("%Y-%m-%d"),
+            "number_of_posts": job.number_of_posts,
             "grade": job.grade,
-            "requirements": job.requirements, 
+            "requirements": job.requirements,
             "duties": job.duties,
-            "createdAt": job.created_at
+            "created_at": job.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "interview_date": job.interview_date.strftime("%Y-%m-%d %H:%M:%S") if job.interview_date else None
+        } for job in jobs]
+
+        return jsonify({"jobs": jobs_data}), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch jobs", "details": str(e)}), 500
+
+    
+
+@routes.route('/api/jobs/<int:job_id>', methods=['PUT'])
+@admin_required
+def update_job(job_id):
+    data = request.get_json()
+    job = Job.query.get_or_404(job_id)
+
+    # Update job fields
+    job.position = data.get('position', job.position)
+    job.description = data.get('description', job.description)
+    job.advert = data.get('advert', job.advert)
+    job.terms_of_service = data.get('termsOfService', job.terms_of_service)
+    job.number_of_posts = int(data.get('numberOfPosts', job.number_of_posts))
+    job.grade = int(data.get('grade', job.grade))
+    job.requirements = data.get('requirements', job.requirements)
+    job.duties = data.get('duties', job.duties)
+
+    # Update application deadline if provided
+    if 'applicationDeadline' in data:
+        job.application_deadline = datetime.strptime(data['applicationDeadline'], "%Y-%m-%d").date()
+
+    # Update interview date if provided
+    if 'interviewDate' in data:
+        if data['interviewDate']:
+            # Replace 'T' with a space and parse the datetime
+            interview_date_str = data['interviewDate'].replace('T', ' ')
+            job.interview_date = datetime.strptime(interview_date_str, "%Y-%m-%d %H:%M")
+        else:
+            job.interview_date = None
+
+    db.session.commit()
+
+    return jsonify({
+        "id": job.id,
+        "position": job.position,
+        "description": job.description,
+        "advert": job.advert,
+        "termsOfService": job.terms_of_service,
+        "numberOfPosts": job.number_of_posts,
+        "applicationDeadline": job.application_deadline.strftime("%Y-%m-%d"),
+        "grade": job.grade,
+        "requirements": job.requirements,
+        "duties": job.duties,
+        "createdAt": job.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+        "interviewDate": job.interview_date.strftime("%Y-%m-%d %H:%M:%S") if job.interview_date else None
+    }), 200
+    
+@routes.route('/api/jobs/<int:job_id>', methods=['DELETE'])
+@admin_required
+def delete_job(job_id):
+    """
+    Soft delete a job by marking it as deleted.
+    """
+    job = Job.query.get(job_id)
+
+    if not job:
+        return jsonify({"error": "Job not found"}), 404
+
+    try:
+        # Soft delete the job by setting is_deleted to True
+        job.is_deleted = True
+        db.session.commit()
+
+        return jsonify({"message": f"Job with ID {job_id} has been soft-deleted."}), 200
+
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": "An error occurred while deleting the job.", "details": str(e)}), 500
+    
+@routes.route('/admin/archived-jobs', methods=['GET'])
+@admin_required
+def get_undeleted_jobs():
+    """
+    Fetch all jobs that are not soft-deleted (is_deleted=False).
+    """
+    try:
+        # Fetch only undeleted jobs
+        jobs = Job.query.all()
+
+        # Prepare the response data
+        jobs_data = [{
+            "id": job.id,
+            "position": job.position,
+            "description": job.description,
+            "advert": job.advert,
+            "terms_of_service": job.terms_of_service,
+            "application_deadline": job.application_deadline.strftime("%Y-%m-%d"),
+            "number_of_posts": job.number_of_posts,
+            "grade": job.grade,
+            "requirements": job.requirements,
+            "duties": job.duties,
+            "created_at": job.created_at.strftime("%Y-%m-%d %H:%M:%S"),
+            "interview_date": job.interview_date.strftime("%Y-%m-%d %H:%M:%S") if job.interview_date else None  # Add this line
+        } for job in jobs]
+
+        return jsonify({"jobs": jobs_data}), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch jobs", "details": str(e)}), 500
+    
+@routes.route('/admin/job-applications', methods=['GET'])
+@admin_required
+def get_all_job_applications():
+    try:
+        applications = JobApplication.query.all()
+
+        # Count applications by status
+        status_counts = {
+            "Pending": 0,
+            "Accepted": 0,
+            "Rejected": 0,
         }
-        for job in jobs
-    ]
-    return jsonify(jobs_list), 200
 
+        applications_data = []
+        for app in applications:
+            if app.status in status_counts:
+                status_counts[app.status] += 1
 
+            # Convert applied_at from UTC to EAT (UTC+3)
+            applied_at_eat = app.applied_at + timedelta(hours=3) if app.applied_at else None
 
+            applications_data.append({
+                "id": app.id,
+                "user_id": app.user.id,
+                "applicant_name": f"{app.user.first_name} {app.user.last_name}",
+                "job_id": app.job_id,
+                "job_title": app.job.position if app.job else "Deleted Job",  # Handle soft-deleted jobs
+                "status": app.status,
+                "applied_at": applied_at_eat.strftime("%Y-%m-%d %H:%M:%S") if applied_at_eat else None
+            })
+
+        return jsonify({
+            "applications": applications_data,
+            "status_counts": status_counts
+        }), 200
+    except Exception as e:
+        return jsonify({"error": "Failed to fetch job applications", "details": str(e)}), 500
+    
 @routes.route('/api/jobs/<int:id>', methods=['GET'])
 def get_job_by_id(id):
     job = Job.query.get(id)
@@ -729,69 +885,7 @@ def get_job_by_id(id):
         return jsonify(job_details), 200
     return jsonify({"message": "Job not found"}), 404
 
-
-
-@routes.route('/api/jobs/<int:job_id>', methods=['PUT'])
-@admin_required
-def update_job(job_id):
-    job = Job.query.get(job_id)
-    if not job:
-        return jsonify({"error": "Job not found"}), 404
-
-    data = request.get_json()
-    job.position = data.get('position', job.position)
-    job.description = data.get('description', job.description)
-    job.advert = data.get('advert', job.advert)
-    job.terms_of_service = data.get('termsOfService', job.terms_of_service)
-    job.number_of_posts = int(data.get('numberOfPosts', job.number_of_posts))
-    job.application_deadline = data.get('applicationDeadline', job.application_deadline)
-    job.grade = int(data.get('grade', job.grade))
-    job.requirements = data.get('requirements', job.requirements)  
-    job.duties = data.get('duties', job.duties)  
-    db.session.commit()
-
-    return jsonify({
-        "id": job.id,
-        "position": job.position,
-        "description": job.description,
-        "advert": job.advert,
-        "termsOfService": job.terms_of_service,
-        "numberOfPosts": job.number_of_posts,
-        "applicationDeadline": job.application_deadline,
-        "grade": job.grade,
-        "requirements": job.requirements,  
-        "duties": job.duties  
-    }), 200
-
-@routes.route('/api/jobs/<int:job_id>', methods=['DELETE'])
-@admin_required
-def delete_job(job_id):
-    """
-    Delete a job by its ID after removing related job applications and saved jobs.
-    """
-    job = Job.query.get(job_id)
-
-    if not job:
-        return jsonify({"error": "Job not found"}), 404
-
-    try:
-        # Delete related job applications first
-        JobApplication.query.filter_by(job_id=job_id).delete()
-
-        # Delete related saved jobs
-        SavedJobs.query.filter_by(job_id=job_id).delete()
-
-        # Now delete the job
-        db.session.delete(job)
-        db.session.commit()
-
-        return jsonify({"message": f"Job with ID {job_id} has been deleted."}), 200
-
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": "An error occurred while deleting the job.", "details": str(e)}), 500
-
-
+    
 @routes.route('/save-job', methods=['POST'])
 @login_required  # Ensure the user is logged in
 def save_job(current_user):
@@ -2387,12 +2481,12 @@ def apply_for_job(current_user, job_id):
                 <p>Dear {current_user.first_name}{current_user.last_name},</p>
                 <p>Thank you for submitting your application for the <strong>{application.job.position}</strong> position . We have successfully received your application and it is now under review.</p>
                 <p>Our recruitment team will carefully evaluate your qualifications and experience. If your profile aligns with our requirements, we will contact you for further steps in the selection process.</p>
-                <p>We appreciate your interest in joining [University Name] and contributing to our mission of excellence in education and research.</p>
+                <p>We appreciate your interest in joining Garissa university and contributing to our mission of excellence in education and research.</p>
                 <p>Should you have any questions or need further assistance, please feel free to contact us at <a href="mailto:careers@university.edu">careers@university.edu</a>.</p>
                 <p>Thank you once again for your application. We wish you the best of luck in the selection process.</p>
                 <p>Best regards,</p>
                 <p><strong>Recruitment Team</strong><br>
-                [University Name]<br>
+                Garissa university<br>
                 <a href="https://www.university.edu">www.university.edu</a></p>
                 <div style="margin-top: 20px; font-size: 12px; color: #777;">
                     <p>This is an automated message. Please do not reply to this email.</p>
@@ -2408,42 +2502,7 @@ def apply_for_job(current_user, job_id):
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
     
-@routes.route('/admin/job-applications', methods=['GET'])
-@admin_required
-def get_all_job_applications():
-    try:
-        applications = JobApplication.query.all()
 
-        # Count applications by status
-        status_counts = {
-            "Pending": 0,
-            "Accepted": 0,
-            "Rejected": 0,
-        }
-
-        applications_data = []
-        for app in applications:
-            if app.status in status_counts:
-                status_counts[app.status] += 1
-
-            # Convert applied_at from UTC to EAT (UTC+3)
-            applied_at_eat = app.applied_at + timedelta(hours=3) if app.applied_at else None
-
-            applications_data.append({
-                "id": app.id,
-                "user_id": app.user.id,
-                "applicant_name": f"{app.user.first_name} {app.user.last_name}",
-                "job_title": app.job.position,
-                "status": app.status,
-                "applied_at": applied_at_eat.strftime("%Y-%m-%d %H:%M:%S") if applied_at_eat else None
-            })
-
-        return jsonify({
-            "applications": applications_data,
-            "status_counts": status_counts
-        }), 200
-    except Exception as e:
-        return jsonify({"error": "Failed to fetch job applications", "details": str(e)}), 500
 
     
 @routes.route('/admin/job-applications/<int:application_id>', methods=['PUT'])
@@ -2471,25 +2530,29 @@ def update_application_status(application_id):
         db.session.commit()
 
         # Define email subject
-        subject = f"Your Job Application Status: {new_status}"
-
-        # University logo URL (Replace with actual logo URL)
-        university_logo = "https://youruniversity.edu/logo.png"
+        subject = f"Your Job Application: {new_status}"
 
         # Define email color and button text based on status
         if new_status == "Accepted":
-            status_color = "#008000"  
+            status_color = "#008000"  # Green for accepted
             message = f"""
-                <p>Congratulations! We are pleased to inform you that your job application for <strong>{application.job.position}</strong> has been <strong style="color: {status_color};">ACCEPTED</strong>.</p>
-                <p>Please come with all the relevant documents on the scheduled date for your interview</p>
+                <p>Dear <strong>{user.first_name} {user.last_name}</strong>,</p>
+                <p>We are pleased to inform you that your job application for the position of <strong>{application.job.position}</strong> has been <strong style="color: {status_color};">ACCEPTED</strong>.</p>
+                <p>You are required to attend an interview on <strong style="font-weight: bold; color: #000080;">{application.job.interview_date.strftime('%A, %B %d, %Y at %I:%M %p')}</strong>.</p>
+                <p>Please ensure you arrive on time and bring all the original relevant documents and any other supporting materials.</p>
+                <p>If you have any questions or need further clarification, feel free to contact us at <a href="mailto:recruitment.gau.ac.ke">recruitment.gau.ac.ke</a>.</p>
+                <p>We look forward to meeting you!</p>
             """
-            button_text = "View Portal"
-            button_link = "http://127.0.0.1:5173"
+            button_text = None  # No button for accepted applications
+            button_link = None
         else:
-            status_color = "#d9534f"  
+            status_color = "#d9534f"  # Red for rejected
             message = f"""
-                <p>We regret to inform you that your job application for <strong>{application.job.position}</strong> has been <strong style="color: {status_color};">REJECTED</strong>.</p>
-                <p>We encourage you to explore other opportunities on our platform.</p>
+                <p>Dear <strong>{user.first_name} {user.last_name}</strong>,</p>
+                <p>We regret to inform you that your job application for the position of <strong>{application.job.position}</strong> has been <strong style="color: {status_color};">REJECTED</strong>.</p>
+                <p>We appreciate your interest in joining our team and encourage you to apply for other opportunities that match your skills and experience.</p>
+                <p>Please keep time and make sure you arrive on the scheduled time</p>
+                <p>Thank you for considering us, and we wish you the best in your future endeavors.</p>
             """
             button_text = "Browse Jobs"
             button_link = "http://127.0.0.1:5173/open-jobs"
@@ -2511,14 +2574,15 @@ def update_application_status(application_id):
                 </tr>
                 <tr>
                     <td style="font-size: 18px; font-weight: bold; color: {status_color}; text-align: center;">
-                        Dear {user.first_name} {user.last_name}
+                        Job Application Status Update
                     </td>
                 </tr>
                 <tr>
-                    <td style="padding: 10px 20px; text-align: center;">
+                    <td style="padding: 10px 20px; text-align: left;">
                         {message}
                     </td>
                 </tr>
+                """ + (f"""
                 <tr>
                     <td align="center" style="padding: 20px;">
                         <a href="{button_link}" style="background-color: {status_color}; color: white; padding: 12px 20px; text-decoration: none; font-size: 16px; border-radius: 5px;">
@@ -2526,9 +2590,10 @@ def update_application_status(application_id):
                         </a>
                     </td>
                 </tr>
+                """ if button_text else "") + """
                 <tr>
                     <td style="text-align: center; padding-top: 20px; font-size: 14px; color: #555;">
-                        <p>Best Regards,<br>Gau job portal</p>
+                        <p>Best Regards,<br>Gau Recruitment Team</p>
                         <p><small>If you have any questions, please contact us at <a href="mailto:recruitment.gau.ac.ke">recruitment.gau.ac.ke</a></small></p>
                     </td>
                 </tr>
@@ -2550,7 +2615,6 @@ def update_application_status(application_id):
     except Exception as e:
         return jsonify({"error": "Failed to update application status", "details": str(e)}), 500
 
-
 @routes.route('/user/job-applications', methods=['GET'])
 @login_required
 def get_user_job_applications(current_user):
@@ -2569,7 +2633,7 @@ def get_user_job_applications(current_user):
             {
                 "id": app.id,
                 "job_title": app.job.position, 
-                "applied_at": (app.applied_at + timedelta(hours=3)).strftime("%Y-%m-%d %H:%M"),  # Convert to EAT
+                "applied_at": app.applied_at.strftime("%Y-%m-%d %H:%M"),
                 "status": app.status
             }
             for app in applications
