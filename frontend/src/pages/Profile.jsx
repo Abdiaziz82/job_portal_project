@@ -38,8 +38,8 @@ export default function Profile() {
           <FetchedEmploymentDetails />
           <FetchedPublications />
           <FetchedDuties />
-          <FetchedDeclarations />
           <FetchedReferees />
+          <FetchedDeclarations />
         </div>
       )}
 

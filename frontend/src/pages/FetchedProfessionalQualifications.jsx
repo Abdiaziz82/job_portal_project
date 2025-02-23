@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa"; // Importing the required icons
+import { toast, ToastContainer } from "react-toastify"; // Importing react-toastify
+import "react-toastify/dist/ReactToastify.css"; // Importing the CSS for react-toastify
 
 export default function FetchedProfessionalQualifications() {
   const [qualifications, setQualifications] = useState([]);
@@ -20,9 +22,11 @@ export default function FetchedProfessionalQualifications() {
         setQualifications(data);
       } else {
         console.error("Failed to fetch professional qualifications:", response.statusText);
+        toast.error("Failed to fetch professional qualifications");
       }
     } catch (error) {
       console.error("Error fetching professional qualifications:", error);
+      toast.error("Error fetching professional qualifications");
     }
   };
 
@@ -41,16 +45,20 @@ export default function FetchedProfessionalQualifications() {
   
       if (response.ok) {
         setQualifications(qualifications.filter((qual) => qual.id !== id));
+        toast.success("Qualification deleted successfully");
       } else {
         console.error("Failed to delete qualification:", response.statusText);
+        toast.error("Failed to delete qualification");
       }
     } catch (error) {
       console.error("Error deleting qualification:", error);
+      toast.error("Error deleting qualification");
     }
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md w-full">
+    <div className="p-6 bg-white rounded-lg shadow-md w-full overflow-hidden">
+      <ToastContainer /> {/* ToastContainer to display notifications */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-800 mb-2 sm:mb-0">
           Professional Qualifications
@@ -120,7 +128,7 @@ export default function FetchedProfessionalQualifications() {
           </div>
         ))
       ) : (
-        <p className=" text-red-600">No professional qualifications added yet. Click on Add Professional Qualification to add your qualifications</p>
+        <p className="text-red-600">No professional qualifications added yet. Click on Add Professional Qualification to add your qualifications</p>
       )}
     </div>
   );

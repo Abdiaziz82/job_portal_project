@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FaPlus, FaEdit, FaTrash } from "react-icons/fa";
+import { toast, ToastContainer } from "react-toastify"; // Importing react-toastify
+import "react-toastify/dist/ReactToastify.css"; // Importing the CSS for react-toastify
 
 export default function FetchedPublications() {
   const [publications, setPublications] = useState([]);
@@ -20,9 +22,11 @@ export default function FetchedPublications() {
         setPublications(data);
       } else {
         console.error("Failed to fetch publications:", response.statusText);
+        toast.error("Failed to fetch publications"); // Toast for fetch error
       }
     } catch (error) {
       console.error("Error fetching publications:", error);
+      toast.error("Error fetching publications"); // Toast for fetch error
     }
   };
 
@@ -42,22 +46,26 @@ export default function FetchedPublications() {
 
       if (response.ok) {
         setPublications(publications.filter((pub) => pub.id !== id));
+        toast.success("Publication deleted successfully"); // Toast for delete success
       } else {
         console.error("Failed to delete publication:", response.statusText);
+        toast.error("Failed to delete publication"); // Toast for delete error
       }
     } catch (error) {
       console.error("Error deleting publication:", error);
+      toast.error("Error deleting publication"); // Toast for delete error
     }
   };
 
   return (
-    <div className="p-6 bg-white rounded-lg shadow-md w-full">
+    <div className="p-6 bg-white rounded-lg shadow-md w-full overflow-hidden">
+      <ToastContainer /> {/* ToastContainer to display notifications */}
       {/* Thin Line at the Top */}
       <div className="border-t-2 border-gray-300 mb-4"></div>
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-800 mb-2 sm:mb-0">
-          Publications 
+          Publications
         </h2>
         <Link
           to="publications-form"

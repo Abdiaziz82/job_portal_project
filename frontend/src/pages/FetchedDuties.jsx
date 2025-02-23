@@ -72,12 +72,12 @@ export default function FetchedDuties() {
       {duties.length > 0 ? (
         duties.map((duty) => (
           <div key={duty.id} className="mt-4 border-b pb-4">
-            <h3 className="text-md font-semibold mb-2">Duty Details</h3>
+            <h3 className="text-md font-semibold mb-2">Details of abilities</h3>
 
             {/* Display Duty Data */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm text-gray-700">
               <p className="break-words whitespace-normal">
-                <strong>Duties:</strong> {duty.duties}
+                 {duty.duties}
               </p>
             </div>
 
