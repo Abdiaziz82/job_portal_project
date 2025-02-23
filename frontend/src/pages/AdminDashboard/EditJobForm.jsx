@@ -5,6 +5,7 @@ const EditJobForm = ({ formData, handleChange, handleUpdate, onCancel }) => {
     <div className="mt-12 bg-white rounded-lg shadow-md p-6">
       <h3 className="text-xl font-bold mb-4">Edit Job</h3>
       <form onSubmit={handleUpdate} className="space-y-4">
+        {/* Position */}
         <input
           type="text"
           name="position"
@@ -14,6 +15,8 @@ const EditJobForm = ({ formData, handleChange, handleUpdate, onCancel }) => {
           className="w-full p-2 border rounded-md"
           required
         />
+
+        {/* Description */}
         <textarea
           name="description"
           value={formData.description}
@@ -23,6 +26,8 @@ const EditJobForm = ({ formData, handleChange, handleUpdate, onCancel }) => {
           className="w-full p-2 border rounded-md"
           required
         />
+
+        {/* Advert */}
         <input
           type="text"
           name="advert"
@@ -32,6 +37,8 @@ const EditJobForm = ({ formData, handleChange, handleUpdate, onCancel }) => {
           className="w-full p-2 border rounded-md"
           required
         />
+
+        {/* Terms of Service */}
         <textarea
           name="termsOfService"
           value={formData.termsOfService}
@@ -41,6 +48,8 @@ const EditJobForm = ({ formData, handleChange, handleUpdate, onCancel }) => {
           className="w-full p-2 border rounded-md"
           required
         />
+
+        {/* Number of Posts */}
         <input
           type="number"
           name="numberOfPosts"
@@ -50,14 +59,33 @@ const EditJobForm = ({ formData, handleChange, handleUpdate, onCancel }) => {
           className="w-full p-2 border rounded-md"
           required
         />
-        <input
-          type="date"
-          name="applicationDeadline"
-          value={formData.applicationDeadline}
-          onChange={handleChange}
-          className="w-full p-2 border rounded-md"
-          required
-        />
+
+        {/* Application Deadline */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Application Deadline</label>
+          <input
+            type="date"
+            name="applicationDeadline"
+            value={formData.applicationDeadline}
+            onChange={handleChange}
+            className="w-full p-2 border rounded-md"
+            required
+          />
+        </div>
+
+        {/* Interview Date */}
+        <div>
+          <label className="block text-sm font-medium mb-1">Interview Date</label>
+          <input
+  type="datetime-local"
+  name="interviewDate"
+  value={formData.interviewDate || ""}
+  onChange={handleChange}
+  className="w-full p-2 border rounded-md"
+/>
+        </div>
+
+        {/* Grade */}
         <textarea
           name="grade"
           value={formData.grade}
@@ -67,6 +95,8 @@ const EditJobForm = ({ formData, handleChange, handleUpdate, onCancel }) => {
           className="w-full p-2 border rounded-md"
           required
         />
+
+        {/* Requirements */}
         <textarea
           name="requirements"
           value={formData.requirements}
@@ -76,6 +106,8 @@ const EditJobForm = ({ formData, handleChange, handleUpdate, onCancel }) => {
           className="w-full p-2 border rounded-md"
           required
         />
+
+        {/* Duties */}
         <textarea
           name="duties"
           value={formData.duties}
@@ -85,6 +117,8 @@ const EditJobForm = ({ formData, handleChange, handleUpdate, onCancel }) => {
           className="w-full p-2 border rounded-md"
           required
         />
+
+        {/* Buttons */}
         <div className="flex space-x-4">
           <button
             type="submit"

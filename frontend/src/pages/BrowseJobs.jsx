@@ -6,13 +6,21 @@ import JobDetails from "./JobDetails";
 
 const BrowseJobs = () => {
   const [jobs, setJobs] = useState([]);
+  const [isLoading, setIsLoading] = useState(true); // Optional: For loading state
   const navigate = useNavigate();
 
   useEffect(() => {
     fetch("http://127.0.0.1:5000/api/jobs")
       .then((response) => response.json())
-      .then((data) => setJobs(data))
-      .catch((error) => console.error("Error fetching jobs:", error));
+      .then((data) => {
+        console.log("Fetched Jobs:", data.jobs); // Log the fetched jobs
+        setJobs(data.jobs); // Use data.jobs instead of data
+        setIsLoading(false); // Optional: Set loading to false after fetching
+      })
+      .catch((error) => {
+        console.error("Error fetching jobs:", error);
+        setIsLoading(false); // Optional: Set loading to false on error
+      });
   }, []);
 
   const handleSaveJob = (jobId) => {
@@ -37,7 +45,7 @@ const BrowseJobs = () => {
   };
 
   return (
-    <div className="container mx-auto mt-12 px-4 pb-20"> {/* Added pb-20 for bottom padding */}
+    <div className="container mx-auto mt-12 px-4 pb-20">
       <Routes>
         <Route
           index
@@ -47,15 +55,19 @@ const BrowseJobs = () => {
                 Available Jobs
               </h2>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-6"> {/* Added pb-6 for bottom padding */}
-                {jobs.length > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-6">
+                {isLoading ? ( // Optional: Show loading state
+                  <div className="col-span-full flex items-center justify-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-600"></div>
+                  </div>
+                ) : jobs.length > 0 ? (
                   jobs.map((job) => (
                     <div
                       key={job.id}
                       className="bg-white shadow-lg rounded-xl overflow-hidden hover:shadow-2xl transition-all duration-300 transform hover:-translate-y-2 border border-gray-100 flex flex-col"
                       style={{
-                        overflow: "hidden", // Prevent content from overflowing
-                        wordWrap: "break-word", // Break long words to prevent overflow
+                        overflow: "hidden",
+                        wordWrap: "break-word",
                       }}
                     >
                       <div className="p-5 flex-1">
@@ -70,7 +82,7 @@ const BrowseJobs = () => {
                           </p>
                           <p>
                             <strong className="text-gray-700">Posts Available:</strong>{" "}
-                            {job.numberOfPosts}
+                            {job.number_of_posts} {/* Updated to number_of_posts */}
                           </p>
                           <p>
                             <strong className="text-gray-700">Grade:</strong>{" "}
@@ -78,7 +90,7 @@ const BrowseJobs = () => {
                           </p>
                           <p className="text-red-600 font-semibold">
                             Deadline:{" "}
-                            {new Date(job.applicationDeadline).toLocaleDateString()}
+                            {new Date(job.application_deadline).toLocaleDateString()} {/* Updated to application_deadline */}
                           </p>
                         </div>
                       </div>
@@ -131,9 +143,34 @@ const BrowseJobs = () => {
                     </div>
                   ))
                 ) : (
-                  <p className="text-center text-gray-500 col-span-full">
-                    No jobs available at the moment.
-                  </p>
+                  <div className="col-span-full flex flex-col items-center justify-center p-8 bg-white shadow-lg rounded-lg border border-gray-100">
+                    <svg
+                      className="w-16 h-16 text-gray-400 mb-4"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                      />
+                    </svg>
+                    <h3 className="text-2xl font-bold text-gray-700 mb-2">
+                      No Jobs Available
+                    </h3>
+                    <p className="text-gray-500 text-center mb-4">
+                      There are currently no job openings. Please check back later or explore other opportunities.
+                    </p>
+                    <button
+                      className="mt-4 bg-gradient-to-r from-green-600 to-green-700 text-white py-2 px-6 rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300"
+                      onClick={() => navigate("/dashboard")}
+                    >
+                      Go to Dashboard
+                    </button>
+                  </div>
                 )}
               </div>
             </>

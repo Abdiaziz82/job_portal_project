@@ -69,7 +69,7 @@ export default function Login() {
         <div className="grid md:grid-cols-2 items-center gap-6">
           <div className="max-md:order-1 max-md:mb-6">
             <img
-              src="https://readymadeui.com/signin-image.webp"
+              src="/signin-image.webp"
               className="w-full h-auto object-contain"
               alt="login-image"
             />

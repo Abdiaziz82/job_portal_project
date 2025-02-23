@@ -37,7 +37,7 @@ const ManageUser = () => {
     return (
         <div className="container mx-auto px-4 sm:px-8 py-8">
             <div className="py-8">
-                <h2 className="text-3xl font-bold text-gray-800 mb-6">Manage Users</h2>
+                <h2 className="text-2xl sm:text-3xl font-bold text-gray-800 mb-6">Manage Users</h2>
                 <div className="mb-6">
                     <input
                         type="text"
@@ -51,13 +51,13 @@ const ManageUser = () => {
                     <table className="min-w-full">
                         <thead className="bg-green-600">
                             <tr>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                <th className="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-white uppercase tracking-wider">
                                     Name
                                 </th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                <th className="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-white uppercase tracking-wider">
                                     Email
                                 </th>
-                                <th className="px-6 py-4 text-left text-xs font-semibold text-white uppercase tracking-wider">
+                                <th className="px-4 sm:px-6 py-3 text-left text-xs sm:text-sm font-semibold text-white uppercase tracking-wider">
                                     Mobile Number
                                 </th>
                             </tr>
@@ -65,28 +65,28 @@ const ManageUser = () => {
                         <tbody className="divide-y divide-gray-200">
                             {filteredUsers.map((user) => (
                                 <tr key={user.id} className="hover:bg-gray-50 transition-colors">
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                                         <div className="flex items-center">
-                                            <div className="flex-shrink-0 h-10 w-10">
-                                                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                                    <span className="text-blue-600 font-semibold">
+                                            <div className="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10">
+                                                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                                    <span className="text-blue-600 font-semibold text-sm sm:text-base">
                                                         {user.first_name[0]}
                                                     </span>
                                                 </div>
                                             </div>
-                                            <div className="ml-4">
+                                            <div className="ml-2 sm:ml-4">
                                                 <div className="text-sm font-medium text-gray-900">
                                                     {user.first_name} {user.last_name}
                                                 </div>
                                             </div>
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm text-gray-900">
                                             {user.email_address}
                                         </div>
                                     </td>
-                                    <td className="px-6 py-4 whitespace-nowrap">
+                                    <td className="px-4 sm:px-6 py-4 whitespace-nowrap">
                                         <div className="text-sm text-gray-900">
                                             {user.mobile_number}
                                         </div>

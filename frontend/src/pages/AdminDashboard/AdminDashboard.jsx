@@ -51,7 +51,7 @@ const AdminDashboard = () => {
           throw new Error("Failed to fetch jobs");
         }
         const data = await response.json();
-        setTotalJobs(data.length);
+        setTotalJobs(data.jobs.length);
       } catch (error) {
         console.error("Error fetching jobs:", error);
       }
@@ -109,7 +109,7 @@ const AdminDashboard = () => {
         {/* Total Jobs */}
         <div className="flex items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
           <div className="p-4 bg-green-100 rounded-full">
-            <FaBriefcase className="text-3xl text-red-600" />
+            <FaBriefcase className="text-3xl text-green-600" />
           </div>
           <div className="ml-4">
             <h2 className="text-lg font-semibold text-gray-700">Total Jobs</h2>
@@ -120,10 +120,10 @@ const AdminDashboard = () => {
         {/* Total Applications */}
         <div className="flex items-center p-6 bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
           <div className="p-4 bg-blue-100 rounded-full">
-            <FaFileAlt className="text-3xl text-red-600" />
+            <FaFileAlt className="text-3xl text-green-600" />
           </div>
           <div className="ml-4">
-            <h2 className="text-lg font-semibold text-red-700">Applications</h2>
+            <h2 className="text-lg font-semibold text-black">Applications</h2>
             <p className="text-2xl font-bold text-gray-900">{totalApplications}</p>
           </div>
         </div>

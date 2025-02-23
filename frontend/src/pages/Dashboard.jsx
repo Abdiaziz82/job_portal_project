@@ -1,5 +1,6 @@
 import { FaSuitcase, FaRegPaperPlane, FaBell, FaCheckCircle } from "react-icons/fa";
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const [jobCount, setJobCount] = useState(0);
@@ -62,20 +63,21 @@ const Dashboard = () => {
           method: "GET",
           credentials: "include",
         });
-
+  
         if (!response.ok) {
           throw new Error("Failed to fetch open jobs");
         }
-
+  
         const data = await response.json();
-        setOpenJobs(data.length);
+        setOpenJobs(data.jobs.length); // Correctly access the jobs array length
       } catch (error) {
         console.error("Error fetching open jobs:", error);
       }
     };
-
+  
     fetchOpenJobs();
   }, []);
+  
 
   // Fetch all jobs for the job alerts section
   useEffect(() => {
@@ -91,7 +93,7 @@ const Dashboard = () => {
         }
 
         const data = await response.json();
-        setJobs(data);
+        setJobs(data.jobs);
       } catch (error) {
         console.error("Error fetching jobs:", error);
       }
@@ -120,23 +122,7 @@ const Dashboard = () => {
       });
   }, []);
 
-  // Function to calculate time difference
-  const timeSincePosted = (createdAt) => {
-    const createdDate = new Date(createdAt);
-    const now = new Date();
-    const diffInSeconds = Math.floor((now - createdDate) / 1000);
 
-    if (diffInSeconds < 60) {
-      return `${diffInSeconds} seconds ago`;
-    }
-    if (diffInSeconds < 3600) {
-      return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-    }
-    if (diffInSeconds < 86400) {
-      return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-    }
-    return `${Math.floor(diffInSeconds / 86400)} days ago`;
-  };
 
   return (
     <div className="p-8 bg-gradient-to-br from-gray-50 to-gray-100 min-h-screen font">
@@ -219,8 +205,13 @@ const Dashboard = () => {
             </p>
           </div>
           <span className="text-sm text-gray-500 mt-2 md:mt-0 md:ml-4 break-words whitespace-normal">
-            Posted {timeSincePosted(job.createdAt)}
-          </span>
+  <Link 
+    to={`/dashboard/browse-jobs/${job.id}`} 
+    className="text-green-600 hover:underline font-medium"
+  >
+    Apply Now
+  </Link>
+</span>
         </div>
       ))
     ) : (

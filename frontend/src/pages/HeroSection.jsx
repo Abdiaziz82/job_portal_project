@@ -37,9 +37,9 @@ const HeroSection = () => {
           {/* Right Side - Image */}
           <div className="md:w-1/2 flex justify-center">
             <img
-              src="https://shaqo-sahal.vercel.app/interview.svg"
+              src="interview.svg"
               alt="University Jobs"
-              className="rounded-lg shadow-lg w-full max-w-sm md:max-w-md"
+              className=" w-full max-w-sm md:max-w-md"
             />
           </div>
         </div>

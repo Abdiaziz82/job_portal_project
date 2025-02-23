@@ -58,14 +58,14 @@ export default function FetchedDuties() {
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-800 mb-2 sm:mb-0">
-          Duties
+          Details of abilities
         </h2>
         <Link
           to="duties-form"
           className="flex items-center bg-green-700 text-white px-3 py-1 rounded-md hover:bg-green-800 transition text-sm sm:text-base whitespace-nowrap"
         >
           <FaPlus className="mr-2" />
-          Add Duties
+          Add Details of abilities
         </Link>
       </div>
 

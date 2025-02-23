@@ -66,7 +66,7 @@ const ViewProfile = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-8 bg-white shadow-2xl rounded-lg">
+    <div className="max-w-7xl mx-auto p-8 bg-white shadow-2xl rounded-lg font">
       {/* Back Button - Top Right */}
       <div className="flex justify-end mb-6">
         <button
@@ -88,28 +88,28 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaUser className="mr-2" /> Personal Details
           </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-h-96 overflow-y-auto">
-            <p><strong>Name:</strong> {profileData.personal_details.full_names}</p>
-            <p><strong>Title:</strong> {profileData.personal_details.title}</p>
-            <p><strong>Date of Birth:</strong> {profileData.personal_details.date_of_birth}</p>
-            <p><strong>ID Number:</strong> {profileData.personal_details.id_number}</p>
-            <p><strong>Gender:</strong> {profileData.personal_details.gender}</p>
-            <p><strong>Nationality:</strong> {profileData.personal_details.nationality}</p>
-            <p><strong>Home County:</strong> {profileData.personal_details.home_county}</p>
-            <p><strong>Constituency:</strong> {profileData.personal_details.constituency}</p>
-            <p><strong>Postal Address:</strong> {profileData.personal_details.postal_address}</p>
-            <p><strong>Mobile:</strong> {profileData.personal_details.mobile_number}</p>
-            <p><strong>Email:</strong> {profileData.personal_details.email_address}</p>
-            <p><strong>Alternative Contact Name:</strong> {profileData.personal_details.alternative_contact_name}</p>
-            <p><strong>Alternative Contact Phone:</strong> {profileData.personal_details.alternative_contact_phone}</p>
-            <p><strong>Disability:</strong> {profileData.personal_details.disability}</p>
-            <p><strong>Disability Details:</strong> {profileData.personal_details.disability_details}</p>
-            <p><strong>Disability Registration:</strong> {profileData.personal_details.disability_registration}</p>
-            <p><strong>Criminal Conviction:</strong> {profileData.personal_details.criminal_conviction}</p>
-            <p><strong>Criminal Offence Details:</strong> {profileData.personal_details.criminal_offence_details}</p>
-            <p><strong>Dismissal from Employment:</strong> {profileData.personal_details.dismissal_from_employment}</p>
-            <p><strong>Dismissal Reason:</strong> {profileData.personal_details.dismissal_reason}</p>
-            <p><strong>Dismissal Date:</strong> {profileData.personal_details.dismissal_date}</p>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <p className="break-words"><strong>Name:</strong> {profileData.personal_details.full_names}</p>
+            <p className="break-words"><strong>Title:</strong> {profileData.personal_details.title}</p>
+            <p className="break-words"><strong>Date of Birth:</strong> {profileData.personal_details.date_of_birth}</p>
+            <p className="break-words"><strong>ID Number:</strong> {profileData.personal_details.id_number}</p>
+            <p className="break-words"><strong>Gender:</strong> {profileData.personal_details.gender}</p>
+            <p className="break-words"><strong>Nationality:</strong> {profileData.personal_details.nationality}</p>
+            <p className="break-words"><strong>Home County:</strong> {profileData.personal_details.home_county}</p>
+            <p className="break-words"><strong>Constituency:</strong> {profileData.personal_details.constituency}</p>
+            <p className="break-words"><strong>Postal Address:</strong> {profileData.personal_details.postal_address}</p>
+            <p className="break-words"><strong>Mobile:</strong> {profileData.personal_details.mobile_number}</p>
+            <p className="break-words"><strong>Email:</strong> {profileData.personal_details.email_address}</p>
+            <p className="break-words"><strong>Alternative Contact Name:</strong> {profileData.personal_details.alternative_contact_name}</p>
+            <p className="break-words"><strong>Alternative Contact Phone:</strong> {profileData.personal_details.alternative_contact_phone}</p>
+            <p className="break-words"><strong>Disability:</strong> {profileData.personal_details.disability}</p>
+            <p className="break-words"><strong>Disability Details:</strong> {profileData.personal_details.disability_details}</p>
+            <p className="break-words"><strong>Disability Registration:</strong> {profileData.personal_details.disability_registration}</p>
+            <p className="break-words"><strong>Criminal Conviction:</strong> {profileData.personal_details.criminal_conviction}</p>
+            <p className="break-words"><strong>Criminal Offence Details:</strong> {profileData.personal_details.criminal_offence_details}</p>
+            <p className="break-words"><strong>Dismissal from Employment:</strong> {profileData.personal_details.dismissal_from_employment}</p>
+            <p className="break-words"><strong>Dismissal Reason:</strong> {profileData.personal_details.dismissal_reason}</p>
+            <p className="break-words"><strong>Dismissal Date:</strong> {profileData.personal_details.dismissal_date}</p>
           </div>
         </div>
       )}
@@ -120,13 +120,13 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaUsers className="mr-2" /> Next of Kin
           </h3>
-          <div className="max-h-96 overflow-y-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {profileData.next_of_kin.map((kin, index) => (
-              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p><strong>Name:</strong> {kin.kin_name}</p>
-                <p><strong>Relationship:</strong> {kin.kin_relationship}</p>
-                <p><strong>Phone:</strong> {kin.kin_tel}</p>
-                <p><strong>Address:</strong> {kin.kin_address}</p>
+              <div key={index} className="mb-4">
+                <p className="break-words"><strong>Name:</strong> {kin.kin_name}</p>
+                <p className="break-words"><strong>Relationship:</strong> {kin.kin_relationship}</p>
+                <p className="break-words"><strong>Phone:</strong> {kin.kin_tel}</p>
+                <p className="break-words"><strong>Address:</strong> {kin.kin_address}</p>
               </div>
             ))}
           </div>
@@ -139,22 +139,22 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaGraduationCap className="mr-2" /> Educational Background
           </h3>
-          <div className="max-h-96 overflow-y-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {profileData.education.map((edu, index) => (
-              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p><strong>Institution:</strong> {edu.university_name || edu.school_name}</p>
-                <p><strong>Degree:</strong> {edu.degree_program}</p>
-                <p><strong>Field:</strong> {edu.field_of_study}</p>
-                <p><strong>Year:</strong> {edu.year_completed}</p>
-                <p><strong>High School Grade:</strong> {edu.high_school_grade}</p>
-                <p><strong>High School Activities:</strong> {edu.high_school_activities}</p>
-                <p><strong>University Grade:</strong> {edu.university_grade}</p>
-                <p><strong>Start Date:</strong> {edu.start_date}</p>
-                <p><strong>End Date:</strong> {edu.end_date}</p>
+              <div key={index} className="mb-4">
+                <p className="break-words"><strong>Institution:</strong> {edu.university_name || edu.school_name}</p>
+                <p className="break-words"><strong>Degree:</strong> {edu.degree_program}</p>
+                <p className="break-words"><strong>Field:</strong> {edu.field_of_study}</p>
+                <p className="break-words"><strong>Year:</strong> {edu.year_completed}</p>
+                <p className="break-words"><strong>High School Grade:</strong> {edu.high_school_grade}</p>
+                <p className="break-words"><strong>High School Activities:</strong> {edu.high_school_activities}</p>
+                <p className="break-words"><strong>University Grade:</strong> {edu.university_grade}</p>
+                <p className="break-words"><strong>Start Date:</strong> {edu.start_date}</p>
+                <p className="break-words"><strong>End Date:</strong> {edu.end_date}</p>
 
                 {/* ✅ Display Multiple File Links */}
                 {edu.file_paths?.length > 0 ? (
-                  <div className="flex flex-col sm:col-span-2">
+                  <div className="flex flex-col">
                     <strong className="text-sm text-gray-700 w-40">Documents:</strong>
                     <div className="flex flex-wrap gap-2 mt-1">
                       {edu.file_paths.map((file, i) => (
@@ -186,17 +186,16 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaBriefcase className="mr-2" /> Employment Details
           </h3>
-          <div className="max-h-96 overflow-y-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {profileData.employment_details.map((job, index) => (
-              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p><strong>Designation:</strong> {job.designation}</p>
-                <p><strong>Ministry:</strong> {job.ministry}</p>
-                <p><strong>From:</strong> {job.from_date} - <strong>To:</strong> {job.to_date}</p>
-                <p><strong>Gross Salary:</strong> ${job.gross_salary}</p>
-                <p><strong>Job Group:</strong> {job.job_group}</p>
-                <p><strong>Duties:</strong> {job.duties}</p>
-                <p><strong>Publications:</strong> {job.publications}</p>
-                <p><strong>Skills and Experience:</strong> {job.skills_experience}</p>
+              <div key={index} className="mb-4">
+                <p className="break-words"><strong>Designation:</strong> {job.designation}</p>
+                <p className="break-words"><strong>Ministry:</strong> {job.ministry}</p>
+                <p className="break-words"><strong>From:</strong> {job.from_date} - <strong>To:</strong> {job.to_date}</p>
+                <p className="break-words"><strong>Gross Salary:</strong> ${job.gross_salary}</p>
+                <p className="break-words"><strong>Job Group:</strong> {job.job_group}</p>
+                <p className="break-words"><strong>Duties:</strong> {job.duties}</p>
+               
               </div>
             ))}
           </div>
@@ -209,19 +208,19 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaCertificate className="mr-2" /> Certificates
           </h3>
-          <div className="max-h-96 overflow-y-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {profileData.certificates.map((cert, index) => (
-              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p><strong>Type:</strong> {cert.certificate_type}</p>
-                <p><strong>Specialization:</strong> {cert.specialization}</p>
-                <p><strong>Institution:</strong> {cert.institution_name}</p>
-                <p><strong>Year:</strong> {cert.year_of_completion}</p>
-                <p><strong>Grade:</strong> {cert.grade}</p>
-                <p><strong>Additional Awards:</strong> {cert.additional_awards}</p>
+              <div key={index} className="mb-4">
+                <p className="break-words"><strong>Type:</strong> {cert.certificate_type}</p>
+                <p className="break-words"><strong>Specialization:</strong> {cert.specialization}</p>
+                <p className="break-words"><strong>Institution:</strong> {cert.institution_name}</p>
+                <p className="break-words"><strong>Year:</strong> {cert.year_of_completion}</p>
+                <p className="break-words"><strong>Grade:</strong> {cert.grade}</p>
+                <p className="break-words"><strong>Additional Awards:</strong> {cert.additional_awards}</p>
 
                 {/* ✅ Display Multiple Certificate Files */}
                 {cert.file_paths?.length > 0 ? (
-                  <div className="flex flex-col sm:col-span-2">
+                  <div className="flex flex-col">
                     <strong className="text-sm text-gray-700 w-40">Certificates:</strong>
                     <div className="flex flex-wrap gap-2 mt-1">
                       {cert.file_paths.map((file, i) => (
@@ -253,14 +252,14 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaUserTie className="mr-2" /> Professional Qualifications
           </h3>
-          <div className="max-h-96 overflow-y-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {profileData.professional_qualifications.map((qual, index) => (
-              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p><strong>Institution:</strong> {qual.institution}</p>
-                <p><strong>Award:</strong> {qual.award}</p>
-                <p><strong>Specialization:</strong> {qual.specialization}</p>
-                <p><strong>Year:</strong> {qual.year_from} - {qual.year_to}</p>
-                <p><strong>Grade:</strong> {qual.grade}</p>
+              <div key={index} className="mb-4">
+                <p className="break-words"><strong>Institution:</strong> {qual.institution}</p>
+                <p className="break-words"><strong>Award:</strong> {qual.award}</p>
+                <p className="break-words"><strong>Specialization:</strong> {qual.specialization}</p>
+                <p className="break-words"><strong>Year:</strong> {qual.year_from} - {qual.year_to}</p>
+                <p className="break-words"><strong>Grade:</strong> {qual.grade}</p>
               </div>
             ))}
           </div>
@@ -273,18 +272,18 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaBook className="mr-2" /> Relevant Courses and Professional Bodies
           </h3>
-          <div className="max-h-96 overflow-y-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {profileData.relevant_courses.map((course, index) => (
-              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p><strong>Year:</strong> {course.year}</p>
-                <p><strong>Institution:</strong> {course.institution}</p>
-                <p><strong>Course Name:</strong> {course.course_name}</p>
-                <p><strong>Details:</strong> {course.details}</p>
-                <p><strong>Duration:</strong> {course.duration}</p>
-                <p><strong>Body Name:</strong> {course.body_name}</p>
-                <p><strong>Membership No:</strong> {course.membership_no}</p>
-                <p><strong>Membership Type:</strong> {course.membership_type}</p>
-                <p><strong>Renewal Date:</strong> {course.renewal_date}</p>
+              <div key={index} className="mb-4">
+                <p className="break-words"><strong>Year:</strong> {course.year}</p>
+                <p className="break-words"><strong>Institution:</strong> {course.institution}</p>
+                <p className="break-words"><strong>Course Name:</strong> {course.course_name}</p>
+                <p className="break-words"><strong>Details:</strong> {course.details}</p>
+                <p className="break-words"><strong>Duration:</strong> {course.duration}</p>
+                <p className="break-words"><strong>Body Name:</strong> {course.body_name}</p>
+                <p className="break-words"><strong>Membership No:</strong> {course.membership_no}</p>
+                <p className="break-words"><strong>Membership Type:</strong> {course.membership_type}</p>
+                <p className="break-words"><strong>Renewal Date:</strong> {course.renewal_date}</p>
               </div>
             ))}
           </div>
@@ -297,17 +296,17 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaAddressBook className="mr-2" /> Referees
           </h3>
-          <div className="max-h-96 overflow-y-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {profileData.referees.map((ref, index) => (
-              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p><strong>Name:</strong> {ref.full_name}</p>
-                <p><strong>Occupation:</strong> {ref.occupation}</p>
-                <p><strong>Email:</strong> {ref.email}</p>
-                <p><strong>Phone:</strong> {ref.mobile_no}</p>
-                <p><strong>Address:</strong> {ref.address}</p>
-                <p><strong>Post Code:</strong> {ref.post_code}</p>
-                <p><strong>City/Town:</strong> {ref.city_town}</p>
-                <p><strong>Known Period:</strong> {ref.known_period}</p>
+              <div key={index} className="mb-4">
+                <p className="break-words"><strong>Name:</strong> {ref.full_name}</p>
+                <p className="break-words"><strong>Occupation:</strong> {ref.occupation}</p>
+                <p className="break-words"><strong>Email:</strong> {ref.email}</p>
+                <p className="break-words"><strong>Phone:</strong> {ref.mobile_no}</p>
+                <p className="break-words"><strong>Address:</strong> {ref.address}</p>
+                <p className="break-words"><strong>Post Code:</strong> {ref.post_code}</p>
+                <p className="break-words"><strong>City/Town:</strong> {ref.city_town}</p>
+                <p className="break-words"><strong>Known Period:</strong> {ref.known_period}</p>
               </div>
             ))}
           </div>
@@ -320,10 +319,10 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaNewspaper className="mr-2" /> Publications
           </h3>
-          <div className="max-h-96 overflow-y-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {profileData.publications.map((pub, index) => (
-              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p><strong>Publication:</strong> {pub.publications}</p>
+              <div key={index} className="mb-4">
+                <p className="break-words"><strong>Publication:</strong> {pub.publications}</p>
               </div>
             ))}
           </div>
@@ -336,10 +335,10 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaTasks className="mr-2" /> Duties
           </h3>
-          <div className="max-h-96 overflow-y-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {profileData.duties.map((duty, index) => (
-              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p><strong>Duties:</strong> {duty.duties}</p>
+              <div key={index} className="mb-4">
+                <p className="break-words"><strong>Duties:</strong> {duty.duties}</p>
               </div>
             ))}
           </div>
@@ -352,11 +351,11 @@ const ViewProfile = () => {
           <h3 className="text-xl font-semibold text-gray-700 mb-4 flex items-center">
             <FaSignature className="mr-2" /> Declarations
           </h3>
-          <div className="max-h-96 overflow-y-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {profileData.declarations.map((decl, index) => (
-              <div key={index} className="mb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <p><strong>Date:</strong> {decl.date}</p>
-                <p><strong>Name:</strong> {decl.name}</p>
+              <div key={index} className="mb-4">
+                <p className="break-words"><strong>Date:</strong> {decl.date}</p>
+                <p className="break-words"><strong>Name:</strong> {decl.name}</p>
               </div>
             ))}
           </div>

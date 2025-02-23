@@ -99,6 +99,10 @@ const UserDashboard = ({ setIsAuthenticated }) => {
             <FaBriefcase className="text-green-600 text-xl" />
             <span>Browse Jobs</span>
           </Link>
+          <Link to="profile" className="flex items-center space-x-4 p-3 text-base font-medium rounded hover:bg-green-100">
+            <FaUser className="text-green-600 text-xl" />
+            <span>Application form</span>
+          </Link>
           <Link to="my-applications" className="flex items-center space-x-4 p-3 text-base font-medium rounded hover:bg-green-100">
             <FaSave className="text-green-600 text-xl" />
             <span>My Applications</span>
@@ -107,10 +111,7 @@ const UserDashboard = ({ setIsAuthenticated }) => {
             <FaSave className="text-green-600 text-xl" />
             <span>Saved Jobs</span>
           </Link>
-          <Link to="profile" className="flex items-center space-x-4 p-3 text-base font-medium rounded hover:bg-green-100">
-            <FaUser className="text-green-600 text-xl" />
-            <span>Profile</span>
-          </Link>
+        
           <Link to="change-password" className="flex items-center space-x-4 p-3 text-base font-medium rounded hover:bg-green-100">
             <FaKey className="text-green-600 text-xl" />
             <span>Change Password</span>

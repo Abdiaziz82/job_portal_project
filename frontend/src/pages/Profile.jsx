@@ -18,9 +18,17 @@ export default function Profile() {
   const isProfileMainRoute = location.pathname === "/dashboard/profile";
 
   return (
-    <div className=" font space-y-6 w-full pb-10 px-4 sm:px-6 lg:px-8">
+    <div className="font space-y-6 w-full pb-10 px-4 sm:px-6 lg:px-8">
       {isProfileMainRoute && (
         <div className="space-y-6">
+          {/* Subheading */}
+          <div className="text-base sm:text-lg text-gray-800 bg-yellow-50 p-4 rounded-lg border border-yellow-200 shadow-sm">
+            <p className="font-bold">
+              Please ensure all sections of this form are completed accurately and saved upon filling. For sections that are not applicable, kindly indicate with 'N/A'. (Attach copies of certificates and testimonials as PDF files as indicated in each case.)
+            </p>
+          </div>
+
+          {/* Profile Sections */}
           <FetchedPersonalDetails />
           <FetchedNextOfKin />
           <FetchedCertificates />
@@ -32,7 +40,6 @@ export default function Profile() {
           <FetchedDuties />
           <FetchedDeclarations />
           <FetchedReferees />
-          
         </div>
       )}
 

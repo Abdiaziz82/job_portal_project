@@ -9,8 +9,9 @@ const ManageJobs = () => {
     numberOfPosts: "",
     applicationDeadline: "",
     grade: "",
-    requirements: "",  
-    duties: "", 
+    requirements: "",
+    duties: "",
+    interviewDate: "", // Add this line
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -50,8 +51,9 @@ const ManageJobs = () => {
         numberOfPosts: "",
         applicationDeadline: "",
         grade: "",
-        requirements: "", 
+        requirements: "",
         duties: "",
+        interviewDate: "", // Add this line
       });
 
       alert("Job posted successfully!");
@@ -92,7 +94,7 @@ const ManageJobs = () => {
         {/* Job Description */}
         <div>
           <label htmlFor="description" className="block text-sm font-medium">
-            Job Description
+            Description
           </label>
           <textarea
             id="description"
@@ -189,7 +191,7 @@ const ManageJobs = () => {
           />
         </div>
 
-        {/* Requirements (New Field) */}
+        {/* Requirements */}
         <div>
           <label htmlFor="requirements" className="block text-sm font-medium">
             Requirements
@@ -205,7 +207,7 @@ const ManageJobs = () => {
           />
         </div>
 
-        {/* Duties (New Field) */}
+        {/* Duties */}
         <div>
           <label htmlFor="duties" className="block text-sm font-medium">
             Duties
@@ -217,6 +219,21 @@ const ManageJobs = () => {
             onChange={handleChange}
             required
             rows="4"
+            className="w-full mt-2 p-3 border border-gray-300 rounded-md"
+          />
+        </div>
+
+        {/* Interview Date */}
+        <div>
+          <label htmlFor="interviewDate" className="block text-sm font-medium">
+            Interview Date
+          </label>
+          <input
+            type="date"
+            id="interviewDate"
+            name="interviewDate"
+            value={formData.interviewDate}
+            onChange={handleChange}
             className="w-full mt-2 p-3 border border-gray-300 rounded-md"
           />
         </div>

@@ -48,7 +48,7 @@ export default function DutiesForm() {
       </button>
 
       {/* Form Title */}
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Add Duties</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-8">Add Details of your abilities</h1>
 
       {/* Duties Form */}
       <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md space-y-6">

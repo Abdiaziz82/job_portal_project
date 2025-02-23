@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FaBriefcase, FaArrowRight } from "react-icons/fa";
+import { FaBriefcase, FaArrowRight, FaRegSadTear } from "react-icons/fa";
 
 const OpenJobs = () => {
   const [jobs, setJobs] = useState([]);
@@ -17,7 +17,7 @@ const OpenJobs = () => {
         return response.json();
       })
       .then((data) => {
-        setJobs(data);
+        setJobs(data.jobs); // Access data.jobs instead of data
         setLoading(false);
       })
       .catch((error) => {
@@ -60,7 +60,8 @@ const OpenJobs = () => {
               {/* Job Details */}
               <div className="p-6 flex flex-col flex-grow">
                 <h3 className="text-2xl font-bold text-green-700 mb-4">
-                  {job.position}({job.numberOfPosts} positions)
+                  {job.position} ({job.number_of_posts}{" "}
+                  {job.number_of_posts === 1 ? "post" : "posts"}) {/* Conditional pluralization */}
                 </h3>
 
                 <div className="text-sm text-gray-600 space-y-3">
@@ -70,7 +71,7 @@ const OpenJobs = () => {
                   </div>
                   <div>
                     <strong className="text-gray-700">Terms of Service:</strong>{" "}
-                    <span className="text-gray-800">{job.termsOfService}</span>
+                    <span className="text-gray-800">{job.terms_of_service}</span>
                   </div>
                   <div>
                     <strong className="text-gray-700">Grade:</strong>{" "}
@@ -92,9 +93,23 @@ const OpenJobs = () => {
             </div>
           ))
         ) : (
-          <p className="text-center text-gray-500 col-span-full">
-            No jobs available at the moment.
-          </p>
+          <div className="col-span-full flex flex-col items-center justify-center text-center py-20">
+            {/* Icon with Animation */}
+            <div className="animate-bounce">
+              <FaRegSadTear className="text-8xl text-green-600 mb-6" />
+            </div>
+
+            {/* Heading */}
+            <h3 className="text-3xl font-bold text-gray-800 mb-4">
+              No Jobs Available
+            </h3>
+
+            {/* Description */}
+            <p className="text-lg text-gray-600 max-w-2xl mb-8">
+              We currently don't have any open job positions. Don't worry! New
+              opportunities are always on the horizon. Check back later
+            </p>
+          </div>
         )}
       </div>
     </div>

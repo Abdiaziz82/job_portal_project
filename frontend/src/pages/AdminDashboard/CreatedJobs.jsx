@@ -13,29 +13,27 @@ const CreatedJobs = () => {
     numberOfPosts: "",
     applicationDeadline: "",
     grade: "",
-    requirements: "", // New field
-    duties: "", // New field
+    requirements: "",
+    duties: "",
+    interviewDate: "",
   });
 
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/api/jobs", {
+        const response = await fetch("http://127.0.0.1:5000/admin/archived-jobs", {
           method: "GET",
-          credentials: "include", // Ensures cookies and authentication headers are sent
+          credentials: "include",
         });
-  
         if (!response.ok) throw new Error("Failed to fetch jobs");
         const data = await response.json();
-        setJobs(data);
+        setJobs(data.jobs);
       } catch (error) {
         console.error("Error fetching jobs:", error);
       }
     };
-  
     fetchJobs();
-  }, []);
-  
+  });
 
   const handleDelete = async (jobId) => {
     if (!window.confirm("Are you sure you want to delete this job?")) return;
@@ -63,18 +61,35 @@ const CreatedJobs = () => {
 
   const handleEditClick = (job) => {
     setEditingJob(job);
-    setFormData({ ...job });
+    setFormData({
+      position: job.position,
+      description: job.description,
+      advert: job.advert,
+      termsOfService: job.terms_of_service,
+      numberOfPosts: job.number_of_posts,
+      applicationDeadline: job.application_deadline,
+      grade: job.grade,
+      requirements: job.requirements,
+      duties: job.duties,
+      interviewDate: job.interview_date || "",
+    });
   };
 
   const handleUpdate = async (e) => {
     e.preventDefault();
     try {
+      const updatedFormData = {
+        ...formData,
+        interviewDate: formData.interviewDate ? formData.interviewDate.replace('T', ' ') : null,
+      };
+
       const response = await fetch(`http://127.0.0.1:5000/api/jobs/${editingJob.id}`, {
         method: "PUT",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(updatedFormData),
       });
+
       if (!response.ok) throw new Error("Failed to update job");
 
       const updatedJob = await response.json();
@@ -90,8 +105,9 @@ const CreatedJobs = () => {
         numberOfPosts: "",
         applicationDeadline: "",
         grade: "",
-        requirements: "", // Reset new field
-        duties: "", // Reset new field
+        requirements: "",
+        duties: "",
+        interviewDate: "",
       });
     } catch (error) {
       console.error("Error updating job:", error);
@@ -108,13 +124,13 @@ const CreatedJobs = () => {
       numberOfPosts: "",
       applicationDeadline: "",
       grade: "",
-      requirements: "", 
-      duties: "", 
+      requirements: "",
+      duties: "",
     });
   };
 
   return (
-    <div className="mt-12">
+    <div className="mt-12 font">
       <h3 className="text-2xl font-bold text-gray-800 text-center mb-8">
         Job Listings
       </h3>
@@ -129,32 +145,38 @@ const CreatedJobs = () => {
               <h4 className="text-lg font-bold truncate">{job.position}</h4>
               <p className="text-sm">
                 <strong>Deadline:</strong>{" "}
-                <span className="text-yellow-300">{job.applicationDeadline}</span>
+                <span className="text-yellow-300">{job.application_deadline}</span>
               </p>
             </div>
 
             {/* Card Body */}
-            <div className="p-6 flex-grow space-y-3 overflow-hidden">
-              <p className="text-sm text-gray-600 break-words">
+            <div className="p-6 flex-grow space-y-3 break-words">
+              <p className="text-sm text-gray-600">
                 <strong>Description:</strong> {job.description}
               </p>
-              <p className="text-sm text-gray-600 break-words">
+              <p className="text-sm text-gray-600">
                 <strong>Advert:</strong> {job.advert}
               </p>
-              <p className="text-sm text-gray-600 break-words">
-                <strong>Terms of Service:</strong> {job.termsOfService}
+              <p className="text-sm text-gray-600">
+                <strong>Terms of Service:</strong> {job.terms_of_service}
               </p>
-              <p className="text-sm text-gray-600 break-words">
+              <p className="text-sm text-gray-600">
                 <strong>Grade:</strong> {job.grade}
               </p>
-              <p className="text-sm text-gray-600 break-words">
-                <strong>Number of Posts:</strong> {job.numberOfPosts}
+              <p className="text-sm text-gray-600">
+                <strong>Number of Posts:</strong> {job.number_of_posts}
               </p>
-              <p className="text-sm text-gray-600 break-words">
+              <p className="text-sm text-gray-600">
                 <strong>Requirements:</strong> {job.requirements}
               </p>
-              <p className="text-sm text-gray-600 break-words">
+              <p className="text-sm text-gray-600">
                 <strong>Duties:</strong> {job.duties}
+              </p>
+              <p className="text-sm text-gray-600">
+                <strong>Interview Date:</strong>{" "}
+                {job.interview_date
+                  ? new Date(job.interview_date).toLocaleString()
+                  : "Not scheduled"}
               </p>
             </div>
 

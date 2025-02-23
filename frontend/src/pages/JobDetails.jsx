@@ -52,7 +52,7 @@ const JobDetails = () => {
     toast.info(
       <div className="w-full flex flex-col items-center">
         <p className="font-medium text-gray-800 text-center">
-          Before submitting your application, ensure your profile is correct and fully updated.
+          Before submitting your application, ensure your application form is correct and fully updated.
         </p>
         <div className="flex justify-center gap-4 mt-3">
           <button
@@ -92,9 +92,9 @@ const JobDetails = () => {
 
       {/* Job Title and Deadline */}
       <div className="text-center mb-6 md:mb-8">
-        <h2 className="text-xl md:text-2xl font-bold text-green-700 mb-2">
-          {position} ({numberOfPosts} posts)
-        </h2>
+      <h2 className="text-xl md:text-2xl font-bold text-green-700 mb-2">
+  {position} ({numberOfPosts} {numberOfPosts === 1 ? "post" : "posts"})
+</h2>
         <p className="text-sm md:text-base text-gray-600 flex flex-col md:flex-row items-center justify-center">
           <span className="flex items-center">
             <FaCalendarAlt className="mr-2 text-green-700" />
@@ -123,8 +123,8 @@ const JobDetails = () => {
         {/* Job Description */}
         <div className="mb-6">
           <h3 className="text-lg font-semibold text-green-700 flex items-center">
-            <FaListAlt className="mr-2" />
-            Job Description
+            
+            
           </h3>
           <p className="text-gray-700 text-sm md:text-base whitespace-pre-line break-words">
             {description}

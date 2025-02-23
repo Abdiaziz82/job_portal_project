@@ -59,15 +59,53 @@ export default function SavedJobs() {
       });
   };
 
-  if (loading) return <p className="text-center text-gray-500">Loading saved jobs...</p>;
-  if (error) return <p className="text-center text-red-500">{error}</p>;
+  if (loading)
+    return (
+      <div className="container mx-auto mt-12 px-4">
+        <div className="flex items-center justify-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-600"></div>
+        </div>
+      </div>
+    );
+
+  if (error)
+    return (
+      <div className="container mx-auto mt-12 px-4">
+        <p className="text-center text-red-500">{error}</p>
+      </div>
+    );
 
   return (
     <div className="container mx-auto mt-12 px-4">
       <h2 className="text-3xl font-bold text-green-700 text-center mb-8">My Saved Jobs</h2>
 
       {savedJobs.length === 0 ? (
-        <p className="text-center text-gray-500">You have not saved any jobs yet.</p>
+        <div className="col-span-full flex flex-col items-center justify-center p-8 bg-white shadow-lg rounded-lg border border-gray-100">
+          <svg
+            className="w-16 h-16 text-gray-400 mb-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+            />
+          </svg>
+          <h3 className="text-2xl font-bold text-gray-700 mb-2">No Saved Jobs</h3>
+          <p className="text-gray-500 text-center mb-4">
+            You have not saved any jobs yet. Start exploring and save jobs that interest you.
+          </p>
+          <button
+            className="mt-4 bg-gradient-to-r from-green-600 to-green-700 text-white py-2 px-6 rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300"
+            onClick={() => navigate("/dashboard/browse-jobs")}
+          >
+            Browse Jobs
+          </button>
+        </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {savedJobs.map((job) => (

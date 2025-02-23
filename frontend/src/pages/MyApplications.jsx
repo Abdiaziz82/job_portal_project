@@ -14,15 +14,41 @@ export default function MyApplications() {
   }, []);
 
   return (
-    <div className="container mx-auto mt-12 px-4 md:px-8">
+    <div className="container mx-auto mt-12 px-4 md:px-8 pb-20"> {/* Added pb-20 for bottom padding */}
       <h2 className="text-2xl md:text-3xl font-bold text-green-700 text-center">
         My Job Applications
       </h2>
 
       {applications.length === 0 ? (
-        <p className="text-center text-gray-500 mt-6">
-          You don't have any job applications yet.
-        </p>
+        <div className="col-span-full flex flex-col items-center justify-center p-8 bg-white shadow-lg rounded-lg border border-gray-100 mt-6">
+          <svg
+            className="w-16 h-16 text-gray-400 mb-4"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+            />
+          </svg>
+          <h3 className="text-2xl font-bold text-gray-700 mb-2">
+            No Job Applications
+          </h3>
+          <p className="text-gray-500 text-center mb-4">
+            You don't have any job applications yet. Start applying to jobs that
+            match your skills and interests.
+          </p>
+          <button
+            className="mt-4 bg-gradient-to-r from-green-600 to-green-700 text-white py-2 px-6 rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-300"
+            onClick={() => (window.location.href = "/dashboard/browse-jobs")}
+          >
+            Browse Jobs
+          </button>
+        </div>
       ) : (
         <div className="mt-6">
           {/* Desktop Table */}
@@ -60,7 +86,7 @@ export default function MyApplications() {
           </div>
 
           {/* Mobile Cards */}
-          <div className="md:hidden space-y-4">
+          <div className="md:hidden space-y-4 mb-8"> {/* Added mb-8 for bottom margin */}
             {applications.map((app) => (
               <div
                 key={app.id}
