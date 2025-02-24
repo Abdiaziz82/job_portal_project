@@ -25,6 +25,16 @@ export default function Referees() {
       email: "",
       known_period: "",
     },
+    referee3: {
+      full_name: "",
+      occupation: "",
+      address: "",
+      post_code: "",
+      city_town: "",
+      mobile_no: "",
+      email: "",
+      known_period: "",
+    },
   });
 
   // Handle input changes
@@ -80,7 +90,7 @@ export default function Referees() {
 
       {/* Referees Form */}
       <form onSubmit={handleSubmit} className="bg-white p-8 rounded-lg shadow-md space-y-10">
-        {["referee1", "referee2"].map((referee, index) => (
+        {["referee1", "referee2", "referee3"].map((referee, index) => (
           <div key={referee}>
             <h2 className="text-2xl font-semibold text-green-700 mb-4">
               Referee {index + 1}

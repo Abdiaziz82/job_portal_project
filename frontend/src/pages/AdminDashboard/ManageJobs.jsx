@@ -229,7 +229,7 @@ const ManageJobs = () => {
             Interview Date
           </label>
           <input
-            type="date"
+            type="datetime-local"
             id="interviewDate"
             name="interviewDate"
             value={formData.interviewDate}

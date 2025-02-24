@@ -65,7 +65,7 @@ export default function FetchedPublications() {
 
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
         <h2 className="text-lg font-semibold text-gray-800 mb-2 sm:mb-0">
-          Publications
+        Publications in refereed journal (s) (for teaching positions applicants)
         </h2>
         <Link
           to="publications-form"

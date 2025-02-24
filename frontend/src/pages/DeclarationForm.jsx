@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaArrowLeft } from "react-icons/fa";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 export default function DeclarationForm() {
   const navigate = useNavigate();
@@ -27,15 +29,21 @@ export default function DeclarationForm() {
       });
 
       const data = await response.json();
+
+      // Handle the response based on the message or error
       if (response.ok) {
-        alert("Declaration added successfully!");
-        navigate(-1); // Navigate back after successful submission
+        if (data.message === "You already have your declaration. Click edit to edit.") {
+          toast.info(data.message); // Show info toast
+        } else {
+          toast.success("Declaration added successfully!"); // Show success toast
+          navigate(-1); // Navigate back after successful submission
+        }
       } else {
-        alert(`Error: ${data.error}`);
+        toast.error(`Error: ${data.error || "Unknown error"}`); // Show error toast
       }
     } catch (error) {
       console.error("Error submitting declaration:", error);
-      alert("An error occurred. Please try again.");
+      toast.error("An error occurred. Please try again."); // Show error toast
     }
   };
 
@@ -80,7 +88,7 @@ export default function DeclarationForm() {
         {/* Name Input (Signature) */}
         <div>
           <label className="block text-gray-700 font-medium mb-2">
-            Signature of the Applicant
+            Signature of the Applicant(use your name as your signature)
           </label>
           <input
             type="text"
@@ -103,6 +111,19 @@ export default function DeclarationForm() {
           </button>
         </div>
       </form>
+
+      {/* React Toastify Container */}
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
     </div>
   );
 }

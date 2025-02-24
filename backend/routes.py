@@ -131,7 +131,7 @@ def send_welcome_email(email, first_name , last_name ):
 
                 </div>
                 <div class="content">
-                    <p>Dear {first_name}{last_name},</p>
+                    <p>Dear {first_name} {last_name},</p>
                     <p>Thank you for signing up with our recruitment portal. We are excited to have you on board!</p>
                     <p>You can now start applying for the open jobs and take the next step in your career.</p>
                     <p>If you have any questions or need assistance, feel free to contact us at <a href="mailto:recruitment@gau.ac.ke">gau@recruitmentportal.com</a>.</p>
@@ -666,8 +666,8 @@ def create_job():
     # Parse interview_date if provided
     interview_date = None
     if 'interviewDate' in data and data['interviewDate']:
-        # Parse the date and assume it is in the Kenya timezone
-        interview_date = datetime.strptime(data['interviewDate'], "%Y-%m-%d %H:%M:%S")
+        # Parse the date in the format sent by the frontend (YYYY-MM-DDTHH:MM)
+        interview_date = datetime.strptime(data['interviewDate'], "%Y-%m-%dT%H:%M")
         interview_date = KENYA_TIMEZONE.localize(interview_date)  # Make it timezone-aware
 
     job = Job(
@@ -1531,19 +1531,18 @@ def upload_educational_background_file(current_user, id):
 @routes.route('/add-referees', methods=['POST'])
 @login_required
 def add_referees(current_user):
-    """Saves both referees linked to a user"""
+    """Saves all referees (referee1, referee2, and referee3) linked to a user"""
 
     try:
         data = request.json  # Expecting JSON data
 
         referee1 = data.get('referee1')
         referee2 = data.get('referee2')
+        referee3 = data.get('referee3')  # Add referee3
 
-        # Ensure both referees are provided
-        if not referee1 or not referee2:
-            return jsonify({'error': 'Both referees are required'}), 400
-
-      
+        # Ensure all referees are provided
+        if not referee1 or not referee2 or not referee3:
+            return jsonify({'error': 'All referees are required'}), 400
 
         # Save Referee 1
         ref1 = Referee(
@@ -1573,7 +1572,21 @@ def add_referees(current_user):
         )
         db.session.add(ref2)
 
-        # Commit both referees to the database
+        # Save Referee 3
+        ref3 = Referee(
+            user_id=current_user.id,
+            full_name=referee3.get('full_name'),
+            occupation=referee3.get('occupation'),
+            address=referee3.get('address'),
+            post_code=referee3.get('post_code'),
+            city_town=referee3.get('city_town'),
+            mobile_no=referee3.get('mobile_no'),
+            email=referee3.get('email'),
+            known_period=referee3.get('known_period')
+        )
+        db.session.add(ref3)
+
+        # Commit all referees to the database
         db.session.commit()
 
         return jsonify({'message': 'Referees saved successfully'}), 201
@@ -2331,14 +2344,22 @@ def delete_duties(current_user, id):
 @routes.route('/declarations', methods=['POST'])
 @login_required
 def add_declaration(current_user):
-    # Get JSON data from the request
-    data = request.get_json()
-
-    # Validate required fields
-    if not data or 'date' not in data or 'name' not in data:
-        return jsonify({'error': 'Missing required fields: date and name'}), 400
+    """Saves a declaration linked to a user"""
 
     try:
+        data = request.get_json()
+
+        # Check if a declaration already exists for the user
+        existing_declaration = Declaration.query.filter_by(user_id=current_user.id).first()
+        if existing_declaration:
+            return jsonify({'message': 'You already have your declaration. Click edit to edit.'}), 200
+
+        # Validate required fields
+        required_fields = ['date', 'name']
+        missing_fields = [field for field in required_fields if field not in data]
+        if missing_fields:
+            return jsonify({'error': f"Missing required fields: {', '.join(missing_fields)}"}), 400
+
         # Create a new Declaration object
         new_declaration = Declaration(
             user_id=current_user.id,  # Link to the current logged-in user
@@ -2346,7 +2367,7 @@ def add_declaration(current_user):
             name=data['name']  # Store the name
         )
 
-        # Add to the database session and commit
+        # Save to the database
         db.session.add(new_declaration)
         db.session.commit()
 
@@ -2360,7 +2381,7 @@ def add_declaration(current_user):
         # Handle errors
         db.session.rollback()
         return jsonify({'error': str(e)}), 500
-
+    
 @routes.route('/declarations', methods=['GET'])
 @login_required
 def get_declarations(current_user):
@@ -2489,6 +2510,7 @@ def apply_for_job(current_user, job_id):
                 Garissa university<br>
                 <a href="https://www.university.edu">www.university.edu</a></p>
                 <div style="margin-top: 20px; font-size: 12px; color: #777;">
+                    <p>© 2025 Recruitment Portal. All rights reserved.</p>
                     <p>This is an automated message. Please do not reply to this email.</p>
                 </div>
             </div>
@@ -2535,10 +2557,16 @@ def update_application_status(application_id):
         # Define email color and button text based on status
         if new_status == "Accepted":
             status_color = "#008000"  # Green for accepted
+            # Check if interview_date exists before formatting
+            interview_date_str = (
+                application.job.interview_date.strftime('%A, %B %d, %Y at %I:%M %p')
+                if application.job.interview_date
+                else "a date to be communicated later"
+            )
             message = f"""
                 <p>Dear <strong>{user.first_name} {user.last_name}</strong>,</p>
                 <p>We are pleased to inform you that your job application for the position of <strong>{application.job.position}</strong> has been <strong style="color: {status_color};">ACCEPTED</strong>.</p>
-                <p>You are required to attend an interview on <strong style="font-weight: bold; color: #000080;">{application.job.interview_date.strftime('%A, %B %d, %Y at %I:%M %p')}</strong>.</p>
+                <p>You are required to attend an interview on <strong style="font-weight: bold; color: #000080;">{interview_date_str}</strong>.</p>
                 <p>Please ensure you arrive on time and bring all the original relevant documents and any other supporting materials.</p>
                 <p>If you have any questions or need further clarification, feel free to contact us at <a href="mailto:recruitment.gau.ac.ke">recruitment.gau.ac.ke</a>.</p>
                 <p>We look forward to meeting you!</p>
@@ -2557,7 +2585,7 @@ def update_application_status(application_id):
             button_text = "Browse Jobs"
             button_link = "http://127.0.0.1:5173/open-jobs"
 
-        # Construct HTML Email Body
+        # Construct HTML Email Body with Footer
         email_body = f"""
         <!DOCTYPE html>
         <html>
@@ -2597,6 +2625,13 @@ def update_application_status(application_id):
                         <p><small>If you have any questions, please contact us at <a href="mailto:recruitment.gau.ac.ke">recruitment.gau.ac.ke</a></small></p>
                     </td>
                 </tr>
+                <!-- Add Footer -->
+                <tr>
+                     <td style="text-align: center; padding-top: 20px; font-size: 12px; color: #777; border-top: 1px solid #ddd;">
+                        <p>© 2025 Recruitment Portal. All rights reserved.</p>
+                        <p>This is an automated message. Please do not reply to this email.</p>
+                      </td>
+                </tr>
             </table>
         </body>
         </html>
@@ -2614,7 +2649,7 @@ def update_application_status(application_id):
 
     except Exception as e:
         return jsonify({"error": "Failed to update application status", "details": str(e)}), 500
-
+    
 @routes.route('/user/job-applications', methods=['GET'])
 @login_required
 def get_user_job_applications(current_user):
