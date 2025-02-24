@@ -10,7 +10,7 @@ const BrowseJobs = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/api/jobs")
+    fetch("/api/jobs")
       .then((response) => response.json())
       .then((data) => {
         console.log("Fetched Jobs:", data.jobs); // Log the fetched jobs
@@ -24,7 +24,7 @@ const BrowseJobs = () => {
   }, []);
 
   const handleSaveJob = (jobId) => {
-    fetch("http://127.0.0.1:5000/save-job", {
+    fetch("/save-job", {
       method: "POST",
       credentials: "include",
       headers: {

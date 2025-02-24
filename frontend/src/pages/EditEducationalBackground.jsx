@@ -29,7 +29,7 @@ export default function EditEducationalBackground() {
         formDataToSend.append("files[]", file);
       });
 
-      const response = await fetch(`http://127.0.0.1:5000/education/${formData.id}`, {
+      const response = await fetch(`/education/${formData.id}`, {
         method: "PUT",
         credentials: "include", // Include cookies for authentication
         body: formDataToSend,

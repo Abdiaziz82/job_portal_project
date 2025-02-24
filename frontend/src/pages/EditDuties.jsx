@@ -17,7 +17,7 @@ export default function EditDuties() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/duties/${formData.id}`,
+        `/duties/${formData.id}`,
         {
           method: "PUT",
           credentials: "include", // Include cookies for authentication

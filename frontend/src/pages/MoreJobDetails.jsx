@@ -10,7 +10,7 @@ const MoreJobDetails = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:5000/api/jobs/${id}`)
+    fetch(`/api/jobs/${id}`)
       .then((response) => {
         if (!response.ok) {
           return response.json().then((err) => {

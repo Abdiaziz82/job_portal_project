@@ -15,7 +15,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchApplicationsCount = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/admin/job-applications", {
+        const response = await fetch("/admin/job-applications", {
           method: "GET",
           credentials: "include",
           headers: {
@@ -46,7 +46,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchJobsCount = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/api/jobs");
+        const response = await fetch("/api/jobs");
         if (!response.ok) {
           throw new Error("Failed to fetch jobs");
         }
@@ -63,7 +63,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchUsersCount = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/users", {
+        const response = await fetch("/users", {
           method: "GET",
           credentials: "include",
           headers: {

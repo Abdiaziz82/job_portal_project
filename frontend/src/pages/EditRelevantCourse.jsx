@@ -17,7 +17,7 @@ export default function EditRelevantCourse() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/relevant-courses/${formData.id}`,
+        `/relevant-courses/${formData.id}`,
         {
           method: "PUT",
           credentials: "include", // Include cookies for authentication

@@ -17,7 +17,7 @@ const JobDetails = () => {
   const [hasApplied, setHasApplied] = useState(false);
 
   useEffect(() => {
-    fetch(`http://127.0.0.1:5000/api/jobs/${id}`, { credentials: "include" })
+    fetch(`/api/jobs/${id}`, { credentials: "include" })
       .then((response) => response.json())
       .then((data) => setJob(data))
       .catch(() => toast.error("Error fetching job details"));
@@ -26,7 +26,7 @@ const JobDetails = () => {
   const applyForJob = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`http://127.0.0.1:5000/apply-job/${id}`, {
+      const response = await fetch(`/apply-job/${id}`, {
         method: "POST",
         credentials: "include",
         headers: { "Content-Type": "application/json" },
@@ -86,6 +86,7 @@ const JobDetails = () => {
   const { position, description, requirements, duties, applicationDeadline, numberOfPosts } = job;
 
   return (
+    
     <div className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 font">
       {/* Toast Notifications */}
       <ToastContainer position="top-center" />

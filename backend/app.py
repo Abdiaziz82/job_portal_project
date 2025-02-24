@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, send_from_directory
 from flask_mail import Mail
 from config import Config
 from models import db
@@ -11,7 +11,7 @@ from flask_jwt_extended import JWTManager  # Import the JWTManager
 mail = Mail()
 
 def create_app():
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder="static" ,static_url_path ='/')
     app.config.from_object(Config)
 
     # Initialize extensions
@@ -31,6 +31,9 @@ def create_app():
     # Ensure the database is set up
     with app.app_context():
         db.create_all()
+
+    # Serve the React app's index.html file
+
 
     return app
 

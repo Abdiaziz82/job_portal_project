@@ -12,7 +12,7 @@ export default function FetchedDeclarations() {
 
   const fetchDeclarations = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/declarations", {
+      const response = await fetch("/declarations", {
         credentials: "include", // Include cookies for authentication
       });
 
@@ -36,7 +36,7 @@ export default function FetchedDeclarations() {
       return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:5000/declarations/${id}`, {
+      const response = await fetch(`/declarations/${id}`, {
         method: "DELETE",
         credentials: "include",
       });

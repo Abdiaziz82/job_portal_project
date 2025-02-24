@@ -35,7 +35,7 @@ const ProfessionalQualificationsForm = () => {
 
     try {
       // Send the qualifications data to the backend
-      const response = await fetch("http://127.0.0.1:5000/professional-qualifications", {
+      const response = await fetch("/professional-qualifications", {
         method: "POST",
         credentials: "include", // Include cookies for authentication
         headers: {

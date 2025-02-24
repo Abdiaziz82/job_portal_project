@@ -70,7 +70,7 @@ const RelevantCoursesForm = () => {
         renewal_date: professionalBodies[index]?.renewalDate || "N/A", // Default to "N/A" if empty
       }));
   
-      const response = await fetch("http://127.0.0.1:5000/relevant-courses-professional-body", {
+      const response = await fetch("/relevant-courses-professional-body", {
         method: "POST",
         credentials: "include",
         headers: {

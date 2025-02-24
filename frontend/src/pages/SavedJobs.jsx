@@ -10,7 +10,7 @@ export default function SavedJobs() {
   const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/saved-jobs", {
+    fetch("/saved-jobs", {
       method: "GET",
       credentials: "include", // Ensure cookies/JWT are sent
     })
@@ -34,7 +34,7 @@ export default function SavedJobs() {
   const handleRemoveJob = (jobId) => {
     console.log("Attempting to remove job:", jobId); // Debugging log
 
-    fetch("http://127.0.0.1:5000/remove-saved-job", {
+    fetch("/remove-saved-job", {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

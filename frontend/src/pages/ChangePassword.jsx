@@ -25,7 +25,7 @@ const ChangePassword = () => {
     }
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/change-password", {
+      const response = await fetch("/change-password", {
         method: "POST",
         credentials: "include", // Ensures cookies (JWT) are sent with the request
         headers: { "Content-Type": "application/json" },

@@ -14,7 +14,7 @@ const AdminLoginForm = () => {
 
     try {
       // Send login request
-      const response = await axios.post('http://127.0.0.1:5000/admin/login', {
+      const response = await axios.post('/admin/login', {
         email_address,
         password
       }, { withCredentials: true });  // Include cookies

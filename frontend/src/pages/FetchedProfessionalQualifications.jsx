@@ -14,7 +14,7 @@ export default function FetchedProfessionalQualifications() {
 
   const fetchQualifications = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/professional-qualifications", {
+      const response = await fetch("/professional-qualifications", {
         credentials: "include", // Include cookies for authentication
       });
       if (response.ok) {
@@ -38,7 +38,7 @@ export default function FetchedProfessionalQualifications() {
     if (!window.confirm("Are you sure you want to delete this qualification?")) return;
   
     try {
-      const response = await fetch(`http://127.0.0.1:5000/professional-qualifications/${id}`, {
+      const response = await fetch(`/professional-qualifications/${id}`, {
         method: "DELETE",
         credentials: "include",
       });

@@ -12,7 +12,7 @@ export default function FetchedCertificates() {
 
   const fetchCertificates = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/certificates", {
+      const response = await fetch("/certificates", {
         credentials: "include",
       });
       if (response.ok) {

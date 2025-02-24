@@ -12,7 +12,7 @@ export default function FetchedRelevantCourses() {
 
   const fetchCourses = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/relevant-courses", {
+      const response = await fetch("/relevant-courses", {
         credentials: "include", // Include cookies for authentication
       });
       if (response.ok) {
@@ -34,7 +34,7 @@ export default function FetchedRelevantCourses() {
     if (!window.confirm("Are you sure you want to delete this course?")) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:5000/relevant-courses/${id}`, {
+      const response = await fetch(`/relevant-courses/${id}`, {
         method: "DELETE",
         credentials: "include",
       });

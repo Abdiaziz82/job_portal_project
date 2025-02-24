@@ -12,7 +12,7 @@ export default function FetchedEmploymentDetails() {
 
   const fetchEmploymentDetails = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/employment-details", {
+      const response = await fetch("/employment-details", {
         credentials: "include", // Include cookies for authentication
       });
       if (response.ok) {
@@ -34,7 +34,7 @@ export default function FetchedEmploymentDetails() {
     if (!window.confirm("Are you sure you want to delete this employment detail?")) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:5000/employment-details/${id}`, {
+      const response = await fetch(`/employment-details/${id}`, {
         method: "DELETE",
         credentials: "include",
       });

@@ -12,7 +12,7 @@ import MyApplications from "./pages/MyApplications";
 import SavedJobs from "./pages/SavedJobs";
 import Profile from "./pages/Profile";
 import Notifications from "./pages/Notifications";
-import Logout from "./pages/Logout";
+
 import PersonalDetails from "./pages/PersonalDetails";
 import Certificates from "./pages/Certificates";
 import Education from "./pages/Education";
@@ -125,7 +125,7 @@ function App() {
                   </Route>
                   
                   <Route path="change-password" element={< ChangePassword />} />
-                  <Route path="logout" element={<Logout />} />
+                  
                 </Route>
               </Routes>
             </UserLayout>

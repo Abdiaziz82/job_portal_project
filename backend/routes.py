@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request, make_response, current_app
+from flask import Flask, Blueprint, jsonify, request, make_response, current_app 
 from models import db, User ,Job , PersonalDetails , Certificate ,EducationalBackground ,Referee ,NextOfKin , ProfessionalQualifications ,RelevantCoursesAndProfessionalBody, EmploymentDetails ,JobApplication ,SavedJobs ,Publication ,Duties ,Declaration ,AdminRefreshToken
 from flask_bcrypt import Bcrypt
 import jwt
@@ -33,6 +33,10 @@ ALLOWED_EXTENSIONS = {'pdf', 'png', 'jpg', 'jpeg'}
 def allowed_file(filename):
     """Check if the uploaded file has an allowed extension."""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@routes.route('/')
+def index():
+    return current_app.send_static_file( 'index.html')
 
 @routes.route('/uploads/<filename>')
 def uploaded_file(filename):

@@ -22,7 +22,7 @@ const ResetPassword = () => {
             return;
         }
 
-        const response = await fetch(`http://127.0.0.1:5000/reset-password/${token}`, {
+        const response = await fetch(`/reset-password/${token}`, {
             method: 'POST',
             body: JSON.stringify({ password }),
             headers: { 'Content-Type': 'application/json' },

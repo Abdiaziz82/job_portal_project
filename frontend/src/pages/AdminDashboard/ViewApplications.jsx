@@ -12,7 +12,7 @@ const ViewApplications = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/admin/job-applications", {
+    fetch("/admin/job-applications", {
       credentials: "include",
     })
       .then((response) => {
@@ -35,7 +35,7 @@ const ViewApplications = () => {
   }, []);
 
   const handleStatusUpdate = (id, status) => {
-    fetch(`http://127.0.0.1:5000/admin/job-applications/${id}`, {
+    fetch(`/admin/job-applications/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       credentials: "include",

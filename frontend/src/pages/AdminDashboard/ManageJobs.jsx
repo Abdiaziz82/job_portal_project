@@ -29,7 +29,7 @@ const ManageJobs = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/api/jobs", {
+      const response = await fetch("/api/jobs", {
         method: "POST",
         credentials: "include",
         headers: {

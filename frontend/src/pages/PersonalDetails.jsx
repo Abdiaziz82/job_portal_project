@@ -59,7 +59,7 @@ export default function PersonalDetails() {
 
     try {
       // Send POST request to the backend
-      const response = await fetch("http://127.0.0.1:5000/personal-details", {
+      const response = await fetch("/personal-details", {
         method: "POST",
         credentials: "include", // Include cookies for authentication
         headers: {

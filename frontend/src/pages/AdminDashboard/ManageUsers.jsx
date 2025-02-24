@@ -10,7 +10,7 @@ const ManageUser = () => {
 
     const fetchUsers = async () => {
         try {
-            const response = await fetch('http://127.0.0.1:5000/users', {
+            const response = await fetch('/users', {
                 credentials: 'include', // Include cookies
             });
             if (!response.ok) {

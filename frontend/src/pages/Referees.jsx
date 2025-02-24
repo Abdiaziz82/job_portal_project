@@ -52,7 +52,7 @@ export default function Referees() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://127.0.0.1:5000/add-referees", {
+      const response = await fetch("/add-referees", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

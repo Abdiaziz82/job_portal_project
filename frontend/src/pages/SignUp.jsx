@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { FaUser, FaEnvelope, FaMobileAlt, FaLock, FaEye, FaEyeSlash } from "react-icons/fa";
+import { Link } from 'react-router-dom';
 
 function SignUp() {
   const [formData, setFormData] = useState({
@@ -48,7 +49,7 @@ function SignUp() {
 
     try {
       // API call
-      const response = await fetch('http://127.0.0.1:5000/signup', {
+      const response = await fetch('/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -258,12 +259,12 @@ function SignUp() {
           <div className="mt-4 text-center">
             <p className="text-gray-500">
               Already have an account?{" "}
-              <a
-                href="/login"
+              <Link
+                to="/login"
                 className="text-green-600 font-semibold hover:underline"
               >
                 Login
-              </a>
+              </Link>
             </p>
           </div>
         </form>

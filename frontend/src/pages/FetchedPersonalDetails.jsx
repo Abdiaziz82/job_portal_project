@@ -12,7 +12,7 @@ export default function FetchedPersonalDetails() {
 
   const fetchPersonalDetails = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/personal-details", {
+      const response = await fetch("/personal-details", {
         credentials: "include", // Include cookies for authentication
       });
       if (response.ok) {
@@ -33,7 +33,7 @@ export default function FetchedPersonalDetails() {
 
   const handleDelete = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/personal-details", {
+      const response = await fetch("/personal-details", {
         method: "DELETE",
         credentials: "include", // Include cookies for authentication
       });

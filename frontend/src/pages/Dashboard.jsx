@@ -13,7 +13,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchJobApplications = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/user/job-applications", {
+        const response = await fetch("/user/job-applications", {
           method: "GET",
           credentials: "include",
         });
@@ -36,7 +36,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchAcceptedApplications = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/user/job-applications?status=accepted", {
+        const response = await fetch("/user/job-applications?status=accepted", {
           method: "GET",
           credentials: "include",
         });
@@ -59,7 +59,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchOpenJobs = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/api/jobs", {
+        const response = await fetch("/api/jobs", {
           method: "GET",
           credentials: "include",
         });
@@ -83,7 +83,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/api/jobs", {
+        const response = await fetch("/api/jobs", {
           method: "GET",
           credentials: "include",
         });
@@ -104,7 +104,7 @@ const Dashboard = () => {
 
   // Fetch saved jobs
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/saved-jobs", {
+    fetch("/saved-jobs", {
       method: "GET",
       credentials: "include",
     })

@@ -21,7 +21,7 @@ const CreatedJobs = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const response = await fetch("http://127.0.0.1:5000/admin/archived-jobs", {
+        const response = await fetch("/admin/archived-jobs", {
           method: "GET",
           credentials: "include",
         });
@@ -39,7 +39,7 @@ const CreatedJobs = () => {
     if (!window.confirm("Are you sure you want to delete this job?")) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:5000/api/jobs/${jobId}`, {
+      const response = await fetch(`/api/jobs/${jobId}`, {
         method: "DELETE",
         credentials: "include",
       });

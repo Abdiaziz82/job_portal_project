@@ -16,7 +16,7 @@ export default function EditPersonalDetails() {
     e.preventDefault();
 
     try {
-      const response = await fetch("http://127.0.0.1:5000/personal-details", {
+      const response = await fetch("/personal-details", {
         method: "PUT",
         credentials: "include", // Include cookies for authentication
         headers: {

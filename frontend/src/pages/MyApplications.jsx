@@ -4,7 +4,7 @@ export default function MyApplications() {
   const [applications, setApplications] = useState([]);
 
   useEffect(() => {
-    fetch("http://127.0.0.1:5000/user/job-applications", {
+    fetch("/user/job-applications", {
       method: "GET",
       credentials: "include",
     })

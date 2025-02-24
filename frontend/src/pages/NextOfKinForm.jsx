@@ -33,7 +33,7 @@ export default function NextOfKinForm() {
     e.preventDefault();
 
     // API URL
-    const API_URL = "http://127.0.0.1:5000/next-of-kin"; 
+    const API_URL = "/next-of-kin"; 
 
     // Prepare the data for submission (only send non-empty kin)
     const kinData = [

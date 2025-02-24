@@ -12,7 +12,7 @@ export default function FetchedReferees() {
 
   const fetchReferees = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/referees", {
+      const response = await fetch("/referees", {
         credentials: "include",
       });
       if (response.ok) {
@@ -34,7 +34,7 @@ export default function FetchedReferees() {
     if (!window.confirm("Are you sure you want to delete this referee?")) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:5000/referees/${id}`, {
+      const response = await fetch(`/referees/${id}`, {
         method: "DELETE",
         credentials: "include",
       });

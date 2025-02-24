@@ -17,7 +17,7 @@ export default function EditEmploymentDetails() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/employment-details/${formData.id}`,
+        `/employment-details/${formData.id}`,
         {
           method: "PUT",
           credentials: "include", // Include cookies for authentication

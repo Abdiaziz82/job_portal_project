@@ -17,7 +17,7 @@ export default function EditDeclaration() {
 
     try {
       const response = await fetch(
-        `http://127.0.0.1:5000/declarations/${formData.id}`,
+        `/declarations/${formData.id}`,
         {
           method: "PUT",
           credentials: "include", // Include cookies for authentication

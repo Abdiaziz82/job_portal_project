@@ -34,7 +34,7 @@ export default function EditCertificate() {
     });
 
     try {
-      const response = await fetch(`http://127.0.0.1:5000/certificates/${formData.id}`, {
+      const response = await fetch(`/certificates/${formData.id}`, {
         method: "PUT",
         credentials: "include",
         body: formDataToSend, // Send FormData

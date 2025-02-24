@@ -12,7 +12,7 @@ export default function FetchedDuties() {
 
   const fetchDuties = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/duties", {
+      const response = await fetch("/duties", {
         credentials: "include", // Include cookies for authentication
       });
 
@@ -35,7 +35,7 @@ export default function FetchedDuties() {
     if (!window.confirm("Are you sure you want to delete this duty?")) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:5000/duties/${id}`, {
+      const response = await fetch(`/duties/${id}`, {
         method: "DELETE",
         credentials: "include",
       });

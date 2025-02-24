@@ -12,7 +12,7 @@ export default function FetchedNextOfKin() {
 
   const fetchNextOfKin = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/next-of-kin", {
+      const response = await fetch("/next-of-kin", {
         credentials: "include",
       });
       if (response.ok) {
@@ -30,7 +30,7 @@ export default function FetchedNextOfKin() {
 
   const handleDelete = async (kinId) => {
     try {
-      const response = await fetch(`http://127.0.0.1:5000/next-of-kin/${kinId}`, {
+      const response = await fetch(`/next-of-kin/${kinId}`, {
         method: "DELETE",
         credentials: "include",
       });

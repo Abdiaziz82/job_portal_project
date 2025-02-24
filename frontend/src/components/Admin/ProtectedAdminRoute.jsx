@@ -9,7 +9,7 @@ const ProtectedAdminRoute = ({ children }) => {
     const verifyAdminAuth = async () => {
       try {
         // Send GET request to check if admin is authenticated
-        const response = await axios.get('http://127.0.0.1:5000/admin/authcheck', {
+        const response = await axios.get('/admin/authcheck', {
           withCredentials: true  // Send cookies with request
         });
 

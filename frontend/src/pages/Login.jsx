@@ -16,7 +16,7 @@ export default function Login() {
     setLoading(true);
   
     try {
-      const response = await fetch('http://127.0.0.1:5000/login', {
+      const response = await fetch('/login', {
         method: 'POST',
         credentials: 'include',  // Send cookies with request
         headers: {
@@ -148,12 +148,12 @@ export default function Login() {
               </button>
               <p className="text-gray-800 text-sm text-center mt-6">
                 Don't have an account?
-                <a
-                  href="/signup"
+                <Link
+                  to="/signup"
                   className="text-green-600 font-semibold hover:underline ml-1 whitespace-nowrap"
                 >
                   Register here
-                </a>
+                </Link>
               </p>
             </div>
           </form>

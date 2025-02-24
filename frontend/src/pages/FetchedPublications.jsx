@@ -14,7 +14,7 @@ export default function FetchedPublications() {
 
   const fetchPublications = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/publications", {
+      const response = await fetch("/publications", {
         credentials: "include",
       });
       if (response.ok) {
@@ -39,7 +39,7 @@ export default function FetchedPublications() {
       return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:5000/publications/${id}`, {
+      const response = await fetch(`/publications/${id}`, {
         method: "DELETE",
         credentials: "include",
       });

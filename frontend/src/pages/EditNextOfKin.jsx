@@ -16,7 +16,7 @@ export default function EditNextOfKin() {
     e.preventDefault();
 
     try {
-      const response = await fetch(`http://127.0.0.1:5000/next-of-kin/${formData.id}`, {
+      const response = await fetch(`/next-of-kin/${formData.id}`, {
         method: "PUT",
         credentials: "include", // Include cookies for authentication
         headers: {

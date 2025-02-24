@@ -12,7 +12,7 @@ export default function FetchedEducationalBackground() {
 
   const fetchEducation = async () => {
     try {
-      const response = await fetch("http://127.0.0.1:5000/education", {
+      const response = await fetch("/education", {
         credentials: "include", // Include cookies for authentication
       });
       if (response.ok) {
@@ -34,7 +34,7 @@ export default function FetchedEducationalBackground() {
     if (!window.confirm("Are you sure you want to delete this educational background?")) return;
 
     try {
-      const response = await fetch(`http://127.0.0.1:5000/education/${id}`, {
+      const response = await fetch(`/education/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
